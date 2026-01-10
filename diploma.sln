@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36811.4 d17.14
+VisualStudioVersion = 17.14.36811.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "diploma", "diploma\diploma.csproj", "{29CF96B3-32FA-4205-B0F9-04BC861043EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "diploma.dal", "diploma.dal\diploma.dal.csproj", "{842B3752-4457-4D12-AF3D-8647A48A9938}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{29CF96B3-32FA-4205-B0F9-04BC861043EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29CF96B3-32FA-4205-B0F9-04BC861043EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29CF96B3-32FA-4205-B0F9-04BC861043EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{842B3752-4457-4D12-AF3D-8647A48A9938}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{842B3752-4457-4D12-AF3D-8647A48A9938}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{842B3752-4457-4D12-AF3D-8647A48A9938}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{842B3752-4457-4D12-AF3D-8647A48A9938}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

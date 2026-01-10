@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,13 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod();
         });
 });
+
+// Подключение SQLite
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(connectionString, b => b.MigrationsAssembly("diploma.dal")));
+// ^^^ Важно: указываем, что миграции будут лежать в проекте DAL
 
 // OpenAPI / Swagger
 builder.Services.AddOpenApi();
