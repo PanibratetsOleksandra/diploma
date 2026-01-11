@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Server.Kestrel.Core;
+﻿using diploma.dal;
+using diploma.dal.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -39,6 +42,16 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString, b => b.MigrationsAssembly("diploma.dal")));
 // ^^^ Важно: указываем, что миграции будут лежать в проекте DAL
+
+
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
 // OpenAPI / Swagger
 builder.Services.AddOpenApi();
