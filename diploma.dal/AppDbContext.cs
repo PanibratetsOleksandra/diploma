@@ -1,10 +1,6 @@
-﻿using diploma.dal.Entities;
+﻿using diploma.core.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace diploma.dal
 {

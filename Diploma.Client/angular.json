@@ -8,7 +8,18 @@
   "projects": {
     "Diploma.Client": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true,
+          "flat": false,
+          "displayBlock": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true,
+          "flat": false
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",

@@ -1,0 +1,56 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
+
+        <div class="text-center">
+            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">
+                Вітаємо знову
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Увійдіть до свого аккаунту Panibratets Artwear
+            </p>
+        </div>
+
+        <form class="mt-8 space-y-6" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="space-y-4">
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email адреса</label>
+                    <input id="email" type="email" formControlName="email" required
+                        class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-black transition-all outline-none"
+                        placeholder="name@company.com">
+                    <p *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+                        class="mt-1 text-xs text-red-500">
+                        Будь ласка, введіть коректний email
+                    </p>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Пароль</label>
+                    <input id="password" type="password" formControlName="password" required
+                        class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-black transition-all outline-none"
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <div *ngIf="errorMessage" class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p class="text-sm text-red-600 text-center">{{ errorMessage }}</p>
+            </div>
+
+            <div>
+                <button type="submit" [disabled]="loginForm.invalid"
+                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-widest">
+                    Увійти
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center">
+            <p class="text-xs text-gray-500">
+                Немає аккаунту?
+                <a routerLink="/register" class="font-medium text-black hover:underline cursor-pointer">
+                    Зареєструватися
+                </a>
+            </p>
+        </div>
+    </div>
+</div>

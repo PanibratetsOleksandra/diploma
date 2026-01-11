@@ -11,8 +11,8 @@ using diploma.dal;
 namespace diploma.dal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260111132859_InitialIdentityMigration")]
-    partial class InitialIdentityMigration
+    [Migration("20260111151056_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -148,7 +148,7 @@ namespace diploma.dal.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("diploma.dal.Entities.AppUser", b =>
+            modelBuilder.Entity("diploma.core.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -231,7 +231,7 @@ namespace diploma.dal.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("diploma.dal.Entities.AppUser", null)
+                    b.HasOne("diploma.core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -240,7 +240,7 @@ namespace diploma.dal.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("diploma.dal.Entities.AppUser", null)
+                    b.HasOne("diploma.core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -255,7 +255,7 @@ namespace diploma.dal.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("diploma.dal.Entities.AppUser", null)
+                    b.HasOne("diploma.core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -264,7 +264,7 @@ namespace diploma.dal.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("diploma.dal.Entities.AppUser", null)
+                    b.HasOne("diploma.core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
