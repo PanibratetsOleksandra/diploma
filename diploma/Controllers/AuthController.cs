@@ -40,10 +40,11 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> Register([FromBody] RegisterDto registerDto)
     {
+       
         // Перевірка, чи не зайнятий Email
         if (await _userManager.Users.AnyAsync(x => x.Email == registerDto.Email))
         {
-            return BadRequest("Користувач з таким Email вже існує");
+            return BadRequest(new List<string>() { "Користувач з таким Email вже існує" });
         }
 
         var user = new AppUser
@@ -56,10 +57,15 @@ public class AuthController : ControllerBase
         // Створення користувача з хешуванням пароля
         var result = await _userManager.CreateAsync(user, registerDto.Password);
 
-        if (!result.Succeeded) return BadRequest(result.Errors);
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => e.Description);
+            return BadRequest(errors);
 
-        // Повертаємо дані разом із токеном для миттєвого входу
-        return Ok(new
+        }
+
+            // Повертаємо дані разом із токеном для миттєвого входу
+            return Ok(new
         {
             token = _tokenService.CreateToken(user),
             email = user.Email,
