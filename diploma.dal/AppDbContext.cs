@@ -10,8 +10,7 @@ namespace diploma.dal
         : base(options)
         {
         }
-
-        //// Ваши существующие DbSet (Products, Orders и т.д.)
-        //public DbSet<Product> Products { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductPhoto> ProductPhotos { get; set; }
     }
 }

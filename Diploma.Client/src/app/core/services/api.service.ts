@@ -17,4 +17,13 @@ export class ApiService {
   get<T>(path: string): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}/${path}`);
   }
+
+  delete<T>(path: string): Observable<T> {
+    return this.http.delete<T>(`${this.baseUrl}/${path}`);
+  }
+
+  // Також корисно додати PUT для майбутнього редагування
+  put<T>(path: string, body: any): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}/${path}`, body);
+  }
 }
