@@ -1,11 +1,10 @@
-// src/app/features/admin/admin-panel.component.ts
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../../../core/services/product.service';
 import { CommonModule } from '@angular/common';
 import { Product } from '../../../data/product.model';
 import { RouterOutlet } from "@angular/router";
-
+import { UserService } from '../../../core/services/user.service';
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
@@ -15,8 +14,10 @@ import { RouterOutlet } from "@angular/router";
 export class AdminPanelComponent implements OnInit {
   private fb = inject(FormBuilder);
   productService = inject(ProductService);
-editingProductId: number | null = null;
-  // Список доступних розмірів для вашого бренду
+  userService = inject(UserService);
+  editingProductId: number | null = null;
+  activeTab: 'products' | 'users' | 'stats' | 'orders' = 'products';
+
   sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   selectedSizes: string[] = [];
 
@@ -27,31 +28,51 @@ editingProductId: number | null = null;
     materials: ['100% Cotton', Validators.required],
     photoUrl: ['', Validators.required]
   });
-  
-getMainPhotoUrl(product: Product): string {
-  // Шукаємо головне фото
-  const mainPhoto = product.photos?.find(p => p.isMain);
-  
-  // Якщо головне фото знайдено — повертаємо його URL
-  // Якщо ні — беремо перше доступне або ставимо "заглушку"
-  return mainPhoto?.url || product.photos?.[0]?.url || 'assets/images/placeholder.jpg';
-}
 
-ngOnInit() {
-  this.productService.getProducts().subscribe({
-    next: (products) => {
-      // Якщо з сервера прийшло 0 товарів, додаємо наші демо-товари для краси
-      if (products.length === 0) {
+  ngOnInit() {
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        if (products.length === 0) {
+          this.productService.products.set(this.demoProducts);
+        }
+      },
+      error: (err) => {
+        console.error('Помилка завантаження: - admin-panel.ts:40', err);
         this.productService.products.set(this.demoProducts);
       }
-    },
-    error: (err) => {
-      console.error('Помилка завантаження: - admin-panel.ts:49', err);
-      // Навіть якщо сервер лежить, показуємо демо-товари, щоб адмінка не була порожньою
-      this.productService.products.set(this.demoProducts);
+    });
+    this.userService.getUsers().subscribe();
+  }
+    toggleUserLock(user: any) {
+  this.userService.toggleLock(user.id).subscribe({
+    next: (res) => {
+      // Оновлюємо статус локально, щоб миттєво побачити зміни
+      user.isLocked = res.isLocked; 
+      // Або просто перевантажуємо список
+      this.userService.getUsers().subscribe();
     }
   });
 }
+
+// Допоміжний метод для перевірки статусу в HTML
+isUserLocked(user: any): boolean {
+  if (!user.lockoutEnd) return false;
+  return new Date(user.lockoutEnd) > new Date();
+}
+deleteUser(id: string) {
+    if (confirm('Ви впевнені, що хочете видалити цього користувача?')) {
+      this.userService.deleteUser(id).subscribe({
+        error: (err) => alert('Не вдалося видалити: ' + err.message)
+      });
+    }  }
+  getMainPhotoUrl(product: Product): string {
+    const mainPhoto = product.photos?.find(p => p.isMain);
+    return mainPhoto?.url || product.photos?.[0]?.url || 'assets/images/placeholder.jpg';
+  }
+
+  setTab(tab: 'products' | 'users' | 'stats' | 'orders') {
+    this.activeTab = tab;
+  }
 
   toggleSize(size: string) {
     if (this.selectedSizes.includes(size)) {
@@ -60,10 +81,23 @@ ngOnInit() {
       this.selectedSizes.push(size);
     }
   }
-editProduct(product: Product) {
+
+  // editProduct(product: Product) {
+  //   this.editingProductId = product.id;
+  //   this.productForm.patchValue({
+  //     name: product.name,
+  //     description: product.description,
+  //     price: product.price,
+  //     materials: product.materials,
+  //     photoUrl: this.getMainPhotoUrl(product)
+  //   });
+  //   this.selectedSizes = [...product.availableSizes as any];
+  //   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // }
+
+  editProduct(product: Product) {
   this.editingProductId = product.id;
 
-  // Заповнюємо форму основними даними
   this.productForm.patchValue({
     name: product.name,
     description: product.description,
@@ -72,149 +106,123 @@ editProduct(product: Product) {
     photoUrl: this.getMainPhotoUrl(product)
   });
 
-  // Оновлюємо вибрані розміри
-  this.selectedSizes = [...product.availableSizes];
+  // Конвертуємо цифри з бази назад у букви для кнопок форми
+  const names = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  this.selectedSizes = product.availableSizes.map(size => 
+    typeof size === 'number' ? names[size] : size
+  );
 
-  // Прокручуємо до форми (опціонально, для зручності)
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-  // onSave() {
-  //   if (this.productForm.valid) {
-  //     const payload = {
-  //       ...this.productForm.value,
-  //       availableSizes: this.selectedSizes
-  //     };
-  //     this.productService.createProduct(payload as any).subscribe(() => {
-  //       this.productForm.reset({ price: 0, materials: '100% Cotton' });
-  //       this.selectedSizes = [];
-  //     });
-  //   }
-  // }
-onSave() {
-  if (this.productForm.valid) {
-    const rawValue = this.productForm.value;
+  onSave() {
+    if (this.productForm.valid) {
+      const rawValue = this.productForm.value;
 
-    // Карта для перетворення тексту в числа (Enum для C#)
-    const sizeMap: { [key: string]: number } = {
-      'XS': 0, 'S': 1, 'M': 2, 'L': 3, 'XL': 4, 'XXL': 5
-    };
+      const sizeMap: { [key: string]: number } = {
+        'XS': 0, 'S': 1, 'M': 2, 'L': 3, 'XL': 4, 'XXL': 5
+      };
 
-    // Формуємо об'єкт продукту
-    const productData: any = {
-      name: rawValue.name ?? '',
-      description: rawValue.description ?? '',
-      price: rawValue.price ?? 0,
-      materials: rawValue.materials ?? '100% Cotton',
-      // Мапимо вибрані розміри в числа
-      availableSizes: this.selectedSizes.map(size => sizeMap[size]),
-      // Формуємо масив фото
-      photos: rawValue.photoUrl ? [{ url: rawValue.photoUrl, isMain: true }] : []
-    };
+      const productData: any = {
+        name: rawValue.name ?? '',
+        description: rawValue.description ?? '',
+        price: rawValue.price ?? 0,
+        materials: rawValue.materials ?? '100% Cotton',
+        availableSizes: this.selectedSizes.map(size => sizeMap[size] ?? size),
+        photos: [{ url: rawValue.photoUrl ?? '', isMain: true }]
+      };
 
-    if (this.editingProductId) {
-      // --- РЕЖИМ РЕДАГУВАННЯ ---
-      productData.id = this.editingProductId;
+      if (this.editingProductId) {
+        productData.id = this.editingProductId;
+        this.productService.updateProduct(this.editingProductId, productData).subscribe({
+          next: () => {
+            console.log('Успішно оновлено! - admin-panel.ts:138');
+            this.resetAfterSave();
+          },
+          error: (err) => alert('Не вдалося оновити: ' + (err.error?.title || err.message))
+        });
+      } else {
+        delete productData.id;
+        this.productService.createProduct(productData).subscribe({
+          next: () => {
+            console.log('Збережено в БД! - admin-panel.ts:147');
+            this.resetAfterSave();
+          },
+          error: (err) => {
+            console.error('Помилка валідації: - admin-panel.ts:151', err.error?.errors);
+            alert('Помилка збереження! Перевір валідність даних.');
+          }
+        });
+      }
+    }
+  }
 
-      this.productService.updateProduct(this.editingProductId, productData).subscribe({
-        next: () => {
-          console.log('Успішно оновлено! - admin-panel.ts:120');
-          this.resetAfterSave();
-        },
-        error: (err) => {
-          console.error('Помилка оновлення: - admin-panel.ts:124', err);
-          alert('Не вдалося оновити: ' + (err.error?.title || err.message));
-        }
-      });
-    } else {
-      // --- РЕЖИМ СТВОРЕННЯ ---
-      // Видаляємо id, щоб база згенерувала його сама
-      delete productData.id;
-
-      this.productService.createProduct(productData).subscribe({
-        next: (res) => {
-          console.log('Збережено в БД! - admin-panel.ts:135', res);
-          this.resetAfterSave();
-        },
-        error: (err) => {
-          console.error('Помилка збереження 400: - admin-panel.ts:139', err.error?.errors);
-          alert('Помилка збереження! Перевір консоль (F12), там деталі валідації.');
-        }
+  deleteProduct(id: number) {
+    if (confirm('Ви впевнені, що хочете видалити цей виріб?')) {
+      this.productService.deleteProduct(id).subscribe({
+        next: () => console.log('Товар видалено - admin-panel.ts:162'),
+        error: (err) => alert('Не вдалося видалити товар.')
       });
     }
   }
-}
-// Допоміжний метод для очищення форми та оновлення списку
-resetAfterSave() {
-  this.productForm.reset({ price: 0, materials: '100% Cotton' });
-  this.selectedSizes = [];
-  this.editingProductId = null;
-  // Оновлюємо список товарів у таблиці, щоб побачити зміни
-  this.productService.getProducts().subscribe();
-}
 
-// Онови тип та початкове значення
-activeTab: 'products' | 'users' | 'stats' | 'orders' = 'products';
+  resetAfterSave() {
+    this.productForm.reset({ price: 0, materials: '100% Cotton' });
+    this.selectedSizes = [];
+    this.editingProductId = null;
+    this.productService.getProducts().subscribe();
+  }
 
-// Метод залишається той самий, він універсальний
-setTab(tab: 'products' | 'users' | 'stats' | 'orders') {
-  this.activeTab = tab;
-}
-
-  // Тимчасові змінні, щоб шаблон не сварився на (isExpanded$ | async)
-  // Ми просто кажемо, що панель завжди розгорнута
+  // Sidebar mocks
   isExpanded = true;
   isHovered = false;
   isMobileOpen = false;
-deleteProduct(id: number) {
-  if (confirm('Ви впевнені, що хочете видалити цей виріб?')) {
-    this.productService.deleteProduct(id).subscribe({
-      next: () => {
-        console.log('Товар видалено з бази - admin-panel.ts:172');
-        // Список у таблиці оновиться автоматично, бо ми використовуємо Signal у сервісі
-      },
-      error: (err) => {
-        console.error('Помилка видалення: - admin-panel.ts:176', err);
-        alert('Не вдалося видалити товар.');
-      }
-    });
-  }
-}
-
-  // Пуста функція, щоб не було помилок при наведенні
   onSidebarMouseEnter() { this.isHovered = true; }
   onSidebarMouseLeave() { this.isHovered = false; }
-mockOrders = [
-  { id: 101, customer: 'Марія Коваль', product: 'Лонгслів "Магія Роду"', price: 2500, status: 'Нове', date: '2026-04-09' },
-  { id: 102, customer: 'Іван Петренко', product: 'Худі Custom Paint', price: 3200, status: 'Відправлено', date: '2026-04-08' },
-];
-// Дані для демонстрації (Mock Data)
-demoProducts: any[] = [
-  {
-    id: 1,
-    name: 'Лонгслів "Магія Роду"',
-    description: 'Ручний розпис з використанням традиційних українських орнаментів у сучасному стилі.',
-    materials: '100% Бавовна',
-    price: 2450,
-    availableSizes: ['S', 'M', 'L'],
-    photos: [{ url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=400', isMain: true }]
-  },
-  {
-    id: 2,
-    name: 'Худі "Gravity Paint"',
-    description: 'Абстрактні підтьоки фарби, створені спеціальною технікою нашарування.',
-    materials: 'Трьохнитка на флісі',
-    price: 3800,
-    availableSizes: ['M', 'L', 'XL'],
-    photos: [{ url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=400', isMain: true }]
-  },
-  {
-    id: 3,
-    name: 'Футболка "Сила Духу"',
-    description: 'Мінімалістичний принт на грудях, виконаний стійкими акриловими фарбами для текстилю.',
-    materials: '95% Бавовна, 5% Еластан',
-    price: 1200,
-    availableSizes: ['XS', 'S', 'M'],
-    photos: [{ url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=400', isMain: true }]
+
+getSizeName(size: any): string {
+  const names = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  // Якщо прийшло число (з бази) — беремо назву з масиву
+  if (typeof size === 'number') {
+    return names[size] || 'Unknown';
   }
-];
+  // Якщо вже рядок (демо-дані) — повертаємо як є
+  return size;
+}
+
+  mockOrders = [
+    { id: 101, customer: 'Марія Коваль', product: 'Лонгслів "Магія Роду"', price: 2500, status: 'Нове', date: '2026-04-09' },
+    { id: 102, customer: 'Іван Петренко', product: 'Худі Custom Paint', price: 3200, status: 'Відправлено', date: '2026-04-08' },
+  ];
+
+  demoProducts: any[] = [
+    {
+      id: 1,
+      name: 'Лонгслів "Магія Роду"',
+      description: 'Ручний розпис з використанням традиційних українських орнаментів у сучасному стилі.',
+      materials: '100% Бавовна',
+      price: 2450,
+      availableSizes: ['S', 'M', 'L'],
+      photos: [{ url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=400', isMain: true }]
+    },
+    {
+      id: 2,
+      name: 'Худі "Gravity Paint"',
+      description: 'Абстрактні підтьоки фарби, створені спеціальною технікою нашарування.',
+      materials: 'Трьохнитка на флісі',
+      price: 3800,
+      availableSizes: ['M', 'L', 'XL'],
+      photos: [{ url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=400', isMain: true }]
+    },
+    {
+      id: 3,
+      name: 'Футболка "Сила Духу"',
+      description: 'Мінімалістичний принт на грудях, виконаний стійкими акриловими фарбами для текстилю.',
+      materials: '95% Бавовна, 5% Еластан',
+      price: 1200,
+      availableSizes: ['XS', 'S', 'M'],
+      photos: [{ url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=400', isMain: true }]
+    }
+  ];
+
+
 }

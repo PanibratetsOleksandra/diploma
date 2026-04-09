@@ -1,3 +1,4 @@
+
 <div class="flex h-screen bg-gray-50 overflow-hidden text-gray-900">
   
   <aside class="fixed flex flex-col top-0 left-0 bg-white border-r border-gray-200 h-screen z-50 transition-all duration-300 w-[290px]">
@@ -60,7 +61,7 @@
             </div>
             <div class="space-y-4">
               <input type="number" formControlName="price" placeholder="Ціна" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-black">
-              <input formControlName="photoUrl" placeholder="URL зображення" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-black">
+             <input formControlName="photoUrl" placeholder="URL зображення" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-black">
               
               <div class="flex flex-wrap gap-2 py-2">
                 @for (size of sizes; track size) {
@@ -118,13 +119,15 @@
                   </td>
                   <td class="px-6 py-4 text-sm text-gray-500">{{ product.materials }}</td>
                   <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ product.price }} ₴</td>
-                  <td class="px-6 py-4">
-                    <div class="flex gap-1">
-                      @for (size of product.availableSizes; track size) {
-                        <span class="px-2 py-0.5 bg-gray-100 text-[9px] font-bold rounded-md text-gray-400 uppercase">{{ size }}</span>
-                      }
-                    </div>
-                  </td>
+                          <td class="px-6 py-4">
+            <div class="flex gap-1">
+              @for (size of product.availableSizes; track size) {
+                <span class="px-2 py-0.5 bg-gray-100 text-[9px] font-bold rounded-md text-gray-400 uppercase">
+                  {{ getSizeName(size) }}
+                </span>
+              }
+            </div>
+          </td>
                   <td class="px-6 py-4 text-right">
                     <div class="flex justify-end gap-2">
                       <button (click)="editProduct(product)" class="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all">
@@ -185,8 +188,93 @@
       </div>
     }
 
-    @if (activeTab === 'users') { <div class="p-20 bg-white rounded-3xl text-center border-2 border-dashed border-gray-100 text-gray-300 font-medium italic">Керування користувачами буде доступне після підключення Identity</div> }
-    @if (activeTab === 'stats') { <div class="p-20 bg-white rounded-3xl text-center border-2 border-dashed border-gray-100 text-gray-300 font-medium italic">Статистика продажів інтегрується на наступному етапі</div> }
+  @if (activeTab === 'users') {
+  <div class="animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-900">Керування користувачами</h2>
+      <span class="text-xs text-gray-400 font-medium italic">Всього зареєстровано: {{ userService.users().length }}</span>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+      <table class="w-full text-left">
+        <thead class="bg-gray-50 border-b border-gray-100 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
+          <tr>
+            <th class="px-8 py-5">Користувач</th>
+            <th class="px-8 py-5">Email</th>
+            <th class="px-8 py-5">Роль</th>
+            <th class="px-8 py-5 text-right">Дії</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+        @for (user of userService.users(); track user.id) {
+  <tr class="hover:bg-gray-50/50 transition-colors">
+    <td class="px-8 py-5">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold">
+          {{ user.userName.substring(0, 1).toUpperCase() }}
+        </div>
+        <span class="font-bold text-gray-900">{{ user.userName }}</span>
+      </div>
+    </td>
+    <td class="px-8 py-5 text-gray-500 text-sm">{{ user.email }}</td>
+    <td class="px-8 py-5">
+      <span [class]="isUserLocked(user) ? 'bg-red-100 text-red-600' : 'bg-blue-50 text-blue-600'" 
+            class="px-3 py-1 rounded-full text-[10px] font-bold uppercase">
+        {{ isUserLocked(user) ? 'Blocked' : (user.roles?.[0] || 'User') }}
+      </span>
+    </td>
+    <td class="px-8 py-5 text-right">
+      <div class="flex justify-end gap-2">
+        <button type="button" (click)="deleteUser(user.id)" 
+                class="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                title="Видалити">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+      </div>
+    </td>
+  </tr>
+} @empty {
+            <tr>
+              <td colspan="4" class="py-20 text-center text-gray-300 italic">Користувачі не знайдені</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+   @if (activeTab === 'stats') {
+  <div class="animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <h2 class="text-2xl font-bold mb-8 text-gray-900">Аналітика бренду</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+        <div class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-black mb-4">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        </div>
+        <div class="text-3xl font-bold text-gray-900">{{ productService.products().length }}</div>
+        <div class="text-sm text-gray-400 font-medium">Товарів у каталозі</div>
+      </div>
+
+      <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+        <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </div>
+        <div class="text-3xl font-bold text-gray-900">{{ userService.users().length }}</div>
+        <div class="text-sm text-gray-400 font-medium">Зареєстрованих клієнтів</div>
+      </div>
+
+      <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+        <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 mb-4">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        </div>
+        <div class="text-3xl font-bold text-gray-900">{{ mockOrders.length }}</div>
+        <div class="text-sm text-gray-400 font-medium">Активних замовлень</div>
+      </div>
+    </div>
+
+  </div>
+}
 
   </main>
 </div>

@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { AdminPanelComponent } from './features/admin/admin-panel/admin-panel';
+import { adminGuard } from './core/guards/admin-guard';
 
 export const routes: Routes = [
   {
@@ -16,9 +18,9 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register.component')
       .then(m => m.RegisterComponent)
   },
-  {
-    path: 'admin',
-    loadComponent: () => import('./features/admin/admin-panel/admin-panel')
-      .then(m => m.AdminPanelComponent)
+{ 
+    path: 'admin', 
+    component: AdminPanelComponent,
+    canActivate: [adminGuard] // Тепер цей роут під охороною!
   },
 ];

@@ -32,7 +32,8 @@ public class AuthController : ControllerBase
 
         return Ok(new
         {
-            token = _tokenService.CreateToken(user),
+            //token = _tokenService.CreateToken(user),
+            token = await _tokenService.CreateToken(user),
             email = user.Email,
             fullName = user.FullName
         });
@@ -67,8 +68,9 @@ public class AuthController : ControllerBase
             // Повертаємо дані разом із токеном для миттєвого входу
             return Ok(new
         {
-            token = _tokenService.CreateToken(user),
-            email = user.Email,
+                //token = _tokenService.CreateToken(user),
+                token = await _tokenService.CreateToken(user),
+                email = user.Email,
             fullName = user.FullName
         });
     }

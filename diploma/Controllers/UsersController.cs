@@ -1,0 +1,75 @@
+﻿using diploma.core.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace diploma.api.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+     //[Authorize(Roles = "Admin")] 
+    public class UsersController : ControllerBase
+    {
+        private readonly UserManager<AppUser> _userManager;
+
+        public UsersController(UserManager<AppUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+        // GET: api/users
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<object>>> GetUsers()
+        {
+            var users = await _userManager.Users
+                .Select(u => new
+                {
+                    u.Id,
+                    u.UserName,
+                    u.Email,
+                    u.FullName
+                })
+                .ToListAsync();
+
+            return Ok(users);
+        }
+
+        // DELETE: api/users/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            // Забороняємо видаляти самого себе (якщо ти зайшла як адмін)
+            // if (user.Email == User.FindFirstValue(ClaimTypes.Email)) return BadRequest("Ви не можете видалити себе");
+
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded) return BadRequest("Не вдалося видалити користувача");
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/toggle-lock")]
+        public async Task<IActionResult> ToggleLock(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            // Якщо користувач не заблокований (або дата блокування вже минула)
+            if (user.LockoutEnd == null || user.LockoutEnd < DateTimeOffset.UtcNow)
+            {
+                // Блокуємо назавжди (до 2099 року)
+                await _userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(new DateTime(2099, 1, 1)));
+                return Ok(new { isLocked = true });
+            }
+            else
+            {
+                // Розблоковуємо (ставимо поточну дату або null)
+                await _userManager.SetLockoutEndDateAsync(user, null);
+                return Ok(new { isLocked = false });
+            }
+        }
+    }
+}

@@ -14,7 +14,9 @@ export class ProductService {
       tap(data => this.products.set(data))
     );
   }
-
+uploadImages(formData: FormData): Observable<string[]> {
+  return this.api.post<string[]>('products/upload', formData);
+}
   createProduct(product: Partial<Product>): Observable<Product> {
     return this.api.post<Product>('products', product).pipe(
       tap(newProduct => {
