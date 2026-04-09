@@ -1,4 +1,5 @@
 ﻿using diploma.business.Extensions;
+using diploma.business.Services;
 using diploma.dal; // Підключаємо наш новий клас
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +17,7 @@ builder.Services.RegisterDataDependecies(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-
+builder.Services.AddScoped<ProductService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

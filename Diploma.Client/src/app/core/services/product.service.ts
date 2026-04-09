@@ -1,4 +1,3 @@
-// src/app/core/services/product.service.ts
 import { inject, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { Product } from '../../data/product.model';
@@ -8,27 +7,34 @@ import { Observable, tap } from 'rxjs';
 export class ProductService {
   private api = inject(ApiService);
   
-  // Використовуємо Signal для збереження списку товарів (реактивність)
   products = signal<Product[]>([]);
 
-  // Завантажити всі товари
   getProducts(): Observable<Product[]> {
     return this.api.get<Product[]>('products').pipe(
       tap(data => this.products.set(data))
     );
   }
 
-  // Додати новий виріб з ручним розписом
   createProduct(product: Partial<Product>): Observable<Product> {
     return this.api.post<Product>('products', product).pipe(
       tap(newProduct => {
-        // Оновлюємо список товарів локально без перезавантаження сторінки
         this.products.update(prev => [...prev, newProduct]);
       })
     );
   }
 
-  // Видалити товар
+  // --- НОВИЙ МЕТОД ДЛЯ РЕДАГУВАННЯ ---
+  updateProduct(id: number, product: Partial<Product>): Observable<Product> {
+    return this.api.put<Product>(`products/${id}`, product).pipe(
+      tap(updatedProduct => {
+        // Оновлюємо товар у списку Signal локально
+        this.products.update(prev => 
+          prev.map(p => p.id === id ? { ...p, ...updatedProduct } : p)
+        );
+      })
+    );
+  }
+
   deleteProduct(id: number): Observable<void> {
     return this.api.delete<void>(`products/${id}`).pipe(
       tap(() => {

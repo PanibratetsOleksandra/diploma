@@ -1,54 +1,192 @@
-<div class="p-8 max-w-6xl mx-auto pt-24">
-  <h1 class="text-3xl font-bold mb-8 italic">Панель керування Panibratets Artwear</h1>
+<div class="flex h-screen bg-gray-50 overflow-hidden text-gray-900">
+  
+  <aside class="fixed flex flex-col top-0 left-0 bg-white border-r border-gray-200 h-screen z-50 transition-all duration-300 w-[290px]">
+    <div class="py-8 px-6 flex justify-start items-center gap-3">
+      <div class="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white font-bold text-xl">P</div>
+      <span class="text-xl font-bold tracking-tight">Artwear Admin</span>
+    </div>
 
-  <div class="grid lg:grid-cols-3 gap-8">
-    <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-fit">
-      <h2 class="text-xl font-semibold mb-4">Новий виріб</h2>
-      <form [formGroup]="productForm" (ngSubmit)="onSave()" class="space-y-4">
-        <input formControlName="name" placeholder="Назва виробу" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-        <textarea formControlName="description" placeholder="Опис розпису" class="w-full p-3 bg-gray-50 border rounded-xl h-24"></textarea>
-        <input type="number" formControlName="price" placeholder="Ціна" class="w-full p-3 bg-gray-50 border rounded-xl">
-        
-        <div class="flex flex-wrap gap-2">
-          @for (size of sizes; track size) {
-            <button type="button" (click)="toggleSize(size)" 
-                    [class]="selectedSizes.includes(size) ? 'bg-orange-500 text-white' : 'bg-gray-100'"
-                    class="px-3 py-1 rounded-lg text-xs font-bold transition">
-              {{ size }}
+    <div class="flex flex-col overflow-y-auto no-scrollbar px-4">
+      <nav class="mb-6">
+        <ul class="flex flex-col gap-2">
+          <li>
+            <button (click)="setTab('products')" [class]="activeTab === 'products' ? 'bg-gray-100 text-black' : 'text-gray-500 hover:bg-gray-50'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all group">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              Каталог товарів
             </button>
-          }
+          </li>
+          <li>
+            <button (click)="setTab('orders')" [class]="activeTab === 'orders' ? 'bg-gray-100 text-black' : 'text-gray-500 hover:bg-gray-50'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all group">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              Замовлення
+            </button>
+          </li>
+          <li>
+            <button (click)="setTab('users')" [class]="activeTab === 'users' ? 'bg-gray-100 text-black' : 'text-gray-500 hover:bg-gray-50'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all group">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              Користувачі
+            </button>
+          </li>
+          <li>
+            <button (click)="setTab('stats')" [class]="activeTab === 'stats' ? 'bg-gray-100 text-black' : 'text-gray-500 hover:bg-gray-50'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all group">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              Статистика
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="flex-1 ml-[290px] overflow-y-auto p-10 bg-gray-50">
+    
+    <div class="flex justify-between items-center mb-10">
+      <h1 class="text-3xl font-bold italic text-gray-900">Panibratets Artwear CMS</h1>
+      <div class="flex items-center gap-4 bg-white p-2 px-4 rounded-2xl shadow-sm border border-gray-100">
+        <span class="text-sm font-semibold text-black">Sasha Panibratets</span>
+        <div class="w-8 h-8 rounded-full bg-black"></div>
+      </div>
+    </div>
+
+    @if (activeTab === 'products') {
+      <div class="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+        
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <h2 class="text-xl font-bold mb-6 text-gray-800">{{ editingProductId ? 'Редагувати виріб' : 'Новий виріб' }}</h2>
+          <form [formGroup]="productForm" (ngSubmit)="onSave()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <input formControlName="name" placeholder="Назва виробу" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-black">
+              <textarea formControlName="description" placeholder="Опис розпису" class="w-full p-4 bg-gray-50 border-none rounded-2xl h-28 outline-none focus:ring-2 focus:ring-black"></textarea>
+            </div>
+            <div class="space-y-4">
+              <input type="number" formControlName="price" placeholder="Ціна" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-black">
+              <input formControlName="photoUrl" placeholder="URL зображення" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-black">
+              
+              <div class="flex flex-wrap gap-2 py-2">
+                @for (size of sizes; track size) {
+                  <button type="button" (click)="toggleSize(size)" [class]="selectedSizes.includes(size) ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'" class="px-4 py-2 rounded-xl text-xs font-bold transition-all hover:scale-105">
+                    {{ size }}
+                  </button>
+                }
+              </div>
+            </div>
+            <div class="md:col-span-2 flex gap-4">
+              <button [disabled]="productForm.invalid" class="flex-1 py-4 bg-black text-white rounded-2xl font-bold hover:bg-gray-800 disabled:opacity-30 transition-all shadow-lg shadow-gray-200">
+                {{ editingProductId ? 'Зберегти зміни' : 'Опублікувати у Shop' }}
+              </button>
+              @if (editingProductId) {
+                <button type="button" (click)="editingProductId = null; productForm.reset({ price: 0, materials: '100% Cotton' }); selectedSizes = []" class="px-8 py-4 bg-gray-100 text-gray-500 rounded-2xl font-bold hover:bg-gray-200 transition-all">
+                  Скасувати
+                </button>
+              }
+            </div>
+          </form>
         </div>
 
-        <input formControlName="photoUrl" placeholder="URL зображення" class="w-full p-3 bg-gray-50 border rounded-xl">
-        
-        <button [disabled]="productForm.invalid" class="w-full py-3 bg-black text-white rounded-xl font-bold hover:bg-gray-800 disabled:opacity-30">
-          Опублікувати
-        </button>
-      </form>
-    </div>
+        <div class="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm pt-4">
+          <div class="flex flex-col gap-4 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">Усі товари бренду</h3>
+              <p class="text-xs text-gray-400">Керування асортиментом Artwear</p>
+            </div>
+          </div>
 
- <div class="lg:col-span-2 space-y-4">
-  @for (product of productService.products(); track product.id) {
-    <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition">
-      
-      <img [src]="getMainPhotoUrl(product)" 
-           class="w-20 h-20 rounded-xl object-cover" 
-           [alt]="product.name">
-
-      <div class="flex-grow">
-        <h3 class="font-bold">{{ product.name }}</h3>
-        <p class="text-sm text-gray-500">{{ product.price }} ₴ • {{ product.materials }}</p>
-        
-        <span class="text-[10px] text-gray-400 italic">
-          Усього фото: {{ product.photos?.length || 0 }}
-        </span>
+          <div class="max-w-full overflow-x-auto">
+            <table class="min-w-full border-t border-gray-50">
+              <thead class="bg-gray-50/50">
+                <tr>
+                  <th class="px-6 py-4 text-start"><input type="checkbox" class="rounded border-gray-300 text-black"></th>
+                  <th class="px-6 py-4 text-start text-[10px] font-bold text-gray-400 uppercase tracking-widest">Виріб</th>
+                  <th class="px-6 py-4 text-start text-[10px] font-bold text-gray-400 uppercase tracking-widest">Матеріал</th>
+                  <th class="px-6 py-4 text-start text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ціна</th>
+                  <th class="px-6 py-4 text-start text-[10px] font-bold text-gray-400 uppercase tracking-widest">Розміри</th>
+                  <th class="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Дії</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                @for (product of productService.products(); track product.id) {
+                <tr class="group hover:bg-gray-50/50 transition-all">
+                  <td class="px-6 py-4"><input type="checkbox" class="rounded border-gray-300"></td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <img [src]="getMainPhotoUrl(product)" class="w-12 h-12 rounded-2xl object-cover shadow-sm group-hover:scale-110 transition-transform duration-300" />
+                      <div>
+                        <span class="block text-sm font-bold text-gray-900 mb-1 italic">{{ product.name }}</span>
+                        <span class="text-[10px] text-gray-400">ID: {{ product.id }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500">{{ product.materials }}</td>
+                  <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ product.price }} ₴</td>
+                  <td class="px-6 py-4">
+                    <div class="flex gap-1">
+                      @for (size of product.availableSizes; track size) {
+                        <span class="px-2 py-0.5 bg-gray-100 text-[9px] font-bold rounded-md text-gray-400 uppercase">{{ size }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex justify-end gap-2">
+                      <button (click)="editProduct(product)" class="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4C2.89543 4 2 4.89543 2 6V20C2 21.1046 2.89543 22 4 22H18C19.1046 22 20 21.1046 20 20V13"/><path d="M18.5 2.50001C19.3284 1.67158 20.6716 1.67158 21.5 2.50001C22.3284 3.32844 22.3284 4.67158 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z"/></svg>
+                      </button>
+                   <button (click)="deleteProduct(product.id)" 
+        class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.54142 3.7915C6.54142 2.54886 7.54878 1.5415 8.79142 1.5415H11.2081C12.4507 1.5415 13.4581 2.54886 13.4581 3.7915V4.0415H16.666C17.0802 4.0415 17.416 4.37729 17.416 4.7915C17.416 5.20572 17.0802 5.5415 16.666 5.5415H16.3752V16.2082C16.3752 17.4508 15.3678 18.4582 14.1252 18.4582H5.87516C4.63252 18.4582 3.62516 17.4508 3.62516 16.2082V5.5415H3.3335C2.91928 5.5415 2.5835 5.20572 2.5835 4.7915C2.5835 4.37729 2.91928 4.0415 3.3335 4.0415H6.54142V3.7915ZM14.8752 16.2082C14.8752 16.6224 14.5394 16.9582 14.1252 16.9582H5.87516C5.46095 16.9582 5.12516 16.6224 5.12516 16.2082V5.5415H14.8752V16.2082ZM8.04142 4.0415H11.9581V3.7915C11.9581 3.37729 11.6223 3.0415 11.2081 3.0415H8.79142C8.37721 3.0415 8.04142 3.37729 8.04142 3.7915V4.0415Z"/>
+  </svg>
+</button>
+                    </div>
+                  </td>
+                </tr>
+                } @empty {
+                  <tr><td colspan="6" class="py-20 text-center text-gray-300 italic text-sm">Тут поки порожньо...</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+    }
 
-      <button (click)="productService.deleteProduct(product.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
-        </svg>
-      </button>
-    </div>
-  }
+    @if (activeTab === 'orders') {
+      <div class="animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <h2 class="text-2xl font-bold mb-8 text-gray-900">Керування замовленнями</h2>
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 border-b border-gray-100 text-gray-400 text-xs uppercase font-bold">
+              <tr>
+                <th class="px-8 py-5">№</th>
+                <th class="px-8 py-5">Клієнт</th>
+                <th class="px-8 py-5">Виріб</th>
+                <th class="px-8 py-5">Сума</th>
+                <th class="px-8 py-5">Статус</th>
+                <th class="px-8 py-5">Дії</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              @for (order of mockOrders; track order.id) {
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                  <td class="px-8 py-5 font-bold">#{{ order.id }}</td>
+                  <td class="px-8 py-5">{{ order.customer }}</td>
+                  <td class="px-8 py-5 text-gray-500">{{ order.product }}</td>
+                  <td class="px-8 py-5 font-semibold">{{ order.price }} ₴</td>
+                  <td class="px-8 py-5">
+                    <span [class]="order.status === 'Нове' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td class="px-8 py-5 text-right"><button class="text-gray-400 hover:text-black transition-colors font-bold text-sm">Деталі</button></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    @if (activeTab === 'users') { <div class="p-20 bg-white rounded-3xl text-center border-2 border-dashed border-gray-100 text-gray-300 font-medium italic">Керування користувачами буде доступне після підключення Identity</div> }
+    @if (activeTab === 'stats') { <div class="p-20 bg-white rounded-3xl text-center border-2 border-dashed border-gray-100 text-gray-300 font-medium italic">Статистика продажів інтегрується на наступному етапі</div> }
+
+  </main>
 </div>
