@@ -21,6 +21,6 @@ export const routes: Routes = [
 { 
     path: 'admin', 
     component: AdminPanelComponent,
-    canActivate: [adminGuard] // Тепер цей роут під охороною!
+    canActivate: [adminGuard]
   },
 ];

@@ -8,7 +8,7 @@ import { UserService } from '../../../core/services/user.service';
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterOutlet],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './admin-panel.html'
 })
 export class AdminPanelComponent implements OnInit {
