@@ -38,8 +38,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAngular");
+app.UseStaticFiles();
 app.UseHttpsRedirection();
-
 // Важливо: додайте Authentication перед Authorization
 app.UseAuthentication();
 app.UseAuthorization();
