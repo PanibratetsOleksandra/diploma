@@ -18,17 +18,28 @@
         <a routerLink="/blog" class="text-sm font-medium hover:text-orange-500 transition">Blog</a>
       </div>
 
-      <div class="flex items-center gap-4">
-        
-        <div class="flex items-center gap-3 border-r border-gray-200 pr-4 mr-1">
-          <a routerLink="/login" class="text-sm font-semibold hover:text-orange-500 transition">
-            Увійти
-          </a>
-          <a routerLink="/register" class="bg-black text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm uppercase tracking-wider">
-            Реєстрація
-          </a>
-        
-        </div>
+   <div class="flex items-center gap-3 border-r border-gray-200 pr-4 mr-1">
+  
+  @if (!authService.currentUserToken()) {
+    <a routerLink="/login" class="text-sm font-semibold hover:text-orange-500 transition">
+      Увійти
+    </a>
+    <a routerLink="/register" class="bg-black text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm uppercase tracking-wider">
+      Реєстрація
+    </a>
+  } 
+  
+  @else {
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-gray-500 font-medium">
+        Привіт, {{ authService.currentUser()?.fullName }}
+      </span>
+      <button (click)="logout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition">
+        Вийти
+      </button>
+    </div>
+  }
+
 
         <button class="hover:text-orange-500 transition p-1">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

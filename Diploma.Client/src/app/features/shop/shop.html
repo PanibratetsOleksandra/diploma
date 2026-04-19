@@ -1,0 +1,123 @@
+<div class="bg-white min-h-screen pt-24 px-6 lg:px-12 text-gray-900">
+  <div class="max-w-7xl mx-auto mb-12">
+    <h1 class="text-4xl font-bold italic mb-2 tracking-tighter">Artwear Shop</h1>
+    <p class="text-gray-500 font-medium">Unique hand-painted pieces for your story.</p>
+  </div>
+
+  <div class="max-w-7xl mx-auto mb-12 space-y-8 border-y border-gray-100 py-8">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      
+      <div class="space-y-4">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400">Select Size</h4>
+        <div class="flex flex-wrap gap-2">
+          @for (size of allSizes; track size) {
+            <button (click)="toggleSize(size)"
+                    [class]="selectedSizes().includes(size) ? 'bg-black text-white border-black' : 'bg-white text-gray-400 border-gray-200'"
+                    class="w-10 h-10 rounded-xl border text-[10px] font-bold transition-all hover:scale-105 active:scale-95 shadow-sm">
+              {{ size }}
+            </button>
+          }
+        </div>
+      </div>
+
+     <div class="space-y-4">
+  <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400">Price Range (₴)</h4>
+  <div class="flex items-center gap-3">
+    <input type="number" 
+           placeholder="Min" 
+           [value]="minPrice() ?? ''" 
+           (input)="minPrice.set($any($event.target).value ? +$any($event.target).value : null)"
+           class="w-full p-3 bg-gray-50 border-none rounded-2xl text-xs focus:ring-2 focus:ring-black">
+    <span class="text-gray-300">—</span>
+    <input type="number" 
+           placeholder="Max" 
+           [value]="maxPrice() ?? ''" 
+           (input)="maxPrice.set($any($event.target).value ? +$any($event.target).value : null)"
+           class="w-full p-3 bg-gray-50 border-none rounded-2xl text-xs focus:ring-2 focus:ring-black">
+  </div>
+</div>
+
+<div class="space-y-4">
+  <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400">Search & Actions</h4>
+  <div class="flex flex-col sm:flex-row gap-2">
+    
+    <div class="relative flex-1">
+      <input type="text" 
+             [value]="searchQuery()"
+             (input)="searchQuery.set($any($event.target).value)"
+             placeholder="Search model..." 
+             class="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-xs focus:ring-2 focus:ring-black">
+      <svg class="w-4 h-4 absolute left-4 top-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <select (change)="sortBy.set($any($event.target).value)" 
+            [value]="sortBy()"
+            class="bg-gray-50 border-none rounded-2xl text-xs focus:ring-2 focus:ring-black px-4 py-3 appearance-none cursor-pointer">
+      <option value="newest">Latest Drop</option>
+      <option value="price-low">Price: Low to High</option>
+      <option value="price-high">Price: High to Low</option>
+    </select>
+    
+    <button (click)="resetFilters()"
+            class="flex items-center justify-center gap-2 px-6 py-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all duration-300 group">
+      <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="text-[10px] font-black uppercase tracking-widest">Reset</span>
+    </button>
+
+  </div>
+</div>
+
+    </div>
+
+    <div class="flex gap-2 overflow-x-auto no-scrollbar pt-4">
+      @for (cat of categories; track cat) {
+        <button (click)="selectedCategory.set(cat)"
+                [class]="selectedCategory() === cat ? 'bg-black text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'"
+                class="px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">
+          {{ cat }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16 pb-24">
+    @for (product of filteredProducts(); track product.id) {
+      <div class="group relative flex flex-col cursor-pointer" [routerLink]="['/product', product.id]">
+          <div class="aspect-[3/4] w-full overflow-hidden rounded-[2.5rem] bg-gray-100 group-hover:shadow-2xl transition-all duration-700 relative">
+             @if (product.id > 5) {
+               <span class="absolute top-6 left-6 z-10 bg-orange-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">New Drop</span>
+             }
+             <img [src]="getProductImage(product)" class="h-full w-full object-cover group-hover:scale-110 transition-all duration-[1.5s]">
+             
+             <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+          
+          <div class="mt-6 flex justify-between items-start px-2">
+              <div>
+                  <h3 class="font-bold italic text-lg text-gray-900 leading-tight">{{ product.name }}</h3>
+                  <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{{ product.materials }}</p>
+                  
+                  <div class="flex gap-1 mt-3">
+                    @for (s of product.availableSizes; track s) {
+                      <span class="text-[8px] font-black text-gray-300 border border-gray-100 px-1.5 py-0.5 rounded uppercase">
+                        {{ getSizeLabel(s) }}
+                      </span>
+                    }
+                  </div>
+              </div>
+              <p class="font-black text-gray-900 text-md">{{ product.price }} ₴</p>
+          </div>
+      </div>
+    } @empty {
+      <div class="col-span-full text-center py-40">
+        <div class="text-4xl mb-4">🎨</div>
+        <p class="text-gray-400 italic font-medium">Нічого не знайдено... Спробуй змінити фільтри.</p>
+      </div>
+    }
+  </div>
+</div>

@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { AdminPanelComponent } from './features/admin/admin-panel/admin-panel';
 import { adminGuard } from './core/guards/admin-guard';
+import { ShopComponent } from './features/shop/shop';
+import { ProductDetailComponent } from './features/product-detail/product-detail';
 
 export const routes: Routes = [
   {
@@ -23,4 +25,6 @@ export const routes: Routes = [
     component: AdminPanelComponent,
     canActivate: [adminGuard]
   },
+  { path: 'shop', component: ShopComponent },
+  { path: 'product/:id', component: ProductDetailComponent }
 ];

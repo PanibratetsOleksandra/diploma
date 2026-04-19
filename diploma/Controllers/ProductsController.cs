@@ -95,8 +95,7 @@ namespace diploma.api.Controllers
             {
                 if (!product.Photos.Any(p => p.Id == dbPhoto.Id))
                 {
-                    _context.ProductPhotos.Remove(dbPhoto);
-                }
+                    _context.ProductPhotos.Remove(dbPhoto);                }
             }
 
             // 4. ДОДАВАННЯ ТА ОНОВЛЕННЯ:

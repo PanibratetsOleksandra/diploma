@@ -1,0 +1,139 @@
+@if (product(); as p) {
+<div class="bg-white min-h-screen pt-24 pb-20 px-6 lg:px-12">
+  <nav class="max-w-7xl mx-auto mb-8 flex text-xs font-bold uppercase tracking-widest text-gray-400 gap-2">
+    <a routerLink="/" class="hover:text-black">Home</a> / 
+    <a routerLink="/shop" class="hover:text-black">Shop</a> / 
+    <span class="text-black italic">{{ p.name }}</span>
+  </nav>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+    
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[0.8fr,1.2fr] gap-16 items-start">
+    
+    <div class="space-y-6 lg:sticky lg:top-32">
+      <div class="w-full max-h-[500px] aspect-square rounded-[2.5rem] overflow-hidden bg-gray-50 shadow-sm">
+        <img [src]="selectedPhoto()" 
+             class="w-full h-full object-cover transition-all duration-700 hover:scale-105">
+      </div>
+
+      <div class="flex gap-3 justify-center lg:justify-start">
+        @for (photo of p.photos; track photo.id) {
+          <button (click)="selectedPhoto.set(getFullUrl(photo.url))" 
+                  [class.ring-2]="selectedPhoto() === getFullUrl(photo.url)"
+                  class="w-16 h-16 rounded-xl overflow-hidden ring-orange-500 ring-offset-2 transition-all opacity-60 hover:opacity-100">
+            <img [src]="getFullUrl(photo.url)" class="w-full h-full object-cover">
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col">
+       </div>
+</div>
+    <!-- Права колонка - інформація про товар -->
+    <div class="flex flex-col">
+      <h1 class="text-5xl font-bold italic text-gray-900 mb-4 tracking-tighter">{{ p.name }}</h1>
+      <p class="text-2xl font-black text-gray-900 mb-6">{{ p.price }} ₴</p>
+      
+      <div class="prose prose-sm text-gray-500 mb-8 italic leading-relaxed">
+        {{ p.description }}
+      </div>
+
+      <!-- Розміри -->
+      <div class="mb-8">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Size</h4>
+        <div class="flex flex-wrap gap-2">
+          @for (size of p.availableSizes; track size) {
+            @let sName = getSizeName(size);
+            <button (click)="selectedSize.set(sName)"
+                    [class]="selectedSize() === sName ? 'bg-black text-white' : 'bg-white text-gray-400 border-gray-200 border'"
+                    class="w-14 h-14 rounded-2xl text-xs font-bold transition-all hover:scale-105">
+              {{ sName }}
+            </button>
+          }
+        </div>
+      </div>
+
+<div class="mb-12">
+  <div class="flex items-center gap-2 mb-4 text-[10px] font-black uppercase text-orange-500 tracking-widest">
+    <span class="relative flex h-2 w-2">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+    </span>
+    Unique artwork available
+  </div>
+  
+  <button class="w-full bg-black text-white rounded-2xl font-black uppercase tracking-widest text-[10px] py-5 hover:bg-gray-800 transition-all shadow-xl active:scale-95">
+    Add unique piece to cart
+  </button>
+</div>
+
+      <!-- Матеріали -->
+      <div class="border-t border-gray-100 pt-8">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Materials</h4>
+        <p class="text-sm font-medium text-gray-800">{{ p.materials || '80% Cotton, 20% Polyester blend for comfort and durability' }}</p>
+      </div>
+
+      <!-- Додаткові ресурси -->
+      <div class="mt-8 pt-4">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Additional Resources:</h4>
+        <div class="flex flex-col space-y-2 text-sm">
+          <a href="#" class="text-gray-500 hover:text-black transition-colors">Fashion Designers</a>
+          <a href="#" class="text-gray-500 hover:text-black transition-colors">Photography</a>
+          <a href="#" class="text-gray-500 hover:text-black transition-colors">Video Editing</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Секція Care Tips -->
+  <div class="max-w-7xl mx-auto mt-24">
+    <h3 class="text-center text-3xl font-bold italic mb-12">Care Tips</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <div class="bg-gray-50/30 p-10 rounded-[3rem] text-center space-y-4 hover:translate-y-[-10px] transition-all duration-500">
+        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm text-orange-500">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.154.124L3 16.21V5a2 2 0 012-2h14a2 2 0 012 2v10.21l-1.572.718z" stroke-width="1.5"/></svg>
+        </div>
+        <h4 class="font-black italic text-xl text-gray-900">Gentle Wash</h4>
+        <p class="text-xs text-gray-500 leading-relaxed">Hand wash or cold cycle. Keep the art alive by avoiding harsh chemicals.</p>
+      </div>
+
+      <div class="bg-gray-50/30 p-10 rounded-[3rem] text-center space-y-4 hover:translate-y-[-10px] transition-all duration-500">
+        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm text-orange-500">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" stroke-width="1.5"/></svg>
+        </div>
+        <h4 class="font-black italic text-xl text-gray-900">Natural Drying</h4>
+        <p class="text-xs text-gray-500 leading-relaxed">Air dry only. High heat from dryers can damage the hand-painted details.</p>
+      </div>
+
+      <div class="bg-gray-50/30 p-10 rounded-[3rem] text-center space-y-4 hover:translate-y-[-10px] transition-all duration-500">
+        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm text-orange-500">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke-width="1.5"/></svg>
+        </div>
+        <h4 class="font-black italic text-xl text-gray-900">Soft Storage</h4>
+        <p class="text-xs text-gray-500 leading-relaxed">Store in a cool, dry place. Avoid direct sunlight during storage to keep colors vibrant.</p>
+      </div>
+    </div>
+  </div>
+
+    <div class="max-w-7xl mx-auto mt-24">
+    <h3 class="text-center text-3xl font-bold italic mb-12">You Might Also Like</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+      @for (rel of relatedProducts(); track rel.id) {
+        <div class="group cursor-pointer flex flex-col" [routerLink]="['/product', rel.id]">
+            <div class="aspect-square rounded-3xl overflow-hidden bg-gray-50 mb-6 shadow-sm group-hover:shadow-xl transition-all duration-500">
+                <img [src]="getFullUrl(rel.photos?.[0]?.url || '')" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition-all duration-[1s]">
+            </div>
+            <h4 class="font-bold text-lg italic text-gray-900 leading-tight">{{ rel.name }}</h4>
+            <p class="text-orange-500 font-black mt-1">{{ rel.price }} ₴</p>
+        </div>
+      } @empty {
+        <p class="text-gray-400 italic">Looking for more art? Explore our collections.</p>
+      }
+    </div>
+  </div>
+</div>
+}
