@@ -14,6 +14,7 @@ export interface ProductPhoto {
 }
 
 export interface Product {
+createdAt: string|Date|undefined;
     id: number;
     name: string;
     description: string;
@@ -21,4 +22,5 @@ export interface Product {
     price: number;
     availableSizes: ProductSize[];
     photos: ProductPhoto[];
+    
 }

@@ -88,14 +88,23 @@
   <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16 pb-24">
     @for (product of filteredProducts(); track product.id) {
       <div class="group relative flex flex-col cursor-pointer" [routerLink]="['/product', product.id]">
-          <div class="aspect-[3/4] w-full overflow-hidden rounded-[2.5rem] bg-gray-100 group-hover:shadow-2xl transition-all duration-700 relative">
-             @if (product.id > 5) {
-               <span class="absolute top-6 left-6 z-10 bg-orange-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">New Drop</span>
-             }
-             <img [src]="getProductImage(product)" class="h-full w-full object-cover group-hover:scale-110 transition-all duration-[1.5s]">
-             
-             <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
+       <div class="aspect-[3/4] w-full overflow-hidden rounded-[2.5rem] bg-gray-100 group-hover:shadow-2xl transition-all duration-700 relative">
+  
+  @if (isNewProduct(product.createdAt)) {
+    <div class="absolute top-6 left-6 z-10 flex items-center gap-1.5 bg-orange-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg">
+      <span class="relative flex h-1.5 w-1.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+      </span>
+      New Drop
+    </div>
+  }
+
+  <img [src]="getProductImage(product)" 
+       class="h-full w-full object-cover group-hover:scale-110 transition-all duration-[1.5s]">
+  
+  <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+</div>
           
           <div class="mt-6 flex justify-between items-start px-2">
               <div>

@@ -91,6 +91,25 @@ export class ShopComponent implements OnInit {
   getSizeLabel(size: any): string {
     return typeof size === 'number' ? this.allSizes[size] : size;
   }
+
+isNewProduct(createdAt: string | Date | undefined): boolean {
+  console.log('DATE: - shop.ts:96', createdAt);
+
+  if (!createdAt) return false;
+
+  const dateAdded = new Date(createdAt);
+  console.log('PARSED: - shop.ts:101', dateAdded);
+
+  if (isNaN(dateAdded.getTime())) return false;
+
+  const today = new Date();
+  const diffTime = today.getTime() - dateAdded.getTime();
+  const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+  console.log('DAYS: - shop.ts:109', diffDays);
+
+  return diffDays >= -1 && diffDays <= 14;
+}
   resetFilters() {
   this.searchQuery.set('');
   this.selectedCategory.set('All');
@@ -100,4 +119,5 @@ export class ShopComponent implements OnInit {
   this.sortBy.set('newest');
   
 }
+
 }
