@@ -7,7 +7,8 @@ namespace diploma.core.Entities
 {
     public class AppUser : IdentityUser
     {
-        public string FullName { get; set; }
+        //public string FullName { get; set; }
+        public string? FullName { get; set; }
 
         // Связь с вашей существующей таблицей заказов
         //public ICollection<Order> Orders { get; set; }

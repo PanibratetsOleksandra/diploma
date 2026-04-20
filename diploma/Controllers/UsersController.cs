@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace diploma.api.Controllers
 {
@@ -71,5 +72,7 @@ namespace diploma.api.Controllers
                 return Ok(new { isLocked = false });
             }
         }
+
+        
     }
 }

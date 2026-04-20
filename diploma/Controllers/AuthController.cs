@@ -52,7 +52,8 @@ public class AuthController : ControllerBase
         {
             UserName = registerDto.Email, // Identity потребує UserName
             Email = registerDto.Email,
-            FullName = registerDto.FullName
+            FullName = registerDto.FullName ?? ""
+            //FullName = registerDto.FullName
         };
 
         // Створення користувача з хешуванням пароля
