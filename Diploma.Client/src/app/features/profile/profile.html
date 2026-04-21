@@ -1,78 +1,206 @@
-<div class="min-h-screen pt-32 pb-20 px-6 lg:px-12 bg-white text-gray-900">
-  <div class="max-w-6xl mx-auto">
+<div class="min-h-screen pt-32 pb-20 px-6 lg:px-12 bg-gray-50/50 text-gray-900">
+  <div class="max-w-7xl mx-auto">
     
-    <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-      <div>
-      <h1 class="text-6xl font-black italic tracking-tighter uppercase leading-none">
-  {{ user()?.fullName || 'My' }}<br>Creative Space
-</h1>
-<p class="mt-4 text-gray-400 font-medium italic">
-  Welcome back, {{ user()?.fullName }}! Track your custom art pieces here.
-</p>
-      </div>
+    <!-- Grid: sidebar фіксований зліва, контент справа -->
+    <div class="flex gap-8">
       
-      <div class="flex gap-4">
-        <button class="px-8 py-4 bg-black text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition">
-          Edit Profile
-        </button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr,350px] gap-12">
-      
-      <div class="space-y-8">
-        <h3 class="text-xl font-black italic uppercase tracking-tighter">My Art Collection (Orders)</h3>
-        
-        @for (order of userOrders(); track order.id) {
-          <div class="group flex items-center gap-6 p-6 border border-gray-100 rounded-[2.5rem] hover:shadow-xl transition-all duration-500">
-            <div class="w-24 h-24 bg-gray-50 rounded-3xl overflow-hidden flex-shrink-0">
-               <div class="w-full h-full flex items-center justify-center text-2xl opacity-20">🎨</div>
+      <!-- Sidebar - притиснуто зліва, не розтягується -->
+      <aside class="w-[280px] flex-shrink-0 sticky top-32 self-start space-y-6">
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center">
+          <div class="relative group cursor-pointer">
+            <div class="w-20 h-20 rounded-full bg-orange-100 overflow-hidden mb-3 border-4 border-white shadow-md">
+              @if (user()?.avatarUrl) {
+                <img [src]="user()?.avatarUrl" class="w-full h-full object-cover">
+              } @else {
+                <div class="w-full h-full flex items-center justify-center text-2xl opacity-30">🎨</div>
+              }
             </div>
+            <div class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="text-[9px] text-white font-bold uppercase">Edit</span>
+            </div>
+          </div>
+          
+          <h2 class="text-lg font-black italic tracking-tighter uppercase leading-tight">
+            {{ user()?.firstName || 'Artist' }}<br>{{ user()?.lastName }}
+          </h2>
+          <p class="text-[10px] text-gray-400 font-medium mt-1 break-all">{{ user()?.email }}</p>
+        </div>
+
+        <nav class="bg-white p-3 rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+          <div class="space-y-0.5">
+            <!-- Orders Tab -->
+            <button (click)="activeTab.set('orders')" 
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
+              [class.bg-orange-50]="activeTab() === 'orders'"
+              [class.text-orange-600]="activeTab() === 'orders'"
+              [class.hover:bg-gray-50]="activeTab() !== 'orders'">
+              <span class="text-lg" [class.opacity-40]="activeTab() !== 'orders'">📦</span>
+              <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'orders'">My Orders</span>
+            </button>
+
+            <!-- Personal Data Tab -->
+            <button (click)="activeTab.set('personal')" 
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
+              [class.bg-orange-50]="activeTab() === 'personal'"
+              [class.text-orange-600]="activeTab() === 'personal'"
+              [class.hover:bg-gray-50]="activeTab() !== 'personal'">
+              <span class="text-lg" [class.opacity-40]="activeTab() !== 'personal'">👤</span>
+              <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'personal'">Personal Data</span>
+            </button>
+
+            <!-- Shipping Tab -->
+            <button (click)="activeTab.set('shipping')" 
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
+              [class.bg-orange-50]="activeTab() === 'shipping'"
+              [class.text-orange-600]="activeTab() === 'shipping'"
+              [class.hover:bg-gray-50]="activeTab() !== 'shipping'">
+              <span class="text-lg" [class.opacity-40]="activeTab() !== 'shipping'">📍</span>
+              <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'shipping'">Shipping</span>
+            </button>
+            <hr class="my-2 border-gray-100">
             
-            <div class="flex-1">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{{ order.date }} • {{ order.id }}</p>
-                  <h4 class="text-lg font-black italic">{{ order.item }}</h4>
+            <!-- Logout -->
+            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-red-50 transition group">
+              <span class="text-lg opacity-40 group-hover:opacity-100 text-red-500">🚪</span>
+              <span class="text-[11px] font-black uppercase tracking-widest text-red-500">Logout</span>
+            </button>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content - розтягується на всю ширину, що залишилася, контент вирівняно зліва -->
+      <main class="flex-1 min-w-0 space-y-8">
+        
+        <!-- MY ORDERS SECTION -->
+        @if (activeTab() === 'orders') {
+          <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
+              <h3 class="text-2xl font-black italic uppercase tracking-tighter">Current Orders</h3>
+              <span class="px-3 py-1 bg-gray-100 rounded-full text-[9px] font-black uppercase tracking-tighter">Total: {{ userOrders().length }}</span>
+            </div>
+
+            @for (order of userOrders(); track order.id) {
+              <div class="group flex flex-wrap items-center gap-4 p-5 border border-gray-50 rounded-2xl hover:border-orange-200 transition-all duration-500 mb-3">
+                <div class="w-16 h-16 bg-gray-50 rounded-xl flex-shrink-0 flex items-center justify-center">🎨</div>
+                <div class="flex-1 min-w-[160px]">
+                  <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{{ order.date }}</p>
+                  <h4 class="text-base font-black italic">{{ order.item }}</h4>
+                  <span [class]="getStatusClass(order.status)" class="mt-1 inline-block px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter">
+                    {{ order.status }}
+                  </span>
                 </div>
                 <p class="font-black text-lg">{{ order.price }} ₴</p>
               </div>
-              
-              <div class="mt-4 flex items-center gap-3">
-                <span [class]="getStatusClass(order.status)" class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter">
-                  {{ order.status }}
-                </span>
-                <a href="#" class="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-black border-b border-transparent hover:border-black transition-all">Details</a>
+            } @empty {
+              <div class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="text-5xl mb-4 opacity-20">🎨</div>
+                <p class="text-gray-400 italic font-medium max-w-xs mx-auto text-sm">
+                  Your collection is empty. Let's create some magic together!
+                </p>
+                <button routerLink="/shop" class="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-[9px] tracking-widest hover:scale-105 transition">
+                  Start Shopping
+                </button>
               </div>
-            </div>
-          </div>
-        } @empty {
-          <div class="p-20 border-2 border-dashed border-gray-100 rounded-[3rem] text-center">
-            <p class="text-gray-400 italic font-medium">No orders yet. Ready to start your first custom piece?</p>
-            <button routerLink="/shop" class="mt-6 text-orange-500 font-black uppercase text-[10px] tracking-widest hover:underline">Go to shop</button>
+            }
           </div>
         }
-      </div>
 
-      <div class="space-y-8">
-        <div class="p-8 bg-gray-50 rounded-[3rem]">
-          <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6">Account Settings</h4>
-          <ul class="space-y-4">
-            <li><a href="#" class="text-sm font-bold hover:text-orange-500 transition">Shipping Address</a></li>
-            <li><a href="#" class="text-sm font-bold hover:text-orange-500 transition">Payment Methods</a></li>
-            <li><a href="#" class="text-sm font-bold hover:text-orange-500 transition">Wishlist</a></li>
-            <li class="pt-4 border-t border-gray-200">
-              <button class="text-sm font-bold text-red-500 hover:text-red-700">Logout</button>
-            </li>
-          </ul>
+        <!-- PERSONAL DATA SECTION -->
+      @if (activeTab() === 'personal') {
+  <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+    <div class="flex justify-between items-center mb-8">
+      <h3 class="text-2xl font-black italic uppercase tracking-tighter">Personal Data</h3>
+      @if (!isEditing()) {
+        <button (click)="startEditing()" class="px-5 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">Edit</button>
+      }
+    </div>
+
+    @if (!isEditing()) {
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
+        <div class="space-y-1">
+          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Full Name</label>
+          <p class="text-base font-bold italic">{{ user()?.lastName }} {{ user()?.firstName }} {{ user()?.middleName }}</p>
         </div>
-        
-        <div class="p-8 bg-orange-500 rounded-[3rem] text-white">
-          <h4 class="text-[10px] font-black uppercase tracking-widest opacity-70 mb-2">Invite Friends</h4>
-          <p class="text-lg font-black italic leading-tight mb-4">Share art, get 10% off your next custom jacket.</p>
-          <button class="w-full py-3 bg-white text-orange-500 rounded-xl font-black uppercase text-[9px] tracking-widest">Copy Link</button>
+        <div class="space-y-1">
+          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Nickname</label>
+          <p class="text-base font-bold italic text-orange-500">@{{ user()?.nickname || user()?.userName }}</p>
+        </div>
+        <div class="space-y-1">
+          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Birthday</label>
+    <p class="text-base font-medium">
+  {{ (user()?.birthDate | date:'dd.MM.yyyy') || '—' }}
+</p>
+        </div>
+        <div class="space-y-1">
+          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Gender</label>
+          <p class="text-base font-medium">{{ user()?.gender || '—' }}</p>
+        </div>
+        <div class="space-y-1">
+          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Email</label>
+          <p class="text-base font-medium">{{ user()?.email }}</p>
         </div>
       </div>
+    } @else {
+      <form (ngSubmit)="saveProfile()" class="space-y-6 max-w-3xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="space-y-1">
+            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Last Name</label>
+            <input [(ngModel)]="editForm().lastName" name="lastName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">First Name</label>
+            <input [(ngModel)]="editForm().firstName" name="firstName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Middle Name</label>
+            <input [(ngModel)]="editForm().middleName" name="middleName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Nickname</label>
+            <input [(ngModel)]="editForm().nickname" name="nickname" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Birthday</label>
+            <input type="date" [(ngModel)]="editForm().birthDate" name="birthDate" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Gender</label>
+          <select [(ngModel)]="editForm().gender" name="gender" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+            <option value="Not Specified">Prefer not to say</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Other">Creative Soul</option>
+          </select>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="submit" class="px-8 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-200 hover:scale-105 transition">Save Changes</button>
+          <button type="button" (click)="isEditing.set(false)" class="px-8 py-3 bg-gray-100 text-gray-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition">Cancel</button>
+        </div>
+      </form>
+    }
+  </div>
+}
+        <!-- SHIPPING SECTION -->
+        @if (activeTab() === 'shipping') {
+          <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <h3 class="text-2xl font-black italic uppercase tracking-tighter mb-6">Shipping Addresses</h3>
+            <div class="space-y-3">
+              <div class="p-5 border border-gray-100 rounded-xl">
+                <p class="font-bold text-sm">Main Address</p>
+                <p class="text-gray-500 text-xs mt-1">Kyiv, Ukraine, 01001</p>
+              </div>
+              <button class="px-5 py-2.5 bg-gray-100 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition">+ Add New Address</button>
+            </div>
+          </div>
+        }
+
+      </main>
 
     </div>
   </div>

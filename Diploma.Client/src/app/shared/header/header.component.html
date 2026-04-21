@@ -20,7 +20,9 @@
 
    <div class="flex items-center gap-3 border-r border-gray-200 pr-4 mr-1">
   
-  @if (!authService.currentUserToken()) {
+  <div class="flex items-center gap-3 border-r border-gray-200 pr-4 mr-1">
+
+  @if (!authService.isAuthenticated) {
     <a routerLink="/login" class="text-sm font-semibold hover:text-orange-500 transition">
       Увійти
     </a>
@@ -28,35 +30,27 @@
       Реєстрація
     </a>
   } 
-  
   @else {
     <div class="flex items-center gap-3">
-      <span class="text-xs text-gray-500 font-medium">
-        Привіт, {{ authService.currentUser()?.fullName }}
-      </span>
+      <a routerLink="/profile" 
+         class="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-black hover:text-white rounded-full transition-all duration-300 group">
+        <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="text-xs font-bold uppercase tracking-widest">My Account</span>
+      </a>
+
       <button (click)="logout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition">
         Вийти
       </button>
     </div>
   }
 
-
-    <a routerLink="/profile" 
-     class="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-black hover:text-white rounded-full transition-all duration-300 group">
-    <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <button class="relative hover:text-orange-500 transition p-1">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
     </svg>
-    <span class="text-xs font-bold uppercase tracking-widest">My Account</span>
-  </a>
+    <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+  </button>
 
-        <button class="relative hover:text-orange-500 transition p-1">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
-          </svg>
-          <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
-        </button>
-
-      </div>
-    </div>
-  </nav>
-    </div>
+</div>

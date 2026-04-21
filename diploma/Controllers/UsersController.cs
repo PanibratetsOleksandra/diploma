@@ -1,4 +1,5 @@
-﻿using diploma.core.Entities;
+﻿using diploma.core.DTOs;
+using diploma.core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -72,7 +73,53 @@ namespace diploma.api.Controllers
                 return Ok(new { isLocked = false });
             }
         }
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<ActionResult<object>> GetProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
 
-        
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound();
+
+            return Ok(new
+            {
+                user.Id,
+                user.Email,
+                user.PhoneNumber,
+                user.UserName,
+                user.Nickname,
+                user.FirstName,
+                user.LastName,
+                user.MiddleName,
+                user.BirthDate,
+                user.Gender,
+                user.AvatarUrl
+            });
+        }
+
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile(UserUpdateDto model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound();
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.MiddleName = model.MiddleName;
+            user.Nickname = model.Nickname;
+            user.BirthDate = model.BirthDate;
+            user.Gender = model.Gender;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            return Ok(user);
+        }
+
     }
 }

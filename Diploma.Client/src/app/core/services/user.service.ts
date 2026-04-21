@@ -16,15 +16,20 @@ export class UserService {
   // --- МЕТОДИ ДЛЯ КАБІНЕТУ (НОВІ) ---
 
   // Отримати дані саме того, хто залогінений
-  getProfile(): Observable<User> {
-    return this.api.get<User>('users/profile').pipe(
-      tap(user => {
-        // Додаємо ролі за замовчуванням, як ти робила раніше
-        const mappedUser = { ...user, roles: user.roles || ['User'] };
-        this.currentUser.set(mappedUser);
-      })
-    );
-  }
+getProfile(): Observable<User> {
+  return this.api.get<User>('users/profile').pipe(
+    tap(user => {
+      // Створюємо об'єкт користувача з усіма полями
+      const mappedUser: User = { 
+        ...user, 
+        roles: user.roles || ['User'],
+        // Якщо раптом firstName порожній, можемо взяти UserName
+        firstName: user.firstName || user.userName 
+      };
+      this.currentUser.set(mappedUser);
+    })
+  );
+}
 
   // --- МЕТОДИ ДЛЯ АДМІНКИ (ІСНУЮЧІ) ---
 
@@ -48,4 +53,12 @@ export class UserService {
   toggleLock(id: string): Observable<{isLocked: boolean}> {
     return this.api.post<{isLocked: boolean}>(`users/${id}/toggle-lock`, {});
   }
+
+updateProfile(userData: User): Observable<User> {
+  return this.api.put<User>('users/profile', userData).pipe(
+    tap(updatedUser => {
+      this.currentUser.set(updatedUser); // Відразу оновлюємо дані в інтерфейсі
+    })
+  );
+}
 }
