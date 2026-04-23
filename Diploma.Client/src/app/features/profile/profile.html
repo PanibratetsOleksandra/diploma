@@ -45,15 +45,15 @@
               <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'personal'">Personal Data</span>
             </button>
 
-            <!-- Shipping Tab -->
-            <button (click)="activeTab.set('shipping')" 
-              class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
-              [class.bg-orange-50]="activeTab() === 'shipping'"
-              [class.text-orange-600]="activeTab() === 'shipping'"
-              [class.hover:bg-gray-50]="activeTab() !== 'shipping'">
-              <span class="text-lg" [class.opacity-40]="activeTab() !== 'shipping'">📍</span>
-              <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'shipping'">Shipping</span>
-            </button>
+
+          <button (click)="setTab('shipping')" 
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group" 
+        [class.bg-orange-50]="activeTab() === 'shipping'" 
+        [class.text-orange-600]="activeTab() === 'shipping'">
+  <span class="text-lg">📍</span>
+  <span class="text-[11px] font-black uppercase tracking-widest">Shipping</span>
+</button>
+
             <hr class="my-2 border-gray-100">
             
             <!-- Logout -->
@@ -244,18 +244,91 @@
         }
 
         <!-- SHIPPING SECTION -->
-        @if (activeTab() === 'shipping') {
-          <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-            <h3 class="text-2xl font-black italic uppercase tracking-tighter mb-6">Shipping Addresses</h3>
-            <div class="space-y-3">
-              <div class="p-5 border border-gray-100 rounded-xl">
-                <p class="font-bold text-sm">Main Address</p>
-                <p class="text-gray-500 text-xs mt-1">Kyiv, Ukraine, 01001</p>
-              </div>
-              <button class="px-5 py-2.5 bg-gray-100 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition">+ Add New Address</button>
-            </div>
+ @if (activeTab() === 'shipping') {
+  <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-2xl font-black italic uppercase tracking-tighter">Shipping Addresses</h3>
+      @if (!isAddingAddress()) {
+        <button (click)="isAddingAddress.set(true)" class="px-5 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">+ Add New</button>
+      }
+    </div>
+
+    @if (isAddingAddress()) {
+      <form (ngSubmit)="saveAddress()" class="space-y-6 animate-in fade-in duration-500">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Delivery Service</label>
+            <select [(ngModel)]="newAddress.deliveryService" name="deliveryService" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+              <option value="NovaPoshta">Nova Poshta</option>
+              <option value="UkrPoshta">UkrPoshta</option>
+            </select>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Delivery Type</label>
+            <select [(ngModel)]="newAddress.deliveryType" name="deliveryType" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+              <option value="Warehouse">Warehouse (Відділення)</option>
+              @if (newAddress.deliveryService === 'NovaPoshta') {
+                <option value="Postomaten">Postomaten (Поштомат)</option>
+              }
+              <option value="Courier">Courier (Кур'єр)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input [(ngModel)]="newAddress.region" name="region" placeholder="Region (Область)" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+          <input [(ngModel)]="newAddress.city" name="city" placeholder="City (Місто/Село)" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+        </div>
+
+        @if (newAddress.deliveryType === 'Warehouse' || newAddress.deliveryType === 'Postomaten') {
+          <div class="space-y-1">
+            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">
+              {{ newAddress.deliveryType === 'Postomaten' ? 'Postomaten Number' : 'Warehouse Number' }}
+            </label>
+            <input [(ngModel)]="newAddress.warehouseNumber" name="warehouseNumber" placeholder="№" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
           </div>
         }
+
+        @if (newAddress.deliveryType === 'Courier') {
+          <div class="space-y-4 pt-2">
+            <input [(ngModel)]="newAddress.street" name="street" placeholder="Street (Вулиця)" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+            <div class="grid grid-cols-3 gap-3">
+              <input [(ngModel)]="newAddress.building" name="building" placeholder="Building" class="px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+              <input [(ngModel)]="newAddress.floor" name="floor" placeholder="Floor" class="px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+              <input [(ngModel)]="newAddress.apartment" name="apartment" placeholder="Appt" class="px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+            </div>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" [(ngModel)]="newAddress.hasElevator" name="hasElevator" class="w-5 h-5 accent-orange-500">
+              <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Has Elevator</span>
+            </label>
+          </div>
+        }
+
+        <div class="flex gap-3">
+          <button type="submit" class="px-8 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest">Save Address</button>
+          <button type="button" (click)="isAddingAddress.set(false)" class="px-8 py-3 bg-gray-100 text-gray-400 rounded-xl text-[9px] font-black uppercase tracking-widest">Cancel</button>
+        </div>
+      </form>
+    } @else {
+      <div class="space-y-3">
+        @for (addr of userAddresses(); track addr.id) {
+          <div class="p-5 border border-gray-100 rounded-2xl flex justify-between items-center group">
+            <div>
+              <p class="font-black italic text-sm">{{ addr.deliveryService }} - {{ addr.deliveryType }}</p>
+              <p class="text-gray-500 text-[11px] mt-1">
+                {{ addr.city }}, {{ addr.region }} 
+                @if (addr.warehouseNumber) { | №{{ addr.warehouseNumber }} }
+                @if (addr.street) { | {{ addr.street }}, {{ addr.building }} }
+              </p>
+            </div>
+           <button (click)="removeAddress(addr.id)" class="text-red-500 ...">Delete</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
 
       </main>
 

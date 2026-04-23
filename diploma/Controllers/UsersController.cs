@@ -99,29 +99,6 @@ namespace diploma.api.Controllers
             });
         }
 
-
-        //[HttpPut("profile")]
-        //[Authorize]
-        //public async Task<IActionResult> UpdateProfile(UserUpdateDto model)
-        //{
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    var user = await _userManager.FindByIdAsync(userId);
-        //    if (user == null) return NotFound();
-
-        //    user.FirstName = model.FirstName;
-        //    user.LastName = model.LastName;
-        //    user.MiddleName = model.MiddleName;
-        //    user.Nickname = model.Nickname;
-        //    user.BirthDate = model.BirthDate;
-        //    user.Gender = model.Gender;
-
-        //    var result = await _userManager.UpdateAsync(user);
-        //    if (!result.Succeeded) return BadRequest(result.Errors);
-
-        //    return Ok(user);
-        //}
-
-
         [HttpPut("profile")]
         [Authorize]
         public async Task<IActionResult> UpdateProfile([FromForm] UserUpdateDto model)

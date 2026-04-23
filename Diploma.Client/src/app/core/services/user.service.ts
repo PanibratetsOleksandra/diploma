@@ -65,4 +65,17 @@ getProfile(): Observable<User> {
 updateProfile(formData: FormData): Observable<any> {
   return this.api.put<any>('users/profile', formData);
 }
+// src/app/core/services/user.service.ts
+
+getAddresses(): Observable<any[]> {
+  return this.api.get<any[]>('addresses');
+}
+
+addAddress(address: any): Observable<any> {
+  return this.api.post<any>('addresses', address);
+}
+
+deleteAddress(id: number): Observable<void> {
+  return this.api.delete<void>(`addresses/${id}`);
+}
 }
