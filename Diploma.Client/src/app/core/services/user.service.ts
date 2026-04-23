@@ -61,7 +61,9 @@ getProfile(): Observable<User> {
 //     })
 //   );
 // }
-
+updateAddress(id: number, address: any): Observable<any> {
+  return this.api.put<any>(`addresses/${id}`, address);
+}
 updateProfile(formData: FormData): Observable<any> {
   return this.api.put<any>('users/profile', formData);
 }

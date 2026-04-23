@@ -55,4 +55,29 @@ public class AddressesController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAddress(int id, UserAddress updatedAddress)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var address = await _context.UserAddresses
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+
+        if (address == null) return NotFound();
+
+        // Оновлюємо поля
+        address.DeliveryService = updatedAddress.DeliveryService;
+        address.DeliveryType = updatedAddress.DeliveryType;
+        address.Region = updatedAddress.Region;
+        address.City = updatedAddress.City;
+        address.WarehouseNumber = updatedAddress.WarehouseNumber;
+        address.Street = updatedAddress.Street;
+        address.Building = updatedAddress.Building;
+        address.Floor = updatedAddress.Floor;
+        address.Apartment = updatedAddress.Apartment;
+        address.HasElevator = updatedAddress.HasElevator;
+
+        await _context.SaveChangesAsync();
+        return Ok(address);
+    }
 }

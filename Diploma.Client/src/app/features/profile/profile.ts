@@ -54,23 +54,51 @@ loadAddresses() {
 // saveAddress() {
 //   this.userService.addAddress(this.newAddress).subscribe({
 //     next: (savedAddr) => {
-//       this.userAddresses.update(prev => [...prev, savedAddr]);
+//       // Замість ручного оновлення краще перекачати список з бази
+//       this.loadAddresses(); 
 //       this.isAddingAddress.set(false);
-//       this.resetAddressForm(); // Очистити поля
+//       this.resetAddressForm();
 //     },
-//     error: (err) => console.error('Помилка збереження адреси: - profile.ts:61', err)
+//     error: (err) => console.error('Помилка збереження адреси - profile.ts:62', err)
 //   });
 // }
+// Додай нові сигнали
+isEditingAddress = signal(false);
+
+// Метод для початку редагування
+startEditAddress(addr: any) {
+  this.newAddress = { ...addr }; // Копіюємо дані в об'єкт форми
+  this.isEditingAddress.set(true);
+  this.isAddingAddress.set(true); // Відкриваємо ту саму форму
+}
+
+// Оновлений saveAddress
 saveAddress() {
-  this.userService.addAddress(this.newAddress).subscribe({
-    next: (savedAddr) => {
-      // Замість ручного оновлення краще перекачати список з бази
-      this.loadAddresses(); 
-      this.isAddingAddress.set(false);
-      this.resetAddressForm();
-    },
-    error: (err) => console.error('Помилка збереження адреси - profile.ts:72', err)
-  });
+  if (this.isEditingAddress()) {
+    // РЕДАГУВАННЯ — тепер через метод сервісу
+    this.userService.updateAddress(this.newAddress.id, this.newAddress).subscribe({
+      next: () => {
+        this.loadAddresses();
+        this.closeAddressForm();
+      },
+      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:84', err)
+    });
+  } else {
+    // СТВОРЕННЯ НОВОЇ (тут все було ок)
+    this.userService.addAddress(this.newAddress).subscribe({
+      next: () => {
+        this.loadAddresses();
+        this.closeAddressForm();
+      },
+      error: (err) => console.error('Помилка збереження адреси: - profile.ts:93', err)
+    });
+  }
+}
+
+closeAddressForm() {
+  this.isAddingAddress.set(false);
+  this.isEditingAddress.set(false);
+  this.resetAddressForm();
 }
 
 removeAddress(id: number) {
@@ -127,7 +155,7 @@ removeAddress(id: number) {
         this.isEditing.set(false);
         this.selectedFile = null;
       },
-      error: (err) => console.error('Error saving profile - profile.ts:130', err)
+      error: (err) => console.error('Error saving profile - profile.ts:158', err)
     });
   }
 
@@ -222,4 +250,6 @@ resetAddressForm() {
     if (tab === 'shipping') {
       this.loadAddresses();
     }}
+
+    
 }

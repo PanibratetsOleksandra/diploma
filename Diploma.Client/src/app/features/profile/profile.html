@@ -322,14 +322,21 @@
                 @if (addr.street) { | {{ addr.street }}, {{ addr.building }} }
               </p>
             </div>
-           <button (click)="removeAddress(addr.id)" class="text-red-500 ...">Delete</button>
+         <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+
+  <button (click)="startEditAddress(addr)" class="p-2 text-orange-500 hover:bg-orange-50 rounded-xl transition">
+    <span class="text-[10px] font-black uppercase tracking-widest">Edit</span>
+  </button>
+  <button (click)="removeAddress(addr.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-xl transition">
+    <span class="text-[10px] font-black uppercase tracking-widest">Delete</span>
+  </button>
+</div>
           </div>
         }
       </div>
     }
   </div>
 }
-
       </main>
 
     </div>
