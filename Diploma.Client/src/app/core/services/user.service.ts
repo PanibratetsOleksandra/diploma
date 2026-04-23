@@ -54,11 +54,15 @@ getProfile(): Observable<User> {
     return this.api.post<{isLocked: boolean}>(`users/${id}/toggle-lock`, {});
   }
 
-updateProfile(userData: User): Observable<User> {
-  return this.api.put<User>('users/profile', userData).pipe(
-    tap(updatedUser => {
-      this.currentUser.set(updatedUser); // Відразу оновлюємо дані в інтерфейсі
-    })
-  );
+// updateProfile(userData: User): Observable<User> {
+//   return this.api.put<User>('users/profile', userData).pipe(
+//     tap(updatedUser => {
+//       this.currentUser.set(updatedUser); // Відразу оновлюємо дані в інтерфейсі
+//     })
+//   );
+// }
+
+updateProfile(formData: FormData): Observable<any> {
+  return this.api.put<any>('users/profile', formData);
 }
 }

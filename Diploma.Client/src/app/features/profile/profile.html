@@ -6,25 +6,22 @@
       
       <!-- Sidebar - притиснуто зліва, не розтягується -->
       <aside class="w-[280px] flex-shrink-0 sticky top-32 self-start space-y-6">
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center">
-          <div class="relative group cursor-pointer">
-            <div class="w-20 h-20 rounded-full bg-orange-100 overflow-hidden mb-3 border-4 border-white shadow-md">
-              @if (user()?.avatarUrl) {
-                <img [src]="user()?.avatarUrl" class="w-full h-full object-cover">
-              } @else {
-                <div class="w-full h-full flex items-center justify-center text-2xl opacity-30">🎨</div>
-              }
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-              <span class="text-[9px] text-white font-bold uppercase">Edit</span>
-            </div>
-          </div>
-          
-          <h2 class="text-lg font-black italic tracking-tighter uppercase leading-tight">
-            {{ user()?.firstName || 'Artist' }}<br>{{ user()?.lastName }}
-          </h2>
-          <p class="text-[10px] text-gray-400 font-medium mt-1 break-all">{{ user()?.email }}</p>
-        </div>
+
+    <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-100">
+  <div class="relative">
+    <div class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
+      @if (getAvatarUrl()) {
+        <img [src]="getAvatarUrl()" alt="Avatar" class="w-full h-full object-cover">
+      } @else {
+        <span class="text-4xl">🎨</span>
+      }
+    </div>
+  </div>
+  <div>
+    <h4 class="font-bold text-lg">{{ user()?.firstName }} {{ user()?.lastName }}</h4>
+    <p class="text-sm text-gray-500">@{{ user()?.nickname || user()?.userName }}</p>
+  </div>
+</div>
 
         <nav class="bg-white p-3 rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
           <div class="space-y-0.5">
@@ -106,86 +103,146 @@
         }
 
         <!-- PERSONAL DATA SECTION -->
-      @if (activeTab() === 'personal') {
-  <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-    <div class="flex justify-between items-center mb-8">
-      <h3 class="text-2xl font-black italic uppercase tracking-tighter">Personal Data</h3>
-      @if (!isEditing()) {
-        <button (click)="startEditing()" class="px-5 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">Edit</button>
-      }
-    </div>
+        @if (activeTab() === 'personal') {
+          <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-8">
+              <h3 class="text-2xl font-black italic uppercase tracking-tighter">Personal Data</h3>
+              @if (!isEditing()) {
+                <button (click)="startEditing()" class="px-5 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">Edit</button>
+              }
+            </div>
+            
+            @if (!isEditing()) {
+              <!-- AVATAR DISPLAY -->
+              <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-100">
+                <div class="relative">
+                  <div class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
+                    @if (getAvatarUrl()) {
+                      <img [src]="getAvatarUrl()" alt="Avatar" class="w-full h-full object-cover">
+                    } @else {
+                      <span class="text-4xl">🎨</span>
+                    }
+                  </div>
+                </div>
+                <div>
+                  <h4 class="font-bold text-lg">{{ user()?.firstName }} {{ user()?.lastName }}</h4>
+                  <p class="text-sm text-gray-500">@{{ user()?.nickname || user()?.userName }}</p>
+                </div>
+              </div>
 
-    @if (!isEditing()) {
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
-        <div class="space-y-1">
-          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Full Name</label>
-          <p class="text-base font-bold italic">{{ user()?.lastName }} {{ user()?.firstName }} {{ user()?.middleName }}</p>
-        </div>
-        <div class="space-y-1">
-          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Nickname</label>
-          <p class="text-base font-bold italic text-orange-500">@{{ user()?.nickname || user()?.userName }}</p>
-        </div>
-        <div class="space-y-1">
-          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Birthday</label>
-    <p class="text-base font-medium">
-  {{ (user()?.birthDate | date:'dd.MM.yyyy') || '—' }}
-</p>
-        </div>
-        <div class="space-y-1">
-          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Gender</label>
-          <p class="text-base font-medium">{{ user()?.gender || '—' }}</p>
-        </div>
-        <div class="space-y-1">
-          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Email</label>
-          <p class="text-base font-medium">{{ user()?.email }}</p>
-        </div>
-      </div>
-    } @else {
-      <form (ngSubmit)="saveProfile()" class="space-y-6 max-w-3xl">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="space-y-1">
-            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Last Name</label>
-            <input [(ngModel)]="editForm().lastName" name="lastName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-          </div>
-          <div class="space-y-1">
-            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">First Name</label>
-            <input [(ngModel)]="editForm().firstName" name="firstName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-          </div>
-          <div class="space-y-1">
-            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Middle Name</label>
-            <input [(ngModel)]="editForm().middleName" name="middleName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-          </div>
-        </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
+                <div class="space-y-1">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Full Name</label>
+                  <p class="text-base font-bold italic">{{ user()?.lastName }} {{ user()?.firstName }} {{ user()?.middleName }}</p>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Nickname</label>
+                  <p class="text-base font-bold italic text-orange-500">@{{ user()?.nickname || user()?.userName }}</p>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Birthday</label>
+                  <p class="text-base font-medium">{{ (user()?.birthDate | date:'dd.MM.yyyy') || '—' }}</p>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Gender</label>
+                  <p class="text-base font-medium">{{ getGenderLabel(user()?.gender) }}</p>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Email</label>
+                  <p class="text-base font-medium">{{ user()?.email }}</p>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Mobile Phone</label>
+                  <p class="text-base font-medium">{{ user()?.phoneNumber || '—' }}</p>
+                </div>
+              </div>
+            } @else {
+              <!-- EDIT FORM WITH AVATAR UPLOAD -->
+              <form (ngSubmit)="saveProfile()" class="space-y-6 max-w-3xl">
+                <!-- AVATAR UPLOAD SECTION -->
+                <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
+                  <div class="relative group cursor-pointer" (click)="triggerFileInput(fileInput)">
+                    <div class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
+                      @if (getPreviewUrl()) {
+                        <img [src]="getPreviewUrl()" alt="Avatar preview" class="w-full h-full object-cover">
+                      } @else {
+                        <span class="text-4xl">🎨</span>
+                      }
+                    </div>
+                    <div class="absolute inset-0 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-all">
+  
+  <!-- ФОТО ПРИ HOVER -->
+  <img 
+    [src]="getAvatarUrl()" 
+    class="w-full h-full object-cover brightness-50"
+  >
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-1">
-            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Nickname</label>
-            <input [(ngModel)]="editForm().nickname" name="nickname" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-          </div>
-          <div class="space-y-1">
-            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Birthday</label>
-            <input type="date" [(ngModel)]="editForm().birthDate" name="birthDate" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-          </div>
-        </div>
-
-        <div class="space-y-1">
-          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Gender</label>
-          <select [(ngModel)]="editForm().gender" name="gender" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-            <option value="Not Specified">Prefer not to say</option>
-            <option value="Female">Female</option>
-            <option value="Male">Male</option>
-            <option value="Other">Creative Soul</option>
-          </select>
-        </div>
-
-        <div class="flex gap-3 pt-4">
-          <button type="submit" class="px-8 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-200 hover:scale-105 transition">Save Changes</button>
-          <button type="button" (click)="isEditing.set(false)" class="px-8 py-3 bg-gray-100 text-gray-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition">Cancel</button>
-        </div>
-      </form>
-    }
+  <!-- ТЕКСТ -->
+  <div class="absolute inset-0 flex items-center justify-center">
+    <span class="text-white text-xs font-bold uppercase">
+      Change
+    </span>
   </div>
-}
+
+</div>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold">Profile Photo</p>
+                    <p class="text-xs text-gray-400">Click on the photo to change it</p>
+                  </div>
+                  <input #fileInput type="file" accept="image/*" (change)="onAvatarSelected($event)" class="hidden">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Last Name</label>
+                    <input [(ngModel)]="editForm().lastName" name="lastName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">First Name</label>
+                    <input [(ngModel)]="editForm().firstName" name="firstName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Middle Name</label>
+                    <input [(ngModel)]="editForm().middleName" name="middleName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Nickname</label>
+                    <input [(ngModel)]="editForm().nickname" name="nickname" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Birthday</label>
+                    <input type="date" [(ngModel)]="editForm().birthDate" name="birthDate" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+                  </div>
+                </div>
+                
+                <div class="space-y-1">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Mobile Phone</label>
+                  <input [(ngModel)]="editForm().phoneNumber" name="phoneNumber" type="tel" placeholder="+380..." class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Gender</label>
+                  <select [(ngModel)]="editForm().gender" name="gender" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+                    <option value="Not Specified">Prefer not to say</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Other">Creative Soul</option>
+                  </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                  <button type="submit" class="px-8 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-200 hover:scale-105 transition">Save Changes</button>
+                  <button type="button" (click)="cancelEditing()" class="px-8 py-3 bg-gray-100 text-gray-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition">Cancel</button>
+                </div>
+              </form>
+            }
+          </div>
+        }
+
         <!-- SHIPPING SECTION -->
         @if (activeTab() === 'shipping') {
           <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
