@@ -3,6 +3,7 @@ import { AdminPanelComponent } from './features/admin/admin-panel/admin-panel';
 import { adminGuard } from './core/guards/admin-guard';
 import { ShopComponent } from './features/shop/shop';
 import { ProductDetailComponent } from './features/product-detail/product-detail';
+import { AiAssistantComponent } from './features/ai-assistant/ai-assistant';
 
 export const routes: Routes = [
   {
@@ -31,4 +32,5 @@ export const routes: Routes = [
     path: 'profile', 
     loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent) 
   },
+  { path: 'ai-assistant', component: AiAssistantComponent }
 ];

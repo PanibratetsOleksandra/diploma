@@ -80,4 +80,5 @@ addAddress(address: any): Observable<any> {
 deleteAddress(id: number): Observable<void> {
   return this.api.delete<void>(`addresses/${id}`);
 }
+
 }
