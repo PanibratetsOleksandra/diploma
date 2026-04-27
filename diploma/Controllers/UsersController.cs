@@ -20,6 +20,8 @@ namespace diploma.api.Controllers
             _userManager = userManager;
         }
 
+
+
         // GET: api/users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetUsers()

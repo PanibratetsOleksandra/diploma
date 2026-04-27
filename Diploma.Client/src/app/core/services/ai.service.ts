@@ -9,4 +9,17 @@ export class AiService {
   generateDesign(vision: string): Observable<any> {
     return this.api.post<any>('ai/generate-image', { vision });
   }
+
+saveDesign(payload: { base64Image: string | null, prompt: string }): Observable<any> {
+  return this.api.post<any>('ai/save-design', payload);
+}
+
+getMyDesigns() {
+  return this.api.get<any[]>('ai/my-designs');
+}
+
+deleteDesign(id: number) {
+  return this.api.delete<any>(`ai/designs/${id}`);
+}
+
 }

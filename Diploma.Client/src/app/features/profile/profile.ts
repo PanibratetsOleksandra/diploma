@@ -4,22 +4,23 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../core/services/user.service';
 import { FormsModule } from '@angular/forms';
 import { ImageService } from '../../core/services/image.service';
-
+import { AiService } from '../../core/services/ai.service';
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './profile.html'
 })
 export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private imageService = inject(ImageService);
-
+private aiService = inject(AiService);
   isEditing = signal(false);
   editForm = signal<any>({});
   user = this.userService.currentUser;
   userOrders = signal<any[]>([]);
-  activeTab = signal<'orders' | 'personal' | 'shipping' | 'style'>('orders');
+ activeTab = signal<'orders' | 'personal' | 'shipping' | 'designs'>('orders');
   selectedFile: File | null = null;
 
 getAvatarUrl(): string {
@@ -40,7 +41,7 @@ getPreviewUrl(): string {
       },
       
       error: (err) => {
-        console.error('Помилка при завантаженні профілю: - profile.ts:43', err);
+        console.error('Помилка при завантаженні профілю: - profile.ts:44', err);
       }
     });
   }
@@ -51,17 +52,6 @@ loadAddresses() {
   });
 }
 
-// saveAddress() {
-//   this.userService.addAddress(this.newAddress).subscribe({
-//     next: (savedAddr) => {
-//       // Замість ручного оновлення краще перекачати список з бази
-//       this.loadAddresses(); 
-//       this.isAddingAddress.set(false);
-//       this.resetAddressForm();
-//     },
-//     error: (err) => console.error('Помилка збереження адреси - profile.ts:62', err)
-//   });
-// }
 // Додай нові сигнали
 isEditingAddress = signal(false);
 
@@ -81,7 +71,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:84', err)
+      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:74', err)
     });
   } else {
     // СТВОРЕННЯ НОВОЇ (тут все було ок)
@@ -90,7 +80,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка збереження адреси: - profile.ts:93', err)
+      error: (err) => console.error('Помилка збереження адреси: - profile.ts:83', err)
     });
   }
 }
@@ -155,7 +145,7 @@ removeAddress(id: number) {
         this.isEditing.set(false);
         this.selectedFile = null;
       },
-      error: (err) => console.error('Error saving profile - profile.ts:158', err)
+      error: (err) => console.error('Error saving profile - profile.ts:148', err)
     });
   }
 
@@ -245,11 +235,48 @@ resetAddressForm() {
     };
     
   }
-  setTab(tab: 'orders' | 'personal' | 'shipping' | 'style') {
-    this.activeTab.set(tab);
-    if (tab === 'shipping') {
-      this.loadAddresses();
-    }}
 
+  myDesigns = signal<any[]>([]);
+  loadMyDesigns() {
+  this.aiService.getMyDesigns().subscribe({
+    next: (designs) => {
+      this.myDesigns.set(designs);
+    },
+    error: (err) => {
+      console.error('Помилка завантаження AI дизайнів: - profile.ts:246', err);
+    }
+  });
+}
+getDesignImageUrl(url: string): string {
+  return this.imageService.getFullImageUrl(url);
+}
+  
+setTab(tab: 'orders' | 'personal' | 'shipping' | 'designs') {
+  this.activeTab.set(tab);
+
+  if (tab === 'shipping') {
+    this.loadAddresses();
+  }
+
+  if (tab === 'designs') {
+    this.loadMyDesigns();
+  }
+}
+deleteDesign(id: number): void {
+  const confirmed = confirm('Delete this design?');
+
+  if (!confirmed) return;
+
+  this.aiService.deleteDesign(id).subscribe({
+    next: () => {
+      this.myDesigns.update(designs =>
+        designs.filter(design => design.id !== id)
+      );
+    },
+    error: (err) => {
+      console.error('Помилка видалення дизайну: - profile.ts:277', err);
+    }
+  });
+}
     
 }
