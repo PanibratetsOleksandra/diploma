@@ -32,5 +32,10 @@ export const routes: Routes = [
     path: 'profile', 
     loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent) 
   },
-  { path: 'ai-assistant', component: AiAssistantComponent }
+  { path: 'ai-assistant', component: AiAssistantComponent },
+  {
+  path: 'designer',
+  loadComponent: () =>
+    import('./features/designer/designer').then(m => m.DesignerComponent)
+},
 ];
