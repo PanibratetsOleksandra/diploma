@@ -22,11 +22,6 @@ namespace diploma.api.Controllers
             _context = context;
         }
 
-        [HttpGet("test")]
-        public IActionResult Test()
-        {
-            return Ok("AiController works");
-        }
 
         [HttpGet("my-designs")]
         [Authorize]

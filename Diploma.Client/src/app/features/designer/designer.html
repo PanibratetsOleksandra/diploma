@@ -20,12 +20,7 @@
           💾 Save Design
         </button>
 
-        <button
-          type="button"
-          (click)="sendForHandPainting()"
-          class="flex items-center gap-2 rounded-full bg-orange-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-700">
-          📨 Send for Hand Painting
-        </button>
+      
       </div>
     </div>
   </div>
@@ -189,29 +184,17 @@
       type="button"
       (click)="rotateLeft()"
       class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50">
-      ‹
+      ↶
     </button>
 
     <button
       type="button"
       (click)="rotateRight()"
       class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50">
-      ›
+     ↷
     </button>
 
-    <button
-      type="button"
-      (click)="undo()"
-      class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50">
-      ↶
-    </button>
 
-    <button
-      type="button"
-      (click)="redo()"
-      class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50">
-      ↷
-    </button>
 
     <button
       type="button"
@@ -270,7 +253,7 @@
           <li><span class="text-orange-500">•</span> Choose your garment type first</li>
           <li><span class="text-orange-500">•</span> Select a tool and color</li>
           <li><span class="text-orange-500">•</span> Draw or add elements to canvas</li>
-          <li><span class="text-orange-500">•</span> Save or send for hand painting</li>
+          <li><span class="text-orange-500">•</span> Save</li>
         </ul>
       </div>
 
