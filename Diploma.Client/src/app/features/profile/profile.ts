@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { ImageService } from '../../core/services/image.service';
 import { AiService } from '../../core/services/ai.service';
 import { RouterLink } from '@angular/router';
+import { DesignerService } from '../../core/services/designer.service';
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -13,6 +14,7 @@ imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './profile.html'
 })
 export class ProfileComponent implements OnInit {
+  private designerService = inject(DesignerService)
   private userService = inject(UserService);
   private imageService = inject(ImageService);
 private aiService = inject(AiService);
@@ -20,7 +22,8 @@ private aiService = inject(AiService);
   editForm = signal<any>({});
   user = this.userService.currentUser;
   userOrders = signal<any[]>([]);
- activeTab = signal<'orders' | 'personal' | 'shipping' | 'designs'>('orders');
+  userCreations = signal<any[]>([]);
+activeTab = signal<'orders' | 'personal' | 'shipping' | 'ai-designs' | 'creations'>('orders');
   selectedFile: File | null = null;
 
 getAvatarUrl(): string {
@@ -41,7 +44,7 @@ getPreviewUrl(): string {
       },
       
       error: (err) => {
-        console.error('Помилка при завантаженні профілю: - profile.ts:44', err);
+        console.error('Помилка при завантаженні профілю: - profile.ts:47', err);
       }
     });
   }
@@ -71,7 +74,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:74', err)
+      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:77', err)
     });
   } else {
     // СТВОРЕННЯ НОВОЇ (тут все було ок)
@@ -80,7 +83,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка збереження адреси: - profile.ts:83', err)
+      error: (err) => console.error('Помилка збереження адреси: - profile.ts:86', err)
     });
   }
 }
@@ -145,7 +148,7 @@ removeAddress(id: number) {
         this.isEditing.set(false);
         this.selectedFile = null;
       },
-      error: (err) => console.error('Error saving profile - profile.ts:148', err)
+      error: (err) => console.error('Error saving profile - profile.ts:151', err)
     });
   }
 
@@ -243,25 +246,27 @@ resetAddressForm() {
       this.myDesigns.set(designs);
     },
     error: (err) => {
-      console.error('Помилка завантаження AI дизайнів: - profile.ts:246', err);
+      console.error('Помилка завантаження AI дизайнів: - profile.ts:249', err);
     }
   });
 }
 getDesignImageUrl(url: string): string {
   return this.imageService.getFullImageUrl(url);
 }
+loadUserCreations() {
+    this.designerService.getMyManualDesigns().subscribe({
+      next: (data) => this.userCreations.set(data),
+      error: (err) => console.error('Помилка creations: - profile.ts:259', err)
+    });
+  }
   
-setTab(tab: 'orders' | 'personal' | 'shipping' | 'designs') {
+setTab(tab: 'orders' | 'personal' | 'shipping' | 'ai-designs' | 'creations') {
   this.activeTab.set(tab);
-
-  if (tab === 'shipping') {
-    this.loadAddresses();
-  }
-
-  if (tab === 'designs') {
-    this.loadMyDesigns();
-  }
+  if (tab === 'shipping') this.loadAddresses();
+  if (tab === 'ai-designs') this.loadMyDesigns();
+  if (tab === 'creations') this.loadUserCreations();
 }
+  
 deleteDesign(id: number): void {
   const confirmed = confirm('Delete this design?');
 
@@ -274,9 +279,19 @@ deleteDesign(id: number): void {
       );
     },
     error: (err) => {
-      console.error('Помилка видалення дизайну: - profile.ts:277', err);
+      console.error('Помилка видалення дизайну: - profile.ts:282', err);
     }
   });
 }
+
+
+  deleteCreation(id: number) {
+    if (!confirm('Are you sure you want to delete this creation?')) return;
+    this.designerService.deleteDesign(id).subscribe({
+      next: () => {
+        this.userCreations.update(items => items.filter(i => i.id !== id));
+      }
+    });
+  }
     
 }
