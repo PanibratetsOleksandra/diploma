@@ -64,9 +64,21 @@
     Unique artwork available
   </div>
   
-  <button class="w-full bg-black text-white rounded-2xl font-black uppercase tracking-widest text-[10px] py-5 hover:bg-gray-800 transition-all shadow-xl active:scale-95">
-    Add unique piece to cart
-  </button>
+<button 
+  (click)="addToCart()"
+  [disabled]="!selectedSize() || isAdded()"
+  [class.bg-green-600]="isAdded()"
+  [class.bg-black]="!isAdded()"
+  class="w-full text-white rounded-2xl font-black uppercase tracking-widest text-[10px] py-5 transition-all duration-300 shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+  
+  @if (isAdded()) {
+    <span>Added to Bag! ✨</span>
+  } @else if (!selectedSize()) {
+    <span>Select Size First</span>
+  } @else {
+    <span>Add unique piece to cart</span>
+  }
+</button>
 </div>
 
       <!-- Матеріали -->

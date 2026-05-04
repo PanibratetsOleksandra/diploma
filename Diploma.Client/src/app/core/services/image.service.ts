@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class ImageService {
-  private apiUrl = 'http://localhost:5000';
+  // private apiUrl = 'http://localhost:5000';
+  private apiUrl = 'https://localhost:7001';
 
   getFullImageUrl(path: string | null | undefined): string {
     if (!path || !path.trim()) {

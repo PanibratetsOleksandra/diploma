@@ -4,7 +4,8 @@ import { adminGuard } from './core/guards/admin-guard';
 import { ShopComponent } from './features/shop/shop';
 import { ProductDetailComponent } from './features/product-detail/product-detail';
 import { AiAssistantComponent } from './features/ai-assistant/ai-assistant';
-
+import { CartComponent } from './features/cart/cart';
+import { CheckoutComponent } from './features/checkout/checkout';
 export const routes: Routes = [
   {
     path: '',
@@ -38,4 +39,6 @@ export const routes: Routes = [
   loadComponent: () =>
     import('./features/designer/designer').then(m => m.DesignerComponent)
 },
+{ path: 'cart', component: CartComponent },
+{ path: 'checkout', component: CheckoutComponent }
 ];

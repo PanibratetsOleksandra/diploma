@@ -7,6 +7,8 @@ import { ImageService } from '../../core/services/image.service';
 import { AiService } from '../../core/services/ai.service';
 import { RouterLink } from '@angular/router';
 import { DesignerService } from '../../core/services/designer.service';
+import { CartService } from '../../core/services/cart.service';
+import { CartItem } from '../../core/models/cart-item.model';
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -14,9 +16,11 @@ imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './profile.html'
 })
 export class ProfileComponent implements OnInit {
+  [x: string]: any;
   private designerService = inject(DesignerService)
   private userService = inject(UserService);
   private imageService = inject(ImageService);
+    private cartService = inject(CartService);
 private aiService = inject(AiService);
   isEditing = signal(false);
   editForm = signal<any>({});
@@ -44,7 +48,7 @@ getPreviewUrl(): string {
       },
       
       error: (err) => {
-        console.error('Помилка при завантаженні профілю: - profile.ts:47', err);
+        console.error('Помилка при завантаженні профілю: - profile.ts:51', err);
       }
     });
   }
@@ -74,7 +78,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:77', err)
+      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:81', err)
     });
   } else {
     // СТВОРЕННЯ НОВОЇ (тут все було ок)
@@ -83,7 +87,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка збереження адреси: - profile.ts:86', err)
+      error: (err) => console.error('Помилка збереження адреси: - profile.ts:90', err)
     });
   }
 }
@@ -148,7 +152,7 @@ removeAddress(id: number) {
         this.isEditing.set(false);
         this.selectedFile = null;
       },
-      error: (err) => console.error('Error saving profile - profile.ts:151', err)
+      error: (err) => console.error('Error saving profile - profile.ts:155', err)
     });
   }
 
@@ -246,7 +250,7 @@ resetAddressForm() {
       this.myDesigns.set(designs);
     },
     error: (err) => {
-      console.error('Помилка завантаження AI дизайнів: - profile.ts:249', err);
+      console.error('Помилка завантаження AI дизайнів: - profile.ts:253', err);
     }
   });
 }
@@ -254,12 +258,12 @@ getDesignImageUrl(url: string): string {
   return this.imageService.getFullImageUrl(url);
 }
 loadUserCreations() {
-    this.designerService.getMyManualDesigns().subscribe({
-      next: (data) => this.userCreations.set(data),
-      error: (err) => console.error('Помилка creations: - profile.ts:259', err)
-    });
-  }
-  
+  this.userCreations.set([]); // Очищуємо старі дані перед запитом
+  this.designerService.getMyManualDesigns().subscribe({
+    next: (data) => this.userCreations.set(data),
+    error: (err) => console.error('Помилка creations: - profile.ts:264', err)
+  });
+}
 setTab(tab: 'orders' | 'personal' | 'shipping' | 'ai-designs' | 'creations') {
   this.activeTab.set(tab);
   if (tab === 'shipping') this.loadAddresses();
@@ -279,7 +283,7 @@ deleteDesign(id: number): void {
       );
     },
     error: (err) => {
-      console.error('Помилка видалення дизайну: - profile.ts:282', err);
+      console.error('Помилка видалення дизайну: - profile.ts:286', err);
     }
   });
 }
@@ -293,5 +297,70 @@ deleteDesign(id: number): void {
       }
     });
   }
+
+
+  // Додай нові сигнали в клас ProfileComponent
+isOrderModalOpen = signal(false);
+selectedCreation = signal<any>(null);
+orderCustomDetails = signal({ size: 'M', comments: '' });
+
+// Метод для відкриття модалки
+openOrderForm(creation: any) {
+  this.selectedCreation.set(creation);
+  this.orderCustomDetails.set({ size: 'M', comments: '' }); // Скидаємо поля
+  this.isOrderModalOpen.set(true);
+}
+
+// Метод для фінального додавання в кошик
+confirmOrder() {
+  const creation = this.selectedCreation();
+  const details = this.orderCustomDetails();
+
+  // Визначаємо, які фото додавати
+  const isAi = creation.isAi;
+  
+  // Якщо це ручний дизайн (manual), у нього є front і back. 
+  // Якщо це AI, у нього зазвичай одне поле imageUrl.
+  const mainImg = isAi ? creation.imageUrl : creation.frontImageUrl;
+  const extraPhotos = [];
+
+  if (!isAi && creation.backImageUrl) {
+    extraPhotos.push(creation.backImageUrl);
+  }
+
+  const cartItem: CartItem = {
+    id: `${isAi ? 'ai' : 'manual'}-${creation.id}-${Date.now()}`,
+    originalId: creation.id,
+    name: isAi ? `AI Concept: ${creation.garmentType}` : `Hand-painted ${creation.garmentType}`,
+    price: isAi ? 1350 : 1500,
+    imageUrl: mainImg,
+    additionalPhotos: extraPhotos, // Сюди потрапить Back View
+    quantity: 1,
+    type: isAi ? 'ai-design' : 'manual-design',
+    size: details.size,
+    notes: details.comments
+  };
+
+  this.cartService.addToCart(cartItem);
+  this.isOrderModalOpen.set(false);
+  alert('Додано в кошик! Обидві сторони дизайну збережено. ✨');
+}
+
+// Метод для безпечного оновлення розміру
+updateOrderSize(newSize: string) {
+  this.orderCustomDetails.update(current => ({
+    ...current,
+    size: newSize
+  }));
+}
+
+// Метод для відкриття форми замовлення AI дизайну
+openAiOrderForm(design: any) {
+  // Використовуємо той самий об'єкт "selectedCreation", 
+  // але позначаємо, що це AI тип
+  this.selectedCreation.set({ ...design, isAi: true });
+  this.orderCustomDetails.set({ size: 'M', comments: '' });
+  this.isOrderModalOpen.set(true);
+}
     
 }

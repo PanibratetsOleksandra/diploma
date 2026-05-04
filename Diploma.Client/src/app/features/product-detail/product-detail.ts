@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductService } from '../../core/services/product.service';
 import { Product } from '../../data/product.model';
+import { CartService } from '../../core/services/cart.service';
+import { CartItem } from '../../core/models/cart-item.model';
+
 @Component({
   selector: 'app-product-detail',
   standalone: true,
@@ -10,6 +13,7 @@ import { Product } from '../../data/product.model';
   templateUrl: './product-detail.html'
 })
 export class ProductDetailComponent implements OnInit {
+  private cartService = inject(CartService);
   private route = inject(ActivatedRoute);
   public productService = inject(ProductService);
 isModalOpen = signal<boolean>(false);
@@ -50,6 +54,39 @@ isModalOpen = signal<boolean>(false);
   getMainPhoto(product: Product): string {
     return product.photos?.find(p => p.isMain)?.url || product.photos?.[0]?.url || '';
   }
+// Додай до списку сигналів у класі
+isAdded = signal(false);
+
+addToCart() {
+  const p = this.product();
+  if (!p || !this.selectedSize()) {
+    alert('Будь ласка, оберіть розмір! ✨');
+    return;
+  }
+
+  const cartItem: CartItem = {
+    id: `product-${p.id}-${this.selectedSize()}`,
+    originalId: p.id,
+    name: p.name,
+    price: p.price,
+    imageUrl: this.selectedPhoto() || this.getFullUrl(p.photos?.[0]?.url),
+    additionalPhotos: p.photos?.slice(1).map(ph => ph.url),
+    quantity: 1,
+    type: 'product',
+    size: this.selectedSize()!
+  };
+
+  this.cartService.addToCart(cartItem);
+
+  // --- ЛОГІКА КНОПКИ ---
+  this.isAdded.set(true); // Змінюємо текст на "Added"
+
+  setTimeout(() => {
+    this.isAdded.set(false); // Через 2 секунди повертаємо назад
+  }, 2000);
+}
+
+  
 
   toggleModal(isOpen: boolean) {
     this.isModalOpen.set(isOpen);
