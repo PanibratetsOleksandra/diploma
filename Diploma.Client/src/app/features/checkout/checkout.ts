@@ -106,13 +106,52 @@ saveAddressChanges() {
   this.editingAddressId.set(null); // Закриваємо форму після збереження
 }
 
-  placeOrder() {
-    this.isSubmitting.set(true);
-    // Тут буде виклик API для створення замовлення
-    setTimeout(() => {
-      this.cartService.clearCart();
+
+  // checkout.ts
+
+placeOrder() {
+  if (this.isSubmitting()) return;
+  this.isSubmitting.set(true);
+
+  // Формуємо фінальний об'єкт для відправки
+  const finalOrder = {
+    customerEmail: this.contactInfo().email,
+    customerFullName: `${this.contactInfo().firstName} ${this.contactInfo().lastName}`,
+    customerPhone: this.contactInfo().phone,
+    
+    // Перетворюємо адресу в рядок для спрощення (або залиш об'єктом, якщо БД дозволяє)
+    shippingDetails: JSON.stringify(this.isNewAddress() ? this.newAddress() : this.userAddresses().find(a => a.id === this.selectedAddressId())),
+    
+    paymentMethod: this.paymentMethod(),
+    totalAmount: this.cartService.totalPrice(),
+    
+    // Перетворюємо товари з кошика в формат OrderItem
+    items: this.cartService.items().map(item => ({
+      name: item.name,
+      type: item.type,
+      size: item.size,
+      notes: item.notes,
+      imageUrl: item.imageUrl,
+      price: item.price,
+      quantity: item.quantity
+    }))
+  };
+
+  this.userService.createOrder(finalOrder).subscribe({
+    next: (res) => {
+      console.log('Order created successfully: - checkout.ts:142', res);
+      this.cartService.clearCart(); // Очищуємо кошик
+      this.isSubmitting.set(false);
+      
+      // Перенаправляємо на профіль, де пізніше зробимо вкладку "Мої замовлення"
+      alert(`Замовлення №${res.id} оформлено! Дякую, Сашо! ✨🎨`);
       this.router.navigate(['/profile']);
-      alert('Дякуємо за замовлення! Магія вже створюється. ✨🎨');
-    }, 2000);
-  }
+    },
+    error: (err) => {
+      console.error('Order error: - checkout.ts:151', err);
+      alert('Упс! Сталася помилка. Перевір консоль. 😔');
+      this.isSubmitting.set(false);
+    }
+  });
+}
 }

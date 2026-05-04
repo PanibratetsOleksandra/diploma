@@ -28,7 +28,12 @@ private aiService = inject(AiService);
   userOrders = signal<any[]>([]);
   userCreations = signal<any[]>([]);
 activeTab = signal<'orders' | 'personal' | 'shipping' | 'ai-designs' | 'creations'>('orders');
-  selectedFile: File | null = null;
+  selectedFile: File | null = null;  
+  // Додай цей метод явно
+  getImg(url: string | undefined): string {
+    if (!url) return 'https://placehold.net/600x600.png'; // затичка, якщо фото немає
+    return this.imageService.getFullImageUrl(url);
+  }
 
 getAvatarUrl(): string {
   return this.imageService.getFullImageUrl(this.user()?.avatarUrl);
@@ -45,10 +50,11 @@ getPreviewUrl(): string {
         this.userService.currentUser.set(userData);
         this.userOrders.set(userData?.orders ?? []);       
         this.loadAddresses();
+          this.loadOrders();
       },
       
       error: (err) => {
-        console.error('Помилка при завантаженні профілю: - profile.ts:51', err);
+        console.error('Помилка при завантаженні профілю: - profile.ts:57', err);
       }
     });
   }
@@ -78,7 +84,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:81', err)
+      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:87', err)
     });
   } else {
     // СТВОРЕННЯ НОВОЇ (тут все було ок)
@@ -87,7 +93,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка збереження адреси: - profile.ts:90', err)
+      error: (err) => console.error('Помилка збереження адреси: - profile.ts:96', err)
     });
   }
 }
@@ -152,7 +158,7 @@ removeAddress(id: number) {
         this.isEditing.set(false);
         this.selectedFile = null;
       },
-      error: (err) => console.error('Error saving profile - profile.ts:155', err)
+      error: (err) => console.error('Error saving profile - profile.ts:161', err)
     });
   }
 
@@ -250,7 +256,7 @@ resetAddressForm() {
       this.myDesigns.set(designs);
     },
     error: (err) => {
-      console.error('Помилка завантаження AI дизайнів: - profile.ts:253', err);
+      console.error('Помилка завантаження AI дизайнів: - profile.ts:259', err);
     }
   });
 }
@@ -261,7 +267,7 @@ loadUserCreations() {
   this.userCreations.set([]); // Очищуємо старі дані перед запитом
   this.designerService.getMyManualDesigns().subscribe({
     next: (data) => this.userCreations.set(data),
-    error: (err) => console.error('Помилка creations: - profile.ts:264', err)
+    error: (err) => console.error('Помилка creations: - profile.ts:270', err)
   });
 }
 setTab(tab: 'orders' | 'personal' | 'shipping' | 'ai-designs' | 'creations') {
@@ -283,7 +289,7 @@ deleteDesign(id: number): void {
       );
     },
     error: (err) => {
-      console.error('Помилка видалення дизайну: - profile.ts:286', err);
+      console.error('Помилка видалення дизайну: - profile.ts:292', err);
     }
   });
 }
@@ -354,6 +360,15 @@ updateOrderSize(newSize: string) {
   }));
 }
 
+// profile.component.ts
+orders = signal<any[]>([]);
+
+loadOrders() {
+  this.userService.getMyOrders().subscribe(data => {
+    this.orders.set(data);
+  });
+}
+
 // Метод для відкриття форми замовлення AI дизайну
 openAiOrderForm(design: any) {
   // Використовуємо той самий об'єкт "selectedCreation", 
@@ -361,6 +376,30 @@ openAiOrderForm(design: any) {
   this.selectedCreation.set({ ...design, isAi: true });
   this.orderCustomDetails.set({ size: 'M', comments: '' });
   this.isOrderModalOpen.set(true);
+}
+
+
+// Додай ці сигнали в клас ProfileComponent
+selectedOrder = signal<any | null>(null);
+isOrderDetailsOpen = signal(false);
+
+viewOrderDetails(order: any) {
+  this.selectedOrder.set(order);
+  this.isOrderDetailsOpen.set(true);
+}
+
+closeOrderDetails() {
+  this.isOrderDetailsOpen.set(false);
+  this.selectedOrder.set(null);
+}
+
+// Допоміжний метод для парсингу адреси, якщо вона збережена як JSON рядок
+parseShipping(shippingStr: string) {
+  try {
+    return JSON.parse(shippingStr);
+  } catch {
+    return shippingStr;
+  }
 }
     
 }

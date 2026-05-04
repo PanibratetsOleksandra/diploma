@@ -54,20 +54,12 @@ getProfile(): Observable<User> {
     return this.api.post<{isLocked: boolean}>(`users/${id}/toggle-lock`, {});
   }
 
-// updateProfile(userData: User): Observable<User> {
-//   return this.api.put<User>('users/profile', userData).pipe(
-//     tap(updatedUser => {
-//       this.currentUser.set(updatedUser); // Відразу оновлюємо дані в інтерфейсі
-//     })
-//   );
-// }
 updateAddress(id: number, address: any): Observable<any> {
   return this.api.put<any>(`addresses/${id}`, address);
 }
 updateProfile(formData: FormData): Observable<any> {
   return this.api.put<any>('users/profile', formData);
 }
-// src/app/core/services/user.service.ts
 
 getAddresses(): Observable<any[]> {
   return this.api.get<any[]>('addresses');
@@ -80,5 +72,12 @@ addAddress(address: any): Observable<any> {
 deleteAddress(id: number): Observable<void> {
   return this.api.delete<void>(`addresses/${id}`);
 }
+createOrder(orderData: any): Observable<any> {
+  return this.api.post<any>('orders', orderData);
+}
 
+// user.service.ts
+getMyOrders(): Observable<any[]> {
+  return this.api.get<any[]>('orders/my'); // Створимо такий ендпоінт на беці
+}
 }
