@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-[#FFFDF9] text-gray-900 pt-32 pb-20 px-6 lg:px-12 font-sans animate-in fade-in duration-500">
+  <div class="max-w-4xl mx-auto">
+    
+    <button (click)="goBack()" class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition mb-8">
+      ← Back to Blog
+    </button>
+
+    @if (article(); as item) {
+      <article class="space-y-10">
+        
+        <div class="space-y-4">
+          <span class="px-4 py-1.5 bg-orange-100 text-orange-600 text-[9px] font-black uppercase tracking-widest rounded-full shadow-sm inline-block">
+            {{ item.category }}
+          </span>
+          
+          <h1 class="text-4xl lg:text-6xl font-black italic tracking-tighter text-gray-950 leading-[1.05]">
+            {{ item.title }}
+          </h1>
+
+          <div class="flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-wider pt-2">
+            <span>By {{ item.author }}</span>
+            <span>•</span>
+            <span>{{ item.date | date:'longDate' }}</span>
+            <span>•</span>
+            <span class="text-gray-900 bg-gray-100 px-3 py-1 rounded-md">{{ item.readTime }}</span>
+          </div>
+        </div>
+
+        <div class="aspect-[16/9] w-full rounded-[2.5rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-md">
+          <img [src]="item.imageUrl" [alt]="item.title" class="w-full h-full object-cover">
+        </div>
+
+        <div class="space-y-8 text-base text-gray-700 leading-relaxed font-medium">
+          
+          <p class="text-lg text-gray-950 font-semibold italic border-l-4 border-[#E06A00] pl-6 leading-relaxed">
+            {{ item.intro }}
+          </p>
+
+          @for (paragraph of item.paragraphs; track paragraph) {
+            <p>{{ paragraph }}</p>
+          }
+
+          @if (item.quote) {
+            <div class="p-8 my-10 bg-orange-50/40 border border-orange-100/50 rounded-3xl relative overflow-hidden text-center">
+              <span class="absolute -top-4 -left-2 text-7xl text-orange-200/50 select-none font-serif">“</span>
+              <p class="text-xl font-black italic text-[#E06A00] leading-relaxed relative z-10">
+                {{ item.quote }}
+              </p>
+            </div>
+          }
+
+          @if (item.bullets?.length) {
+            <div class="p-8 bg-white border border-gray-100 rounded-3xl shadow-inner space-y-4">
+              <h4 class="text-xs font-black uppercase tracking-widest text-gray-400">Important Takeaways & Rules:</h4>
+              <ul class="space-y-3">
+                @for (bullet of item.bullets; track bullet) {
+                  <li class="flex gap-3 text-sm">
+                    <span class="text-orange-500 font-bold">✔</span>
+                    <span class="text-gray-600 font-medium leading-relaxed">{{ bullet }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+        </div>
+
+        <div class="pt-8 border-t border-gray-100 flex justify-center">
+          <button (click)="goBack()" class="px-8 py-4 bg-black text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition shadow-lg shadow-gray-200">
+            Back to Articles list
+          </button>
+        </div>
+
+      </article>
+    }
+
+  </div>
+</div>

@@ -113,6 +113,8 @@ placeOrder() {
   if (this.isSubmitting()) return;
   this.isSubmitting.set(true);
 
+  
+
   // Формуємо фінальний об'єкт для відправки
   const finalOrder = {
     customerEmail: this.contactInfo().email,
@@ -125,8 +127,9 @@ placeOrder() {
     paymentMethod: this.paymentMethod(),
     totalAmount: this.cartService.totalPrice(),
     
-    // Перетворюємо товари з кошика в формат OrderItem
     items: this.cartService.items().map(item => ({
+
+     
       name: item.name,
       type: item.type,
       size: item.size,
@@ -136,10 +139,12 @@ placeOrder() {
       quantity: item.quantity
     }))
   };
+  
+
 
   this.userService.createOrder(finalOrder).subscribe({
     next: (res) => {
-      console.log('Order created successfully: - checkout.ts:142', res);
+      console.log('Order created successfully: - checkout.ts:147', res);
       this.cartService.clearCart(); // Очищуємо кошик
       this.isSubmitting.set(false);
       
@@ -148,7 +153,7 @@ placeOrder() {
       this.router.navigate(['/profile']);
     },
     error: (err) => {
-      console.error('Order error: - checkout.ts:151', err);
+      console.error('Order error: - checkout.ts:156', err);
       alert('Упс! Сталася помилка. Перевір консоль. 😔');
       this.isSubmitting.set(false);
     }

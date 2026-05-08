@@ -1,0 +1,70 @@
+// custom-detail.component.ts
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { Location } from '@angular/common';
+
+@Component({
+  selector: 'app-custom-detail',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+templateUrl: './custom-detail.html'
+})
+export class CustomDetailComponent implements OnInit {
+  private router = inject(Router);
+  private location = inject(Location);
+
+  // Сигнал для збереження отриманих даних
+  customItem = signal<any | null>(null);
+
+// custom-detail.component.ts або custom-detail.ts
+
+ngOnInit() {
+  const state = this.location.getState() as any;
+
+  if (!state?.item) {
+    this.router.navigate(['/']);
+    return;
+  }
+
+  const item = { ...state.item };
+
+  let frontImage = '';
+  let backImage = '';
+
+  // CASE 1: "front|back"
+  if (item.imageUrl && item.imageUrl.includes('|')) {
+    const [front, back] = item.imageUrl.split('|');
+    frontImage = front;
+    backImage = back;
+  }
+
+  // CASE 2: constructor (front + additionalPhotos)
+  else if (item.additionalPhotos?.length) {
+    frontImage = item.imageUrl;
+    
+    // 🔥 ВАЖЛИВО: беремо НЕ [0], а перевіряємо чи реально є back
+    backImage = item.additionalPhotos.find((p: string) => p && p !== item.imageUrl) || '';
+  }
+
+  // CASE 3: тільки одне фото (AI або старі дані)
+  else {
+    frontImage = item.imageUrl;
+    backImage = '';
+  }
+
+  item.frontImage = frontImage;
+  item.backImage = backImage;
+
+  this.customItem.set(item);
+}
+
+  getFullUrl(url: string): string {
+    if (!url) return 'assets/images/placeholder.jpg';
+    return url.startsWith('http') ? url : `http://localhost:5000${url}`;
+  }
+
+  goBack() {
+    this.location.back();
+  }
+}

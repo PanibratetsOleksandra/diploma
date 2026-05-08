@@ -1,4 +1,5 @@
-﻿using diploma.core.Entities;
+﻿using diploma.core.DTOs;
+using diploma.core.Entities;
 using diploma.dal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,5 +43,44 @@ namespace diploma.api.Controllers
             return Ok(orders);
         }
 
+
+        // OrdersController.cs
+
+        // 1. Отримати ВСІ замовлення користувачів для адмінки
+        [HttpGet]
+        [Authorize] // Якщо є ролі, краще: [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            var orders = await _context.Orders
+                .Include(o => o.Items) // Підвантажуємо товари, що є всередині замовлення
+                .OrderByDescending(o => o.CreatedAt) // Спочатку найновіші
+                .ToListAsync();
+
+            return Ok(orders);
+        }
+
+        [HttpPut("{id}/status")]
+        [Authorize]
+        public async Task<IActionResult> UpdateOrderStatus(
+     int id,
+     [FromBody] UpdateOrderStatusRequest request)
+        {
+            var order = await _context.Orders.FindAsync(id);
+
+            if (order == null)
+            {
+                return NotFound(new { message = "Замовлення не знайдено" });
+            }
+
+            order.Status = request.Status;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                id = order.Id,
+                status = order.Status
+            });
+        }
     }
 }

@@ -6,6 +6,10 @@ import { ProductDetailComponent } from './features/product-detail/product-detail
 import { AiAssistantComponent } from './features/ai-assistant/ai-assistant';
 import { CartComponent } from './features/cart/cart';
 import { CheckoutComponent } from './features/checkout/checkout';
+import { CustomDetailComponent } from './features/custom-detail/custom-detail';
+import { BlogComponent } from './features/blog/blog';
+import { BlogDetailComponent } from './features/blog/blog-detail';
+
 export const routes: Routes = [
   {
     path: '',
@@ -40,5 +44,8 @@ export const routes: Routes = [
     import('./features/designer/designer').then(m => m.DesignerComponent)
 },
 { path: 'cart', component: CartComponent },
-{ path: 'checkout', component: CheckoutComponent }
+{ path: 'checkout', component: CheckoutComponent },
+{ path: 'custom-detail/:id', component: CustomDetailComponent },
+{ path: 'blog', component: BlogComponent },
+{ path: 'blog/:id', component: BlogDetailComponent }
 ];

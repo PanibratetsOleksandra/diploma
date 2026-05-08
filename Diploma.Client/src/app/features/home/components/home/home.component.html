@@ -1,19 +1,201 @@
-  <main class="flex-grow pt-5 pb-5">
-    <div class="max-w-7xl mx-auto px-6 text-center">
-      <h1 class="text-5xl md:text-7xl font-bold tracking-tighter mb-6">
-        Wear Your <span class="text-orange-500">Art</span>
+<div class="min-h-screen bg-gradient-to-br from-[#FFFDF9] via-white to-[#FFFBF0] text-gray-900 overflow-x-hidden font-sans">
+  
+  <section class="max-w-7xl mx-auto px-6 lg:px-12 pt-36 pb-24 flex flex-col lg:flex-row items-center gap-12 min-h-[90vh]">
+    <div class="w-full lg:w-1/2 space-y-8 animate-in fade-in slide-in-from-left-8 duration-700">
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200/50 rounded-full">
+        <span class="w-2 h-2 rounded-full bg-[#E06A00] animate-pulse"></span>
+        <span class="text-xs font-black uppercase tracking-widest text-[#E06A00]">Hand-Painted Wearable Art</span>
+      </div>
+      
+      <h1 class="text-5xl lg:text-7xl font-black italic tracking-tighter text-gray-950 leading-[0.95]">
+        Wear Your <span class="text-[#E06A00] not-italic">Art</span>
       </h1>
-      <p class="max-w-2xl mx-auto text-xl text-gray-500 leading-relaxed mb-10">
-        Унікальний одяг з ручним розписом, що перетворює ваш гардероб на полотно. 
-        Кожна річ — це витвір мистецтва, створений з пристрастю.
+      
+      <p class="text-base text-gray-500 font-medium max-w-lg leading-relaxed">
+        Відкрий для себе унікальний одяг ручної роботи, який перетворює твій гардероб на художнє полотно. Кожен виріб — це персональний шедевр, створений з пристрастю, душею та сучасними ШІ-технологіями.
       </p>
-      <div class="flex justify-center gap-4">
-        <button routerLink="/shop" class="bg-black text-white px-10 py-4 rounded-full font-semibold hover:bg-gray-800 transition shadow-lg">
-          Explore Collection
+      
+      <div class="flex flex-wrap gap-4 pt-2">
+        <button [routerLink]="['/shop']" class="px-8 py-4 bg-black text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 hover:scale-[1.03] active:scale-[0.98] transition-all shadow-lg shadow-gray-200">
+          Каталог товарів →
         </button>
-        <button routerLink="/designer" class="border border-gray-200 px-10 py-4 rounded-full font-semibold hover:bg-gray-50 transition">
-          Create Your Own
+        <button [routerLink]="['/designer']" class="px-8 py-4 bg-white text-black border-2 border-gray-100 text-xs font-black uppercase tracking-widest rounded-2xl hover:border-black hover:scale-[1.03] active:scale-[0.98] transition-all">
+          Створити свій дизайн
         </button>
       </div>
     </div>
-  </main>
+
+    <div class="w-full lg:w-1/2 flex justify-center animate-in fade-in slide-in-from-right-8 duration-700">
+      <div class="relative w-full max-w-lg aspect-square rounded-[3.5rem] overflow-hidden shadow-2xl border-4 border-white/50 group">
+        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=600" alt="Sasha Painting Jacket" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+        <div class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-3xl shadow-xl flex items-center gap-3 border border-gray-100">
+          <div class="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white font-bold text-lg">✨</div>
+          <div>
+            <div class="text-xs font-black uppercase tracking-tight text-gray-950">1000+ дизайнів</div>
+            <div class="text-[10px] font-bold text-gray-400">Ручний розпис & ШІ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white border-y border-gray-100/80 py-24 px-6 lg:px-12">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+      
+      <div class="w-full lg:w-1/2">
+        <div class="aspect-[4/3] w-full rounded-[2.5rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner">
+          <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=600" alt="Brushes & Acrylic Paints" class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <div class="w-full lg:w-1/2 space-y-6">
+        <span class="text-[10px] font-black uppercase tracking-widest text-[#E06A00] block">Про філософію Panibratets Artwear</span>
+        <h2 class="text-3xl lg:text-4xl font-black italic uppercase tracking-tighter text-gray-950 leading-none">
+          Одяг як маніфест твоєї індивідуальності
+        </h2>
+        <p class="text-sm text-gray-500 font-medium leading-relaxed">
+          Народжений на стику сучасного живопису та концепції сталого споживання (<span class="italic text-gray-900">Slow Fashion</span>), бренд Panibratets Artwear перетворює базові джинсовки, футболки та худі на ексклюзивні артоб’єкти. Кожен штрих наноситься вручну стійкими текстильними фарбами, які не бояться прання.
+        </p>
+        <p class="text-sm text-gray-500 font-medium leading-relaxed">
+          Ми віримо, що мода має бути усвідомленою. Саме тому ми об’єднали класичне художнє ремесло з інноваційними технологіями: 2D-конструктором макетів та генеративним ШІ-асистентом, які допоможуть тобі розробити свій ідеальний принт.
+        </p>
+
+        <div class="grid grid-cols-3 gap-6 pt-6 border-t border-gray-100">
+          <div>
+            <div class="text-2xl font-black text-gray-950">500+</div>
+            <div class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">Щасливих Клієнтів</div>
+          </div>
+          <div>
+            <div class="text-2xl font-black text-gray-950">1000+</div>
+            <div class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">Унікальних Ескізів</div>
+          </div>
+          <div>
+            <div class="text-2xl font-black text-gray-950">100%</div>
+            <div class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">Ручний Розпис</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-6 lg:px-12 py-24 space-y-12">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div>
+        <span class="text-[10px] font-black uppercase tracking-widest text-[#E06A00] block">Featured Collection</span>
+        <h2 class="text-3xl lg:text-4xl font-black italic uppercase tracking-tighter text-gray-950 mt-1">Вибрані витвори мистецтва</h2>
+        <p class="text-xs text-gray-400 mt-1 font-semibold uppercase tracking-wider">Ексклюзивні дизайни, відібрані нашими художниками</p>
+      </div>
+      <button [routerLink]="['/shop']" class="px-6 py-3 bg-gray-50 hover:bg-black hover:text-white border border-gray-100 text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all self-start">
+        Переглянути все →
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      @for (product of featuredProducts(); track product.id) {
+        <div class="bg-white rounded-[2.5rem] p-6 border border-gray-100/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group cursor-pointer" [routerLink]="['/product', product.id]">
+          <div class="aspect-square w-full rounded-[2rem] overflow-hidden border border-gray-100 bg-gray-50 relative mb-6">
+            <img [src]="getMainPhotoUrl(product)" [alt]="product.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]">
+            
+            @if (product.id === 1) {
+              <span class="absolute top-4 right-4 bg-orange-500 text-white text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm">
+                Limited Edition
+              </span>
+            } @else if (product.id === 3) {
+              <span class="absolute top-4 right-4 bg-black text-white text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm">
+                Best Seller
+              </span>
+            }
+          </div>
+
+          <div class="flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-gray-950 italic tracking-tight group-hover:text-orange-500 transition-colors mb-2">
+                {{ product.name }}
+              </h3>
+              <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed mb-4">
+                {{ product.description }}
+              </p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-gray-50">
+              <span class="text-base font-black text-gray-950">{{ product.price | number }} ₴</span>
+              <span class="text-[9px] font-black uppercase tracking-widest text-orange-500 group-hover:translate-x-1 transition-transform">Detail →</span>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-span-3 text-center py-12 text-gray-400 italic text-sm">
+          Завантаження колекції виробів...
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-6 lg:px-12 pb-24">
+    <div class="bg-[#E06A00] rounded-[4rem] text-white p-12 lg:p-20 relative overflow-hidden shadow-2xl shadow-orange-100 flex flex-col items-center text-center">
+      <div class="absolute -right-16 -bottom-16 text-orange-600/30">
+        <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 3a9 9 0 0 0-9 9c0 4.97 4.03 9 9 9 1.5 0 2.5-1 2.5-2.5 0-.72-.31-1.37-.8-1.87-.1-.11-.1-.23-.1-.33 0-.28.23-.5.5-.5h2.15c2.62 0 4.75-2.13 4.75-4.75 0-4.42-4.03-8.05-9-8.05Zm-4.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm3-3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm4 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm3 3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z"/>
+        </svg>
+      </div>
+
+      <div class="relative z-10 max-w-2xl space-y-6">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white text-[#E06A00] text-2xl font-black shadow-lg mb-4">
+          🎨
+        </div>
+        <h2 class="text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-none italic">
+          Створи Свій Власний Дизайн
+        </h2>
+        <p class="text-base text-orange-50 font-medium leading-relaxed">
+          Скористайся нашим унікальним інтерактивним 2D-конструктором, щоб розмістити малюнки з обох сторін виробу, або залучи нашого ШІ-асистента для генерації неймовірних персональних принтів за твоїм текстовим описом!
+        </p>
+        <div class="flex flex-wrap justify-center gap-4 pt-4">
+          <button [routerLink]="['/designer']" class="px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-orange-50 hover:scale-[1.03] active:scale-[0.98] transition-all shadow-xl shadow-orange-950/20">
+            Запустити Конструктор 🚀
+          </button>
+          <button [routerLink]="['/ai-assistant']" class="px-8 py-4 bg-black text-white border border-orange-600 text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-gray-900 hover:scale-[1.03] active:scale-[0.98] transition-all">
+            Спробувати AI Асистента
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-6 lg:px-12 pb-24 space-y-12">
+    <div class="text-center space-y-2">
+      <span class="text-[10px] font-black uppercase tracking-widest text-[#E06A00]">Testimonials</span>
+      <h2 class="text-3xl lg:text-4xl font-black italic uppercase tracking-tighter text-gray-950">Що говорять наші поціновувачі мистецтва</h2>
+      <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Відгуки клієнтів, які вже замовили свій унікальний розпис</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      @for (review of reviews(); track review.name) {
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+          <div class="space-y-4">
+            <div class="flex text-amber-400 gap-1">
+              @for (star of [1,2,3,4,5]; track star) {
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.9 1.303-.9 1.603 0l1.22 3.69h3.882c.969 0 1.371 1.24.588 1.81l-3.141 2.28 1.221 3.69c.3.9-.713 1.64-1.503 1.07l-3.141-2.28-3.141 2.28c-.79.57-1.803-.17-1.503-1.07l1.22-3.69-3.141-2.28c-.788-.57-.386-1.81.588-1.81h3.882l1.22-3.69z"/>
+                </svg>
+              }
+            </div>
+            <p class="text-sm text-gray-500 italic leading-relaxed">
+              "{{ review.text }}"
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 pt-6 border-t border-gray-50 mt-6">
+            <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 font-black flex items-center justify-center text-sm">
+              {{ review.name.substring(0, 1).toUpperCase() }}
+            </div>
+            <div>
+              <h4 class="text-xs font-black text-gray-950">{{ review.name }}</h4>
+              <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">{{ review.role }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+</div>

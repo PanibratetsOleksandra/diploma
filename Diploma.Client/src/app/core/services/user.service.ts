@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { Observable, tap } from 'rxjs';
 import { User } from '../models/user.model';
+import { OrderStatus } from '../../core/enums/order-status.enum';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -80,4 +81,19 @@ createOrder(orderData: any): Observable<any> {
 getMyOrders(): Observable<any[]> {
   return this.api.get<any[]>('orders/my'); // Створимо такий ендпоінт на беці
 }
+
+
+// Отримати всі замовлення для адмінки
+getAllOrders(): Observable<any[]> {
+  return this.api.get<any[]>('orders');
+}
+
+
+updateOrderStatus(orderId: number, status: OrderStatus): Observable<any> {
+  return this.api.put<any>(
+    `orders/${orderId}/status`,
+    { status }
+  );
+}
+
 }

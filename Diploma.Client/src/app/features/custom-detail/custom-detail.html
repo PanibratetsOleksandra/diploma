@@ -1,0 +1,105 @@
+<div class="min-h-screen bg-gray-50/50 text-gray-900 pt-32 pb-20 px-6 lg:px-12 animate-in fade-in duration-500">
+  <div class="max-w-6xl mx-auto">
+    
+    <button (click)="goBack()" class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition mb-8">
+      ← Назад до замовлення
+    </button>
+
+    @if (customItem(); as item) {
+      <div class="flex flex-col lg:flex-row gap-12 bg-white rounded-[3.5rem] p-8 lg:p-12 shadow-sm border border-gray-100/80">
+        
+        <div class="w-full lg:w-1/2 flex flex-col gap-4">
+          
+          @if (item.backImage) {
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col gap-2">
+                <span class="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">
+                  Вигляд спереду
+                </span>
+                <div class="aspect-[3/4] w-full rounded-[2rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner">
+                  <img [src]="getFullUrl(item.frontImage)" alt="Front View" class="w-full h-full object-cover">
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <span class="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">
+                  Вигляд ззаду
+                </span>
+                <div class="aspect-[3/4] w-full rounded-[2rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner">
+                  <img [src]="getFullUrl(item.backImage)" alt="Back View" class="w-full h-full object-cover">
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div class="aspect-square w-full rounded-[2.5rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner group relative">
+              <img [src]="getFullUrl(item.frontImage || item.imageUrl)" alt="Custom Concept" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+              
+              <span [class]="item.type === 'ai-design' ? 'bg-purple-600' : 'bg-orange-600'" 
+                    class="absolute top-6 left-6 text-[9px] font-black uppercase tracking-widest text-white px-4 py-2 rounded-full shadow-md">
+                {{ item.type === 'ai-design' ? '⚡ AI GENERATED' : '🎨 HAND CUSTOMIZED' }}
+              </span>
+            </div>
+          }
+
+        </div>
+
+        <div class="w-full lg:w-1/2 flex flex-col justify-between py-2">
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Концепт індивідуального замовлення</span>
+            <h1 class="text-4xl font-black italic uppercase tracking-tighter leading-tight mb-4">{{ item.name }}</h1>
+            
+            <div class="flex items-center gap-3 mb-8">
+              <span class="text-2xl font-black text-black">{{ item.price }} ₴</span>
+              <span class="px-3 py-1 bg-gray-100 text-[9px] font-black uppercase tracking-wider rounded-lg text-gray-500">Розмір: {{ item.size || 'M' }}</span>
+            </div>
+
+            <div class="space-y-6">
+              @if (item.type === 'ai-design') {
+                <div class="p-6 bg-purple-50/40 border border-purple-100/50 rounded-3xl">
+                  <h4 class="text-[10px] font-black uppercase tracking-widest text-purple-600 mb-3">Prompt (Текстовий запит до ШІ)</h4>
+                  <p class="text-sm font-semibold italic text-gray-700 leading-relaxed">
+                    @if (item.notes) { "{{ item.notes }}" } @else { Опис запиту відсутній }
+                  </p>
+                </div>
+              }
+
+              @if (item.type === 'manual-design') {
+                <div class="p-6 bg-orange-50/40 border border-orange-100/50 rounded-3xl">
+                  <h4 class="text-[10px] font-black uppercase tracking-widest text-orange-600 mb-3">Побажання щодо розпису (Конструктор)</h4>
+                  <p class="text-sm font-semibold italic text-gray-700 leading-relaxed">
+                    @if (item.notes) { "{{ item.notes }}" } @else { Клієнт довірився баченню художника }
+                  </p>
+                </div>
+              }
+
+              <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100">
+                <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Технічні характеристики</h4>
+                <div class="space-y-3 text-xs font-bold uppercase tracking-wider">
+                  <div class="flex justify-between border-b border-gray-100 pb-2">
+                    <span class="text-gray-400">Тип виробу</span>
+                    <span class="text-gray-900">Custom Apparel</span>
+                  </div>
+                  <div class="flex justify-between border-b border-gray-100 pb-2">
+                    <span class="text-gray-400">Фарби для розпису</span>
+                    <span class="text-gray-900">Decola Textile Acrylics</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Догляд</span>
+                    <span class="text-gray-900">Ручне прання (30°C)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-8 border-t border-gray-100 flex gap-4">
+            <button (click)="goBack()" class="flex-1 py-4 bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition shadow-lg shadow-gray-200">
+              Повернутись
+            </button>
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+</div>

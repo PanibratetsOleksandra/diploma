@@ -18,5 +18,6 @@ namespace diploma.dal
         public DbSet<UserDesign> UserDesigns { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Article> Articles { get; set; }
     }
 }
