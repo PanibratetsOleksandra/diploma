@@ -20,14 +20,14 @@
           <div class="flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-wider pt-2">
             <span>By {{ item.author }}</span>
             <span>•</span>
-            <span>{{ item.date | date:'longDate' }}</span>
+            <span>{{ item.createdAt | date:'longDate' }}</span>
             <span>•</span>
             <span class="text-gray-900 bg-gray-100 px-3 py-1 rounded-md">{{ item.readTime }}</span>
           </div>
         </div>
 
         <div class="aspect-[16/9] w-full rounded-[2.5rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-md">
-          <img [src]="item.imageUrl" [alt]="item.title" class="w-full h-full object-cover">
+        <img [src]="imageService.getFullImageUrl(item.imageUrl)" [alt]="item.title" class="w-full h-full object-cover">
         </div>
 
         <div class="space-y-8 text-base text-gray-700 leading-relaxed font-medium">
@@ -36,7 +36,7 @@
             {{ item.intro }}
           </p>
 
-          @for (paragraph of item.paragraphs; track paragraph) {
+          @for (paragraph of parsedParagraphs(); track paragraph) {
             <p>{{ paragraph }}</p>
           }
 
@@ -49,12 +49,12 @@
             </div>
           }
 
-          @if (item.bullets?.length) {
+          @if (parsedBullets().length > 0) {
             <div class="p-8 bg-white border border-gray-100 rounded-3xl shadow-inner space-y-4">
               <h4 class="text-xs font-black uppercase tracking-widest text-gray-400">Important Takeaways & Rules:</h4>
               <ul class="space-y-3">
-                @for (bullet of item.bullets; track bullet) {
-                  <li class="flex gap-3 text-sm">
+                @for (bullet of parsedBullets(); track bullet) {
+                  <li class="flex gap-3 text-sm animate-in slide-in-from-left duration-300">
                     <span class="text-orange-500 font-bold">✔</span>
                     <span class="text-gray-600 font-medium leading-relaxed">{{ bullet }}</span>
                   </li>

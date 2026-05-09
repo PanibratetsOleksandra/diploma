@@ -46,6 +46,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\images\ai-designs\" />
     <Folder Include="wwwroot\images\mockups\" />
+    <Folder Include="wwwroot\images\blog\" />
     <Folder Include="wwwroot\images\user-designs\" />
     <Folder Include="wwwroot\images\users\" />
     <Folder Include="wwwroot\images\products\" />
