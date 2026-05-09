@@ -254,6 +254,10 @@
           <li><span class="text-orange-500">•</span> Select a tool and color</li>
           <li><span class="text-orange-500">•</span> Draw or add elements to canvas</li>
           <li><span class="text-orange-500">•</span> Save</li>
+<button type="button" (click)="openPreview3D()"
+  class="flex items-center gap-2 rounded-full bg-black text-white px-5 py-3 text-sm font-bold transition hover:bg-gray-800 shadow-lg">
+  🎯 Preview in 3D
+</button>
         </ul>
       </div>
 
@@ -290,4 +294,12 @@
     </div>
 
   </div>
+@if (show3DPreview()) {
+<app-preview3d
+  [frontDesignUrl]="frontOverlay()"
+  [backDesignUrl]="backOverlay()"
+    [garmentType]="selectedGarment()"
+    (close)="closePreview3D()">
+  </app-preview3d>
+}
 </div>

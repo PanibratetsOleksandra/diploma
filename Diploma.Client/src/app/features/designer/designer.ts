@@ -14,6 +14,7 @@ import {
 
 import { AuthService } from '../../core/services/auth.service';
 import { DesignerService } from '../../core/services/designer.service';
+import { Preview3DComponent } from '../preview3d/preview3d.component';
 
 type Tool = 'brush' | 'circle' | 'square' | 'text' | 'upload' | null;
 type Garment = 'tshirt' | 'sweatshirt' | 'hoodie' | 'tote' | 'denimJacket';
@@ -22,7 +23,7 @@ type GarmentView = 'front' | 'back';
 @Component({
   selector: 'app-designer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+imports: [CommonModule, FormsModule, Preview3DComponent],
   templateUrl: './designer.html',
   styleUrl: './designer.scss'
 })
@@ -31,6 +32,10 @@ export class DesignerComponent implements AfterViewInit, OnInit {
   private history: string[] = [];
   private historyIndex = -1;
   private isRestoring = false;
+  
+frontOverlay = signal<string | null>(null);
+backOverlay = signal<string | null>(null);
+
 
   private router = inject(Router);
   public authService = inject(AuthService);
@@ -242,7 +247,7 @@ ngAfterViewInit(): void {
       this.updateLayers();
 
     } catch (e) {
-      console.error('Error loading mockup: - designer.ts:245', e);
+      console.error('Error loading mockup: - designer.ts:250', e);
     }
   }
 
@@ -510,11 +515,11 @@ private async renderOtherSideAndSave(): Promise<void> {
   this.designerService.saveManualDesign(payload).subscribe({
     next: () => {
       sessionStorage.removeItem('pendingManualDesign');
-      console.log('✅ Design saved! - designer.ts:513');
+      console.log('✅ Design saved! - designer.ts:518');
     },
     error: (err) => {
-      console.error('❌ Save error: - designer.ts:516', err);
-      console.error('❌ Validation errors: - designer.ts:517', JSON.stringify(err.error?.errors));
+      console.error('❌ Save error: - designer.ts:521', err);
+      console.error('❌ Validation errors: - designer.ts:522', JSON.stringify(err.error?.errors));
     }
   });
 }
@@ -569,10 +574,77 @@ private async renderSideToDataUrl(view: GarmentView, savedJSON: string | null): 
     return dataUrl;
 
   } catch (e) {
-    console.error('Error rendering side: - designer.ts:572', e);
+    console.error('Error rendering side: - designer.ts:577', e);
     tempCanvas.dispose();
     return '';
   }
 }
+
+
+show3DPreview = signal<boolean>(false);
+
+async openPreview3D(): Promise<void> {
+  this.saveCurrentViewState();
+
+  // Генеруємо ПРОЗОРІ overlay без футболки
+  const frontOverlay = await this.renderOverlayOnly(this.frontCanvasJSON);
+  const backOverlay = await this.renderOverlayOnly(this.backCanvasJSON);
+
+  this.frontOverlay.set(frontOverlay || null);
+  this.backOverlay.set(backOverlay || null);
+
+  this.show3DPreview.set(true);
+}
+
+closePreview3D(): void {
+  this.show3DPreview.set(false);
+}
+
+// designer.component.ts
+
+// Рендерить ТІЛЬКИ користувацькі шари на прозорому фоні для 3D-текстури
+private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
+  if (!savedJSON) return '';
+
+  const parsed = JSON.parse(savedJSON);
+  const userObjects = parsed.objects.filter((obj: any) => obj.name !== 'mockup');
+  
+  if (userObjects.length === 0) return '';
+
+  const tempCanvasEl = document.createElement('canvas');
+  tempCanvasEl.width = 560;
+  tempCanvasEl.height = 560;
+
+  const tempCanvas = new Canvas(tempCanvasEl, {
+    width: 560,
+    height: 560,
+    backgroundColor: '' // ← порожній рядок = прозорий фон
+  });
+
+  try {
+    await tempCanvas.loadFromJSON({
+      version: '6.0.0',
+      objects: userObjects
+    });
+
+    tempCanvas.renderAll();
+
+    // ← PNG з прозорістю (не jpeg!)
+    const dataUrl = tempCanvas.toDataURL({ 
+      format: 'png',
+      multiplier: 2,
+      enableRetinaScaling: true
+    });
+
+    tempCanvas.dispose();
+    return dataUrl;
+
+  } catch (e) {
+    console.error('Error rendering overlay: - designer.ts:643', e);
+    tempCanvas.dispose();
+    return '';
+  }
+}
+
 
 }
