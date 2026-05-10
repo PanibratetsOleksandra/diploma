@@ -10,14 +10,12 @@ using System.Text;
 using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔐 Вмикаємо HTTP + HTTPS
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenLocalhost(5000);
     options.ListenLocalhost(7001, listen => listen.UseHttps());
 });
 
-// 3. CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
@@ -28,7 +26,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Викликаємо наш статичний метод розширення
 builder.Services.RegisterBusinessDependecies(builder.Configuration);
 builder.Services.RegisterDataDependecies(builder.Configuration);
 
@@ -60,8 +57,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-
-//builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -84,6 +79,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-await app.UseDefaultAdmin();
+await app.SeedIdentityDataAsync();
 
 app.Run();

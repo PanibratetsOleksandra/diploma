@@ -1,4 +1,5 @@
-﻿using diploma.core.DTOs;
+﻿using diploma.core;
+using diploma.core.DTOs;
 using diploma.core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,79 +11,18 @@ namespace diploma.api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-     //[Authorize(Roles = "Admin")] 
-    public class UsersController : ControllerBase
+
+    public class UsersController(UserManager<AppUser> userManager) : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
 
-        public UsersController(UserManager<AppUser> userManager)
-        {
-            _userManager = userManager;
-        }
-
-
-
-        // GET: api/users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> GetUsers()
-        {
-            var users = await _userManager.Users
-                .Select(u => new
-                {
-                    u.Id,
-                    u.UserName,
-                    u.Email,
-                    u.FullName
-                })
-                .ToListAsync();
-
-            return Ok(users);
-        }
-
-        // DELETE: api/users/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
-
-            // Забороняємо видаляти самого себе (якщо ти зайшла як адмін)
-            // if (user.Email == User.FindFirstValue(ClaimTypes.Email)) return BadRequest("Ви не можете видалити себе");
-
-            var result = await _userManager.DeleteAsync(user);
-            if (!result.Succeeded) return BadRequest("Не вдалося видалити користувача");
-
-            return NoContent();
-        }
-
-        [HttpPost("{id}/toggle-lock")]
-        public async Task<IActionResult> ToggleLock(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
-
-            // Якщо користувач не заблокований (або дата блокування вже минула)
-            if (user.LockoutEnd == null || user.LockoutEnd < DateTimeOffset.UtcNow)
-            {
-                // Блокуємо назавжди (до 2099 року)
-                await _userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(new DateTime(2099, 1, 1)));
-                return Ok(new { isLocked = true });
-            }
-            else
-            {
-                // Розблоковуємо (ставимо поточну дату або null)
-                await _userManager.SetLockoutEndDateAsync(user, null);
-                return Ok(new { isLocked = false });
-            }
-        }
         [HttpGet("profile")]
-        [Authorize]
+        [Authorize(Roles = $"{Roles.ADMIN},{Roles.USER}")]
         public async Task<ActionResult<object>> GetProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await userManager.FindByIdAsync(userId);
             if (user == null) return NotFound();
 
             return Ok(new
@@ -101,30 +41,61 @@ namespace diploma.api.Controllers
             });
         }
 
+
+        [HttpGet]
+        [Authorize(Roles = Roles.ADMIN)]
+        public async Task<ActionResult<IEnumerable<object>>> GetUsers()
+        {
+
+            var users = await userManager.Users
+                //.Where(u => u.role)
+                .Select(u => new
+                {
+                    u.Id,
+                    u.UserName,
+                    u.Email,
+                    u.FullName
+                })
+                .ToListAsync();
+
+            return Ok(users);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.ADMIN)]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+            var result = await userManager.DeleteAsync(user);
+            if (!result.Succeeded) return BadRequest("Не вдалося видалити користувача");
+
+            return NoContent();
+        }
+
+      
         [HttpPut("profile")]
-        [Authorize]
+        [Authorize(Roles = $"{Roles.ADMIN},{Roles.USER}")]
         public async Task<IActionResult> UpdateProfile([FromForm] UserUpdateDto model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await userManager.FindByIdAsync(userId);
             if (user == null) return NotFound();
 
-            // Оновлюємо текстові поля
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.MiddleName = model.MiddleName;
             user.Nickname = model.Nickname;
-            user.PhoneNumber = model.PhoneNumber; // Зберігаємо телефон
+            user.PhoneNumber = model.PhoneNumber;
             user.BirthDate = model.BirthDate;
             user.Gender = model.Gender;
 
-            // Обробка фото
             if (model.Photo != null && model.Photo.Length > 0)
             {
                 var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/users");
                 if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 
-                // Видаляємо старе фото, якщо воно не дефолтне
+  
                 if (!string.IsNullOrEmpty(user.AvatarUrl) && !user.AvatarUrl.Contains("default"))
                 {
                     var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.AvatarUrl.TrimStart('/'));
@@ -142,7 +113,7 @@ namespace diploma.api.Controllers
                 user.AvatarUrl = $"/images/users/{fileName}";
             }
 
-            var result = await _userManager.UpdateAsync(user);
+            var result = await userManager.UpdateAsync(user);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
             return Ok(user);
