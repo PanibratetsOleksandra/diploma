@@ -1,55 +1,50 @@
-
-<div class=" flex flex-col bg-white font-sans text-gray-900">
-  
+<div class="flex flex-col bg-white font-sans text-gray-900">
   <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      
-      <div class="flex items-center gap-2 cursor-pointer" routerLink="/">
-        <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-          <span class="text-white font-bold text-xl">P</span>
+    <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between"> <div class="flex items-center gap-4 cursor-pointer" routerLink="/"> <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-100 shadow-md flex items-center justify-center bg-gray-50 transition-transform hover:scale-105">
+          <img [src]="imageService.getFullImageUrl('images/main/logo.jpg')" 
+               alt="Panibratets Artwear Logo" 
+               class="w-full h-full object-cover">
         </div>
-        <span class="text-xl font-bold tracking-tight">Panibratets Artwear</span>
+        
+        <span class="text-2xl font-extrabold italic uppercase tracking-tighter text-gray-950">Panibratets Artwear</span>
       </div>
 
       <div class="hidden md:flex items-center gap-8">
-        <a routerLink="/" class="text-sm font-medium hover:text-orange-500 transition">Home</a>
-        <a routerLink="/shop" class="text-sm font-medium hover:text-orange-500 transition">Shop</a>
-        <a routerLink="/ai-assistant" class="text-sm font-medium hover:text-orange-500 transition">AI Artist</a>
-        <a routerLink="/designer" class="text-sm font-medium hover:text-orange-500 transition">Designer</a>
-        <a routerLink="/blog" class="text-sm font-medium hover:text-orange-500 transition">Blog</a>
+        <a routerLink="/" class="text-sm font-semibold hover:text-[#E06A00] transition">Головна</a>
+        <a routerLink="/shop" class="text-sm font-semibold hover:text-[#E06A00] transition">Магазин</a>
+        <a routerLink="/ai-assistant" class="text-sm font-semibold hover:text-[#E06A00] transition">ШІ Асистент</a>
+        <a routerLink="/designer" class="text-sm font-semibold hover:text-[#E06A00] transition">2D Конструктор</a>
+        <a routerLink="/blog" class="text-sm font-semibold hover:text-[#E06A00] transition">Блог</a>
       </div>
 
-   <div class="flex items-center gap-3 border-r border-gray-200 pr-4 mr-1">
-    
-  
-  <div class="flex items-center gap-3 border-r border-gray-200 pr-4 mr-1">
+      <div class="flex items-center gap-5"> <div class="flex items-center gap-3 border-r border-gray-200 pr-5"> @if (!authService.isAuthenticated) {
+            <a routerLink="/login" class="text-sm font-bold hover:text-[#E06A00] transition">Увійти</a>
+            <a routerLink="/register" class="bg-black text-white px-5 py-2.5 rounded-full text-xs font-black hover:bg-gray-800 transition shadow-sm uppercase tracking-widest">Реєстрація</a>
+          } @else {
+            <div class="flex items-center gap-3">
+              <a routerLink="/profile" class="flex items-center gap-2 px-5 py-2.5 bg-gray-50 hover:bg-black hover:text-white rounded-full transition-all duration-300 group">
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="text-xs font-bold uppercase tracking-widest">Кабінет</span>
+              </a>
+              <button (click)="logout()" class="text-sm font-bold text-red-500 hover:text-red-700 transition">Вийти</button>
+            </div>
+          }
+        </div>
 
-  <div class="flex items-center gap-3 border-r border-gray-200 pr-4 mr-1">
-  @if (!authService.isAuthenticated) {
-    <a routerLink="/login" class="text-sm font-semibold hover:text-orange-500 transition">Увійти</a>
-    <a routerLink="/register" class="bg-black text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm uppercase tracking-wider">Реєстрація</a>
-  } @else {
-    <div class="flex items-center gap-3">
-      <a routerLink="/profile" class="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-black hover:text-white rounded-full transition-all duration-300 group">
-        <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="text-xs font-bold uppercase tracking-widest">My Account</span>
-      </a>
-      <button (click)="logout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition">Вийти</button>
+        <button routerLink="/cart" class="relative hover:text-[#E06A00] transition p-2.5 flex items-center" title="Кошик">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          </svg>
+          @if (cartService.totalCount() > 0) {
+            <span class="absolute top-0 right-0 bg-[#E06A00] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold animate-bounce">
+              {{ cartService.totalCount() }}
+            </span>
+          }
+        </button>
+
+      </div>
+
     </div>
-  }
-
-  <button routerLink="/cart" class="relative hover:text-orange-500 transition p-2 flex items-center">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
-    </svg>
-    
-    @if (cartService.totalCount() > 0) {
-      <span class="absolute top-0 right-0 bg-orange-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold animate-bounce">
-        {{ cartService.totalCount() }}
-      </span>
-    }
-  </button>
-</div>
+  </nav>
 </div>

@@ -7,7 +7,7 @@ export class ImageService {
 
   getFullImageUrl(path: string | null | undefined): string {
     if (!path || !path.trim()) {
-      return 'assets/images/placeholder.jpg';
+      return 'https://placehold.net/400x400.png';
     }
 
     const normalizedPath = path.trim().replace(/\\/g, '/');

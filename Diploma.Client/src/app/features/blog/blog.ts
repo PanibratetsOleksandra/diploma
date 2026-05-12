@@ -6,6 +6,8 @@ import { RouterLink } from '@angular/router';
 import { BlogService, Article } from '../../core/services/blog.service';
 import { UserService } from '../../core/services/user.service';
 import { ImageService } from '../../core/services/image.service'; // 🔥 Імпортуємо твій сервіс картинок
+import { AuthService } from '../../core/services/auth.service';
+
 
 @Component({
   selector: 'app-blog',
@@ -18,7 +20,7 @@ export class BlogComponent implements OnInit {
   private userService = inject(UserService);
   private fb = inject(FormBuilder);
   public imageService = inject(ImageService); // 🔥 Інжектуємо як public, щоб використовувати в HTML шаблоні
-
+public authService = inject(AuthService);
   // Стан даних
   articles = signal<Article[]>([]);
   searchQuery = signal<string>('');
@@ -29,8 +31,7 @@ export class BlogComponent implements OnInit {
   selectedFile = signal<File | null>(null);
   imagePreviewUrl = signal<string | null>(null);
 
-  // Дозволяємо бачити функції автора/адміна
-  isWriter = signal<boolean>(true);
+isWriter = computed(() => this.authService.isAdmin());
 
   // Керування формою
   isFormOpen = signal<boolean>(false);
@@ -82,7 +83,7 @@ export class BlogComponent implements OnInit {
   loadArticles() {
     this.blogService.getArticles().subscribe({
       next: (data) => this.articles.set(data),
-      error: (err) => console.error('Error loading articles from API: - blog.ts:85', err)
+      error: (err) => console.error('Error loading articles from API: - blog.ts:86', err)
     });
   }
 
@@ -160,7 +161,7 @@ export class BlogComponent implements OnInit {
           this.loadArticles();
           this.closeModal();
         },
-        error: (err) => console.error('Помилка оновлення: - blog.ts:163', err)
+        error: (err) => console.error('Помилка оновлення: - blog.ts:164', err)
       });
     } else {
       this.blogService.createArticle(formData as any).subscribe({

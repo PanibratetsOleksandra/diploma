@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../../../core/services/product.service';
 import { Product } from '../../../../data/product.model';
+import { ImageService } from '../../../../core/services/image.service';
 
 @Component({
   selector: 'app-home',
@@ -13,6 +14,7 @@ import { Product } from '../../../../data/product.model';
   styleUrl: './home.component.scss' // або .css залежно від проекту
 })
 export class HomeComponent implements OnInit {
+  public imageService = inject(ImageService);
   public productService = inject(ProductService);
 
   // Сигнал для збереження популярних товарів

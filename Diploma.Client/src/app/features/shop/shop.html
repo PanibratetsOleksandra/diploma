@@ -82,7 +82,17 @@
           {{ cat }}
         </button>
       }
+ 
     </div>
+         <div class="flex gap-2 overflow-x-auto no-scrollbar pt-3 border-t border-gray-50 mt-3">
+        @for (type of types; track type) {
+          <button (click)="selectedType.set(type)" 
+                  [class]="selectedType() === type ? 'bg-orange-500 text-white shadow-sm' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'" 
+                  class="px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 active:scale-95">
+            {{ type }}
+          </button>
+        }
+      </div>
   </div>
 
   <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16 pb-24">

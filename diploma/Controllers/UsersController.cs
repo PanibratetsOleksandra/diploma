@@ -48,7 +48,6 @@ namespace diploma.api.Controllers
         {
 
             var users = await userManager.Users
-                //.Where(u => u.role)
                 .Select(u => new
                 {
                     u.Id,

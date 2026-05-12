@@ -1,7 +1,9 @@
-import { Component, AfterViewInit, signal, inject, OnInit } from '@angular/core';
+import { Component, AfterViewInit, signal, inject, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ImageService } from '../../core/services/image.service'; 
+
 import { 
   Canvas, 
   FabricImage, 
@@ -14,7 +16,6 @@ import {
 
 import { AuthService } from '../../core/services/auth.service';
 import { DesignerService } from '../../core/services/designer.service';
-import { Preview3DComponent } from '../preview3d/preview3d.component';
 
 type Tool = 'brush' | 'circle' | 'square' | 'text' | 'upload' | null;
 type Garment = 'tshirt' | 'sweatshirt' | 'hoodie' | 'tote' | 'denimJacket';
@@ -23,15 +24,16 @@ type GarmentView = 'front' | 'back';
 @Component({
   selector: 'app-designer',
   standalone: true,
-imports: [CommonModule, FormsModule, Preview3DComponent],
+imports: [CommonModule, FormsModule],
   templateUrl: './designer.html',
   styleUrl: './designer.scss'
 })
 export class DesignerComponent implements AfterViewInit, OnInit {
-  private canvas!: Canvas;
+public canvas!: Canvas;
   private history: string[] = [];
   private historyIndex = -1;
   private isRestoring = false;
+
   
 frontOverlay = signal<string | null>(null);
 backOverlay = signal<string | null>(null);
@@ -40,11 +42,16 @@ backOverlay = signal<string | null>(null);
   private router = inject(Router);
   public authService = inject(AuthService);
   private designerService = inject(DesignerService);
-
+public imageService = inject(ImageService);
   selectedView = signal<GarmentView>('front');
   selectedTool = signal<Tool>(null);
   selectedGarment = signal<Garment>('hoodie');
   selectedColor = signal('#000000');
+  selectedFontFamily = signal<string>('Arial');
+  selectedFontSize = signal<number>(34);
+  fonts = ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Impact', 'Comic Sans MS'];
+  brushWidth = signal<number>(6);
+  selectedOpacity = signal<number>(1); 
   layers = signal<FabricObject[]>([]);
 
   frontDesign = signal<string | null>(null);
@@ -54,60 +61,49 @@ backOverlay = signal<string | null>(null);
   private frontCanvasJSON: string | null = null;
   private backCanvasJSON: string | null = null;
 
-  private mockupBaseUrl = 'http://localhost:5000/images/mockups';
 
-  garments = [
-    { 
-      id: 'tshirt' as Garment, 
-      name: 'T-Shirt', 
-      icon: '👕', 
-      views: { 
-        front: `${this.mockupBaseUrl}/tshirt-front.png`, 
-        back: `${this.mockupBaseUrl}/tshirt-back.png` 
-      } 
-    },
-    { 
-      id: 'sweatshirt' as Garment, 
-      name: 'Sweatshirt', 
-      icon: '🧥', 
-      views: { 
-        front: `${this.mockupBaseUrl}/sweatshirt-front.png`, 
-        back: `${this.mockupBaseUrl}/sweatshirt-back.png` 
-      } 
-    },
-    { 
-      id: 'hoodie' as Garment, 
-      name: 'Hoodie', 
-      icon: '👚', 
-      views: { 
-        front: `${this.mockupBaseUrl}/hoodie-front.png`, 
-        back: `${this.mockupBaseUrl}/hoodie-back.png` 
-      } 
-    },
-    { 
-      id: 'tote' as Garment, 
-      name: 'Tote Bag', 
-      icon: '👜', 
-      views: { 
-        front: `${this.mockupBaseUrl}/tote-bag-front.png`, 
-        back: `${this.mockupBaseUrl}/tote-bag-back.png` 
-      } 
-    },
-    { 
-      id: 'denimJacket' as Garment, 
-      name: 'Denim Jacket', 
-      icon: '👔', 
-      views: { 
-        front: `${this.mockupBaseUrl}/denim-jacket-front.png`, 
-        back: `${this.mockupBaseUrl}/denim-jacket-back.png` 
-      } 
-    }
+ garments = [
+    { id: 'tshirt' as Garment, name: 'T-Shirt', icon: '👕', views: { front: 'images/mockups/tshirt-front.png', back: 'images/mockups/tshirt-back.png' } },
+    { id: 'sweatshirt' as Garment, name: 'Sweatshirt', icon: '🧥', views: { front: 'images/mockups/sweatshirt-front.png', back: 'images/mockups/sweatshirt-back.png' } },
+    { id: 'hoodie' as Garment, name: 'Hoodie', icon: '👚', views: { front: 'images/mockups/hoodie-front.png', back: 'images/mockups/hoodie-back.png' } },
+    { id: 'tote' as Garment, name: 'Tote Bag', icon: '👜', views: { front: 'images/mockups/tote-bag-front.png', back: 'images/mockups/tote-bag-back.png' } },
+    { id: 'denimJacket' as Garment, name: 'Denim Jacket', icon: '👔', views: { front: 'images/mockups/denim-jacket-front.png', back: 'images/mockups/denim-jacket-back.png' } }
   ];
 
   colors = [
     '#000000', '#ffffff', '#ff5f5f', '#4ecdc4', '#45b7d1', 
     '#ff9671', '#8dd3c7', '#f9d56e', '#b388c9', '#8795a1'
   ];
+
+// 🔥 Глобальне слухання клавіатури: Видалення та гарячі комбінації Ctrl+Z / Ctrl+Y
+// 🔥 Надійне слухання клавіатури, яке працює на будь-якій розкладці (UA / EN)
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    const activeObject = this.canvas?.getActiveObject();
+    
+    // Якщо користувач зараз пише текст, гарячі клавіші не чіпаємо
+    if (activeObject && activeObject.type === 'i-text' && (activeObject as any).isEditing) {
+      return; 
+    }
+
+    // 1. Обробка комбінацій Ctrl + Z та Ctrl + Y через фізичні коди клавіш
+    if (event.ctrlKey || event.metaKey) {
+      if (event.code === 'KeyZ') {
+        event.preventDefault();
+        this.undo();
+      } 
+      else if (event.code === 'KeyY') {
+        event.preventDefault();
+        this.redo();
+      }
+      return;
+    }
+
+    // 2. Видалення об'єктів
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      this.deleteSelected();
+    }
+  }
 
 ngOnInit(): void {
   const saved = sessionStorage.getItem('pendingManualDesign');
@@ -149,8 +145,38 @@ ngAfterViewInit(): void {
   this.canvas.on('object:modified', () => this.onCanvasChanged());
   this.canvas.on('object:removed', () => this.onCanvasChanged());
 
-  // loadGarmentMockup тепер автоматично підхопить frontCanvasJSON/backCanvasJSON
-  // якщо вони були відновлені в ngOnInit
+    this.canvas.on('selection:created', (e) => {
+      const active = e.selected?.[0];
+      if (active) this.selectedOpacity.set(active.opacity ?? 1);
+    });
+    this.canvas.on('selection:updated', (e) => {
+      const active = e.selected?.[0];
+      if (active) this.selectedOpacity.set(active.opacity ?? 1);
+    });
+
+
+    this.canvas.on('selection:created', (e) => {
+      const active = e.selected?.[0];
+      if (active) {
+        this.selectedOpacity.set(active.opacity ?? 1);
+        // Якщо це текст, підтягуємо його параметри в повзунки
+        if (active.type === 'i-text') {
+          this.selectedFontFamily.set((active as any).fontFamily ?? 'Arial');
+          this.selectedFontSize.set((active as any).fontSize ?? 34);
+        }
+      }
+    });
+
+    this.canvas.on('selection:updated', (e) => {
+      const active = e.selected?.[0];
+      if (active) {
+        this.selectedOpacity.set(active.opacity ?? 1);
+        if (active.type === 'i-text') {
+          this.selectedFontFamily.set((active as any).fontFamily ?? 'Arial');
+          this.selectedFontSize.set((active as any).fontSize ?? 34);
+        }
+      }
+    });
   this.loadGarmentMockup();
 }
 
@@ -190,7 +216,7 @@ ngAfterViewInit(): void {
     const garment = this.garments.find(g => g.id === this.selectedGarment());
     if (!garment) return;
 
-    const imageUrl = garment.views[this.selectedView()];
+const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedView()]);
 
     this.canvas.clear();
     this.canvas.backgroundColor = '#f7f8fa';
@@ -247,7 +273,7 @@ ngAfterViewInit(): void {
       this.updateLayers();
 
     } catch (e) {
-      console.error('Error loading mockup: - designer.ts:250', e);
+      console.error('Error loading mockup: - designer.ts:276', e);
     }
   }
 
@@ -266,6 +292,13 @@ ngAfterViewInit(): void {
     this.loadGarmentMockup();
   }
 
+  updateBrushWidth(width: number): void {
+  this.brushWidth.set(width);
+  if (this.canvas && this.canvas.isDrawingMode && this.canvas.freeDrawingBrush) {
+    this.canvas.freeDrawingBrush.width = width;
+  }
+}
+
   chooseTool(tool: Tool): void {
     this.selectedTool.set(tool);
     this.canvas.isDrawingMode = false;
@@ -274,7 +307,7 @@ ngAfterViewInit(): void {
       this.canvas.isDrawingMode = true;
       const brush = new PencilBrush(this.canvas);
       brush.color = this.selectedColor();
-      brush.width = 4;
+  brush.width = this.brushWidth();
       this.canvas.freeDrawingBrush = brush;
     } else if (tool === 'circle') {
       this.addCircle();
@@ -283,6 +316,7 @@ ngAfterViewInit(): void {
     } else if (tool === 'text') {
       this.addText();
     }
+    
   }
 
   selectColor(color: string): void {
@@ -295,6 +329,20 @@ ngAfterViewInit(): void {
       active.set('fill', color);
       this.canvas.renderAll();
       this.saveHistory();
+    }
+  }
+
+
+  // 🔥 Функція зміни прозорості обраного об'єкта
+  updateSelectedOpacity(opacity: number): void {
+    this.selectedOpacity.set(opacity);
+    const active = this.canvas?.getActiveObject();
+    
+    // Змінюємо прозорість тільки якщо об'єкт виділено і це не фоновий мокап
+    if (active && (active as any).name !== 'mockup') {
+      active.set('opacity', opacity);
+      this.canvas.renderAll();
+      this.saveHistory(); // Зберігаємо крок в історію Ctrl+Z
     }
   }
 
@@ -333,7 +381,8 @@ ngAfterViewInit(): void {
     const text = new IText('Your Text', {
       left: 280,
       top: 280,
-      fontSize: 34,
+   fontSize: this.selectedFontSize(),
+fontFamily: this.selectedFontFamily(),
       fill: this.selectedColor(),
       originX: 'center',
       originY: 'center',
@@ -343,7 +392,29 @@ ngAfterViewInit(): void {
     this.canvas.add(text);
     this.canvas.setActiveObject(text);
   }
+// 🔥 Зміна шрифту для виділеного тексту
+  updateFontFamily(font: string): void {
+    this.selectedFontFamily.set(font);
+    const active = this.canvas?.getActiveObject();
+    if (active && active.type === 'i-text') {
+      active.set('fontFamily', font);
+      this.canvas.renderAll();
+      this.saveHistory();
+    }
+  }
 
+  // 🔥 Зміна розміру для виділеного тексту
+  updateFontSize(size: number): void {
+    this.selectedFontSize.set(size);
+    const active = this.canvas?.getActiveObject();
+    if (active && active.type === 'i-text') {
+      active.set('fontSize', size);
+      this.canvas.renderAll();
+      this.saveHistory();
+    }
+  }
+
+  
   uploadImage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -375,6 +446,55 @@ ngAfterViewInit(): void {
       this.canvas.remove(active);
       this.canvas.discardActiveObject();
       this.canvas.renderAll();
+    }
+  }
+
+  // 🔥 Функція для дублювання обраного об'єкта
+  duplicateSelected(): void {
+    const active = this.canvas.getActiveObject();
+    
+    // Перевіряємо, чи є активний об'єкт і чи це не фоновий мокап одягу
+    if (active && (active as any).name !== 'mockup') {
+      active.clone().then((cloned) => {
+        this.canvas.discardActiveObject();
+        
+        // Зміщуємо клонований об'єкт трохи вбік і вниз, щоб користувач побачив копію
+        cloned.set({
+          left: cloned.left! + 20,
+          top: cloned.top! + 20,
+          evented: true
+        });
+
+        // Якщо це текстове поле, скидаємо стан редагування для копії
+        if (cloned.type === 'i-text') {
+          (cloned as any).isEditing = false;
+        }
+
+        this.canvas.add(cloned);
+        this.canvas.setActiveObject(cloned); // Автоматично виділяємо нову копію
+        this.canvas.renderAll();
+      });
+    }
+  }
+
+
+  // 🔥 Віддзеркалити ліворуч / праворуч (по горизонталі)
+  flipHorizontal(): void {
+    const active = this.canvas?.getActiveObject();
+    if (active && (active as any).name !== 'mockup') {
+      active.set('flipX', !active.flipX);
+      this.canvas.renderAll();
+      this.saveHistory();
+    }
+  }
+
+  // 🔥 Віддзеркалити вгору / вниз (по вертикалі)
+  flipVertical(): void {
+    const active = this.canvas?.getActiveObject();
+    if (active && (active as any).name !== 'mockup') {
+      active.set('flipY', !active.flipY);
+      this.canvas.renderAll();
+      this.saveHistory();
     }
   }
 
@@ -515,11 +635,11 @@ private async renderOtherSideAndSave(): Promise<void> {
   this.designerService.saveManualDesign(payload).subscribe({
     next: () => {
       sessionStorage.removeItem('pendingManualDesign');
-      console.log('✅ Design saved! - designer.ts:518');
+      console.log('✅ Design saved! - designer.ts:638');
     },
     error: (err) => {
-      console.error('❌ Save error: - designer.ts:521', err);
-      console.error('❌ Validation errors: - designer.ts:522', JSON.stringify(err.error?.errors));
+      console.error('❌ Save error: - designer.ts:641', err);
+      console.error('❌ Validation errors: - designer.ts:642', JSON.stringify(err.error?.errors));
     }
   });
 }
@@ -529,7 +649,7 @@ private async renderSideToDataUrl(view: GarmentView, savedJSON: string | null): 
   const garment = this.garments.find(g => g.id === this.selectedGarment());
   if (!garment) return '';
 
-  const imageUrl = garment.views[view];
+const imageUrl = this.imageService.getFullImageUrl(garment.views[view]);
 
   // Створюємо тимчасовий canvas поза DOM
   const tempCanvasEl = document.createElement('canvas');
@@ -574,33 +694,12 @@ private async renderSideToDataUrl(view: GarmentView, savedJSON: string | null): 
     return dataUrl;
 
   } catch (e) {
-    console.error('Error rendering side: - designer.ts:577', e);
+    console.error('Error rendering side: - designer.ts:697', e);
     tempCanvas.dispose();
     return '';
   }
 }
 
-
-show3DPreview = signal<boolean>(false);
-
-async openPreview3D(): Promise<void> {
-  this.saveCurrentViewState();
-
-  // Генеруємо ПРОЗОРІ overlay без футболки
-  const frontOverlay = await this.renderOverlayOnly(this.frontCanvasJSON);
-  const backOverlay = await this.renderOverlayOnly(this.backCanvasJSON);
-
-  this.frontOverlay.set(frontOverlay || null);
-  this.backOverlay.set(backOverlay || null);
-
-  this.show3DPreview.set(true);
-}
-
-closePreview3D(): void {
-  this.show3DPreview.set(false);
-}
-
-// designer.component.ts
 
 // Рендерить ТІЛЬКИ користувацькі шари на прозорому фоні для 3D-текстури
 private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
@@ -618,7 +717,7 @@ private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
   const tempCanvas = new Canvas(tempCanvasEl, {
     width: 560,
     height: 560,
-    backgroundColor: '' // ← порожній рядок = прозорий фон
+    backgroundColor: '' 
   });
 
   try {
@@ -628,8 +727,6 @@ private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
     });
 
     tempCanvas.renderAll();
-
-    // ← PNG з прозорістю (не jpeg!)
     const dataUrl = tempCanvas.toDataURL({ 
       format: 'png',
       multiplier: 2,
@@ -640,7 +737,7 @@ private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
     return dataUrl;
 
   } catch (e) {
-    console.error('Error rendering overlay: - designer.ts:643', e);
+    console.error('Error rendering overlay: - designer.ts:740', e);
     tempCanvas.dispose();
     return '';
   }
@@ -648,3 +745,4 @@ private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
 
 
 }
+

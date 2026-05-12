@@ -39,7 +39,7 @@ showToast(message: string, type: 'success' | 'error' = 'success'): void {
 
   setTimeout(() => {
     this.toastMessage.set('');
-  }, 10000);
+  }, 3000);
 }
 
   examples = [
@@ -161,41 +161,6 @@ openInspirationModal(): void {
 closeInspirationModal(): void {
   this.isInspirationModalOpen.set(false);
 }
-
-// saveToProfile(): void {
-//   const imageUrl = this.generatedImage();
-
-//   if (!imageUrl) return;
-
-//   // const token = localStorage.getItem('token');
-
-// if (!this.authService.currentUser()) {
-//   sessionStorage.setItem('pendingAiImage', imageUrl);
-
-//   this.router.navigate(['/login'], {
-//    queryParams: { returnUrl: '/ai-assistant' }
-//   });
-
-//   return;
-// }
-
-//     const payload = {
-//       base64Image: this.generatedImage(),
-//       prompt: this.userVision()
-//     };
-
-//     this.isLoading.set(true);
-//     this.aiService.saveDesign(payload).subscribe({
-//       next: () => {
-//         this.isLoading.set(false);
-//         alert('✨ Design saved to your collection!');
-//       },
-//       error: (err) => {
-//         this.isLoading.set(false);
-//         console.error(err);
-//       }
-//     });
-//   }
 
 saveToProfile(): void {
   const imageUrl = this.generatedImage();

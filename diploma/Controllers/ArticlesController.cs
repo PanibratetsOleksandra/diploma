@@ -1,18 +1,15 @@
-﻿// ArticlesController.cs
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using diploma.core.Entities;
 using diploma.dal;
 using diploma.core.DTOs;
-
+using Microsoft.AspNetCore.Authorization;
+using diploma.core;
 namespace diploma.api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+
     public class ArticlesController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -23,6 +20,7 @@ namespace diploma.api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Roles.ADMIN)]
         public async Task<IActionResult> Create([FromForm] ArticleDto dto, IFormFile? imageFile)
         {
             var article = new Article
@@ -96,6 +94,7 @@ namespace diploma.api.Controllers
 
         // Видалити статтю
         [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.ADMIN)]
         public async Task<IActionResult> Delete(int id)
         {
             var article = await _context.Articles.FindAsync(id);
@@ -117,6 +116,7 @@ namespace diploma.api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = Roles.ADMIN)]
         public async Task<IActionResult> Update(int id, [FromForm] ArticleDto dto, IFormFile? imageFile)
         {
             var article = await _context.Articles.FindAsync(id);

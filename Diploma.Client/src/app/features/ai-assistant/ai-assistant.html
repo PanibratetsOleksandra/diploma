@@ -1,357 +1,221 @@
-<div class="min-h-screen bg-gradient-to-br from-amber-50 via-white to-purple-50 px-4 py-10">
+<div class="min-h-screen bg-gradient-to-br from-amber-50 via-white to-purple-50 px-4 py-10 font-sans">
   <div class="mx-auto max-w-6xl">
-
-    <!-- Header -->
+    
     <div class="mb-12 text-center">
-      <div class="mx-auto mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-100 to-purple-100 px-6 py-3 text-sm font-medium text-orange-700">
+      <div class="mx-auto mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-100 to-purple-100 px-6 py-3 text-sm font-bold text-orange-700 shadow-sm">
         <span>✨</span>
-        <span>AI-Powered Design Assistant</span>
+        <span>Генеративний ШІ Асистент</span>
       </div>
-
-      <h1 class="mb-4 text-5xl font-normal text-black">
-        Find Your Style
+      <h1 class="mb-4 text-5xl font-black italic uppercase tracking-tighter text-gray-950">
+        Знайди Свій Стиль
       </h1>
-
       <div class="mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 sm:flex-row">
-        <p class="text-xl leading-relaxed text-slate-600">
-          Describe your mood, style, or inspiration, and our AI artist will generate
-          unique design ideas for your custom clothing
+        <p class="text-lg font-medium leading-relaxed text-slate-600">
+          Опишіть свій настрій, ідею чи джерело натхнення, і наш штучний інтелект згенерує унікальний ескіз для художнього розпису вашого одягу
         </p>
-
-        <button
-          type="button"
-          (click)="openInspirationModal()"
-          class="shrink-0 rounded-full bg-white px-5 py-3 text-sm font-semibold text-orange-600 shadow-md transition hover:bg-orange-50 hover:scale-[1.02]">
-          Need Inspiration?
+        <button type="button" (click)="openInspirationModal()" 
+                class="shrink-0 rounded-full bg-white px-6 py-3 text-sm font-black uppercase tracking-wider text-orange-600 shadow-md transition hover:bg-orange-50 hover:scale-[1.02] active:scale-95">
+          Потрібна ідея?
         </button>
       </div>
     </div>
 
-    <!-- Main Grid -->
     <div class="grid gap-12 lg:grid-cols-2">
-
-      <!-- Left column -->
+      
       <div class="space-y-6">
-
-        <!-- Describe card -->
-        <div class="rounded-3xl bg-white p-8 shadow-lg">
-          <h2 class="mb-5 text-2xl font-normal text-black">
-            Describe Your Vision
-          </h2>
-
-          <textarea
-            [ngModel]="userVision()"
-            (ngModelChange)="userVision.set($event)"
-            placeholder="E.g., 'Sunset over mountains with warm colors and soft gradients'"
-            class="min-h-[128px] w-full resize-none rounded-2xl border-2 border-slate-300 bg-slate-50 p-5 text-sm text-slate-700 outline-none transition placeholder:text-slate-500 focus:border-orange-400 focus:ring-2 focus:ring-orange-200">
+        <div class="rounded-3xl bg-white p-8 shadow-lg border border-gray-100">
+          <h2 class="mb-5 text-xl font-black uppercase tracking-widest text-gray-400">Опишіть ваше бачення</h2>
+          
+          <textarea [ngModel]="userVision()" (ngModelChange)="userVision.set($event)" 
+                    placeholder="Наприклад: 'Магічне сонцестояння, теплі теракотові кольори, м'які етнічні лінії та золоті градієнти...'" 
+                    class="min-h-[128px] w-full resize-none rounded-2xl border-2 border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100">
           </textarea>
 
-          <!-- Prompt builder -->
           <div class="mt-5 space-y-4">
-
+            
             <div>
-              <label class="mb-2 block text-xs font-semibold text-slate-600">
-                Clothing type
-              </label>
-
-              <select
-                [ngModel]="selectedGarment()"
-                (ngModelChange)="selectedGarment.set($event); buildPrompt()"
-                class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400">
-                <option value="">Choose clothing</option>
-
+              <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-400">Тип виробу (основа)</label>
+              <select [ngModel]="selectedGarment()" (ngModelChange)="selectedGarment.set($event); buildPrompt()" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-orange-400">
+                <option value="">Оберіть базовий одяг</option>
                 @for (garment of garments; track garment) {
                   <option [value]="garment">{{ garment }}</option>
                 }
               </select>
-
-              <input
-                [ngModel]="customGarment()"
-                (ngModelChange)="customGarment.set($event); buildPrompt()"
-                placeholder="Or enter your own clothing type..."
-                class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400"
-              />
+              <input [ngModel]="customGarment()" (ngModelChange)="customGarment.set($event); buildPrompt()" placeholder="Або введіть свій варіант основи..." class="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:border-orange-400" />
             </div>
 
             <div>
-              <label class="mb-2 block text-xs font-semibold text-slate-600">
-                Print placement
-              </label>
-
-              <select
-                [ngModel]="selectedPlacement()"
-                (ngModelChange)="selectedPlacement.set($event); buildPrompt()"
-                class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400">
-                <option value="">Choose placement</option>
-
+              <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-400">Розміщення малюнка</label>
+              <select [ngModel]="selectedPlacement()" (ngModelChange)="selectedPlacement.set($event); buildPrompt()" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-orange-400">
+                <option value="">Оберіть місце нанесення</option>
                 @for (placement of placements; track placement) {
                   <option [value]="placement">{{ placement }}</option>
                 }
               </select>
-
-              <input
-                [ngModel]="customPlacement()"
-                (ngModelChange)="customPlacement.set($event); buildPrompt()"
-                placeholder="Or enter your own print placement..."
-                class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400"
-              />
+              <input [ngModel]="customPlacement()" (ngModelChange)="customPlacement.set($event); buildPrompt()" placeholder="Або введіть своє унікальне розташування..." class="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:border-orange-400" />
             </div>
 
             <div>
-              <label class="mb-2 block text-xs font-semibold text-slate-600">
-                Style
-              </label>
-
-              <select
-                [ngModel]="selectedStyle()"
-                (ngModelChange)="selectedStyle.set($event); buildPrompt()"
-                class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400">
-                <option value="">Choose style</option>
-
+              <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-400">Стиль виконання</label>
+              <select [ngModel]="selectedStyle()" (ngModelChange)="selectedStyle.set($event); buildPrompt()" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-orange-400">
+                <option value="">Оберіть стиль розпису</option>
                 @for (style of styles; track style) {
                   <option [value]="style">{{ style }}</option>
                 }
               </select>
-
-              <input
-                [ngModel]="customStyle()"
-                (ngModelChange)="customStyle.set($event); buildPrompt()"
-                placeholder="Or enter your own style..."
-                class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400"
-              />
+              <input [ngModel]="customStyle()" (ngModelChange)="customStyle.set($event); buildPrompt()" placeholder="Або зазначте свій авторський стиль..." class="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:border-orange-400" />
             </div>
 
             <div>
-              <label class="mb-2 block text-xs font-semibold text-slate-600">
-                Colors
-              </label>
-
-              <select
-                [ngModel]="selectedColors()"
-                (ngModelChange)="selectedColors.set($event); buildPrompt()"
-                class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400">
-                <option value="">Choose colors</option>
-
+              <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-400">Колірна палітра</label>
+              <select [ngModel]="selectedColors()" (ngModelChange)="selectedColors.set($event); buildPrompt()" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-orange-400">
+                <option value="">Оберіть поєднання кольорів</option>
                 @for (colors of colorPalettes; track colors) {
                   <option [value]="colors">{{ colors }}</option>
                 }
               </select>
-
-              <input
-                [ngModel]="customColors()"
-                (ngModelChange)="customColors.set($event); buildPrompt()"
-                placeholder="Or enter your own colors..."
-                class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400"
-              />
+              <input [ngModel]="customColors()" (ngModelChange)="customColors.set($event); buildPrompt()" placeholder="Або пропишіть свої улюблені відтінки..." class="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:border-orange-400" />
             </div>
 
             <div>
-              <label class="mb-2 block text-xs font-semibold text-slate-600">
-                Main idea
-              </label>
-
-              <input
-                [ngModel]="designIdea()"
-                (ngModelChange)="designIdea.set($event); buildPrompt()"
-                placeholder="E.g., daisy, ocean wave, dragon, flowers..."
-                class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400"
-              />
+              <label class="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-400">Головний елемент композиції</label>
+              <input [ngModel]="designIdea()" (ngModelChange)="designIdea.set($event); buildPrompt()" placeholder="Наприклад: дерево життя, фенікс, колоски пшениці, геометричний орнамент..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:border-orange-400" />
             </div>
-
           </div>
 
-          <button
-            type="button"
-            (click)="generate()"
-            [disabled]="isLoading()"
-            class="mt-4 flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-orange-300 to-amber-300 px-6 py-4 text-sm font-bold text-white transition hover:scale-[1.01] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60">
-
+          <button type="button" (click)="generate()" [disabled]="isLoading()" 
+                  class="mt-6 flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-4 text-sm font-black uppercase tracking-widest text-white transition hover:scale-[1.01] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 active:scale-95 shadow-sm">
             @if (isLoading()) {
-              <span class="animate-pulse">Generating Design...</span>
+              <span class="animate-pulse">Створюємо магію ШІ...</span>
             } @else {
-              <span>🪄</span>
-              <span>Generate Design</span>
+              <span>🪄</span> <span>Згенерувати дизайн</span>
             }
           </button>
         </div>
-
       </div>
 
-      <!-- Right column -->
-     <div class="space-y-6">
-  <div class="rounded-3xl bg-white p-8 shadow-lg">
-    <h2 class="mb-6 text-2xl font-normal text-black"> AI Generated Design </h2>
-    
-    <div class="flex min-h-[385px] items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-white p-6">
-      @if (isLoading()) {
-        <div class="flex flex-col items-center">
-          <div class="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
-          <p class="mt-5 text-sm font-semibold text-orange-500"> Creating Magic... </p>
-        </div>
-      } @else if (generatedImage()) {
-  <div class="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full text-center">
-    
-    <div class="group relative mb-6 overflow-hidden rounded-3xl shadow-xl border-4 border-white transition hover:scale-[1.01]">
-      <img [src]="generatedImage()!" alt="AI Generated Design" class="max-h-[340px] w-full rounded-xl object-contain" />
-      
-
-    </div>
-
-    <div class="flex flex-col gap-3 px-2">
-     <button
-  type="button"
-  (click)="saveToProfile()"
-  [disabled]="isSaving()"
-  class="flex items-center justify-center gap-2 rounded-full border-2 border-black px-8 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-black hover:text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60">
-
-  @if (isSaving()) {
-    <span>Saving...</span>
-  } @else {
-    <span>{{ authService.currentUser() ? '⭐ Save to My Collection' : '👤 Login to Save Design' }}</span>
-  }
-</button>
-      
-      @if (!authService.currentUser()) {
-        <p class="text-[9px] text-slate-400 italic font-medium">
-          *You need to be logged in to save your AI designs
-        </p>
-      }
-    </div>
-  </div>
-      } @else {
-        <div class="text-center text-slate-400">
-          <div class="mb-5 text-6xl">✨</div>
-          <p class="text-sm"> Your AI-generated design will appear here </p>
-        </div>
-      }
-    </div>
-  </div>
-
-  <div class="rounded-3xl bg-gradient-to-br from-purple-50 via-orange-50 to-amber-50 p-8">
-     </div>
-</div>
-        <!-- How it works -->
-        <div class="rounded-3xl bg-gradient-to-br from-purple-50 via-orange-50 to-amber-50 p-8">
-          <h3 class="mb-6 text-base font-normal text-black">
-            How It Works
-          </h3>
-
-          <div class="space-y-4 text-sm text-slate-700">
-            <div class="flex items-center gap-4">
-              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">1</span>
-              <span>Describe your style, mood, or upload inspiration</span>
-            </div>
-
-            <div class="flex items-center gap-4">
-              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">2</span>
-              <span>AI generates unique design concepts</span>
-            </div>
-
-            <div class="flex items-center gap-4">
-              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">3</span>
-              <span>Choose your favorite and order custom painting</span>
-            </div>
-
-            <div class="flex items-center gap-4">
-              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">4</span>
-              <span>Our artists bring it to life on your chosen garment</span>
-            </div>
+      <div class="space-y-6">
+        <div class="rounded-3xl bg-white p-8 shadow-lg border border-gray-100">
+          <h2 class="mb-6 text-xl font-black uppercase tracking-widest text-gray-400">Згенерований ескіз</h2>
+          
+          <div class="flex min-h-[385px] items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white p-6">
+            @if (isLoading()) {
+              <div class="flex flex-col items-center">
+                <div class="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
+                <p class="mt-5 text-sm font-bold text-orange-500 animate-pulse"> Художник ШІ малює... </p>
+              </div>
+            } @else if (generatedImage()) {
+              <div class="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full text-center">
+                <div class="group relative mb-6 overflow-hidden rounded-3xl shadow-md border-4 border-white transition hover:scale-[1.01]">
+                  <img [src]="generatedImage()!" alt="Згенерований ШІ Дизайн" class="max-h-[340px] w-full rounded-xl object-contain" />
+                </div>
+                
+                <div class="flex flex-col gap-3 px-2">
+                  <button type="button" (click)="saveToProfile()" [disabled]="isSaving()" 
+                          class="flex items-center justify-center gap-2 rounded-full border-2 border-black bg-white px-8 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-black hover:text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60 active:scale-95">
+                    @if (isSaving()) {
+                      <span>Збереження...</span>
+                    } @else {
+                      <span>{{ authService.currentUser() ? '⭐ Зберегти до моєї колекції' : '👤 Увійдіть, щоб зберегти ескіз' }}</span>
+                    }
+                  </button>
+                  @if (!authService.currentUser()) {
+                    <p class="text-[9px] text-slate-400 italic font-semibold">
+                      * Необхідно авторизуватися на сайті, щоб зберігати ШІ-ескізи у свій профіль
+                    </p>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="text-center text-slate-400">
+                <div class="mb-5 text-6xl">✨</div>
+                <p class="text-sm font-bold text-slate-400 uppercase tracking-wider text-[11px]">
+                  Тут з'явиться ваш унікальний ШІ-дизайн
+                </p>
+              </div>
+            }
           </div>
         </div>
 
+        <div class="rounded-3xl bg-gradient-to-br from-purple-50 via-orange-50 to-amber-50 p-8 border border-orange-100/40">
+          <h3 class="mb-6 text-sm font-black uppercase tracking-widest text-gray-500"> Як це працює? </h3>
+          <div class="space-y-4 text-xs font-bold text-slate-700">
+            <div class="flex items-center gap-4">
+              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-black text-white shadow-sm">1</span>
+              <span>Опишіть свій унікальний стиль, настрій чи деталі композиції</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-black text-white shadow-sm">2</span>
+              <span>Штучний інтелект миттєво генерує унікальні художні концепції</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-black text-white shadow-sm">3</span>
+              <span>Оберіть найкращий варіант та збережіть його до своєї колекції</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-black text-white shadow-sm">4</span>
+              <span>Наші художники вручну перенесуть цей ескіз текстильними фарбами на ваш одяг</span>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
 
-    <!-- Bottom section -->
-    <div class="mt-12 rounded-3xl bg-white p-10 text-center shadow-lg">
-      <h2 class="mb-10 text-2xl font-normal text-black">
-        Why Use AI Stylist?
-      </h2>
-
+    <div class="mt-12 rounded-3xl bg-white p-10 text-center shadow-md border border-gray-100">
+      <h2 class="mb-10 text-xl font-black uppercase tracking-widest text-gray-400"> Чому саме ШІ Асистент? </h2>
       <div class="grid gap-10 md:grid-cols-3">
         <div>
-          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-orange-400 text-3xl text-white">
-            ✨
-          </div>
-          <h3 class="mb-3 font-medium text-black">Instant Inspiration</h3>
-          <p class="text-sm leading-relaxed text-slate-600">
-            Get design ideas in seconds based on your preferences
+          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-orange-400 text-3xl text-white shadow-sm"> ✨ </div>
+          <h3 class="mb-3 font-bold text-gray-950">Миттєве натхнення</h3>
+          <p class="text-xs leading-relaxed font-semibold text-slate-500 uppercase tracking-wide">
+            Отримуйте десятки свіжих ідей для кастомізації одягу за лічені секунди
           </p>
         </div>
-
         <div>
-          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500 text-3xl text-white">
-            🪄
-          </div>
-          <h3 class="mb-3 font-medium text-black">Personalized Results</h3>
-          <p class="text-sm leading-relaxed text-slate-600">
-            AI learns your style to suggest perfect matches
+          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500 text-3xl text-white shadow-sm"> 🪄 </div>
+          <h3 class="mb-3 font-bold text-gray-950">Персональний результат</h3>
+          <p class="text-xs leading-relaxed font-semibold text-slate-500 uppercase tracking-wide">
+            Нейромережа підлаштовується під ваші побажання для створення ексклюзивного ескізу
           </p>
         </div>
-
         <div>
-          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-pink-500 text-3xl text-white">
-            🛍️
-          </div>
-          <h3 class="mb-3 font-medium text-black">Easy Ordering</h3>
-          <p class="text-sm leading-relaxed text-slate-600">
-            One click to turn AI concepts into real artwork
+          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-pink-500 text-3xl text-white shadow-sm"> 🛍️ </div>
+          <h3 class="mb-3 font-bold text-gray-950">Легке замовлення</h3>
+          <p class="text-xs leading-relaxed font-semibold text-slate-500 uppercase tracking-wide">
+            Згенерований концепт стає основою для роботи майстрів ручного розпису
           </p>
         </div>
       </div>
     </div>
 
   </div>
+</div>
 
-  <!-- Inspiration Modal -->
-  @if (isInspirationModalOpen()) {
-    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
-      <div class="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-8 shadow-2xl">
-
-        <button
-          type="button"
-          (click)="closeInspirationModal()"
-          class="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xl text-slate-500 transition hover:bg-slate-200 hover:text-slate-700">
-          ×
-        </button>
-
-        <h3 class="mb-3 text-2xl font-normal text-black">
-          Need Inspiration?
-        </h3>
-
-        <p class="mb-6 text-sm text-slate-600">
-          Try one of these examples:
-        </p>
-
-        <div class="space-y-3">
-          @for (example of examples; track example) {
-            <button
-              type="button"
-              (click)="useExample(example)"
-              class="w-full rounded-xl bg-amber-50 px-4 py-4 text-left text-sm leading-relaxed text-slate-700 transition hover:bg-amber-100">
-              {{ example }}
-            </button>
-          }
-        </div>
-
+@if (isInspirationModalOpen()) {
+  <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+    <div class="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-8 shadow-2xl border border-gray-100">
+      <button type="button" (click)="closeInspirationModal()" class="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xl text-slate-500 transition hover:bg-slate-200 hover:text-slate-700 shadow-sm font-bold"> × </button>
+      <h3 class="mb-2 text-xl font-black uppercase tracking-tighter text-gray-950"> Шукаєте натхнення? </h3>
+      <p class="mb-6 text-xs font-semibold text-slate-400 uppercase tracking-wider"> Спробуйте один із цих готових запитів для нейромережі: </p>
+      <div class="space-y-3">
+        @for (example of examples; track example) {
+          <button type="button" (click)="useExample(example)" class="w-full rounded-xl bg-amber-50/60 px-5 py-4 text-left text-xs font-bold leading-relaxed text-slate-700 transition hover:bg-amber-100/80 border border-amber-100/40 active:scale-[0.99]">
+            {{ example }}
+          </button>
+        }
       </div>
     </div>
-    
-  }
+  </div>
+}
 
-     @if (toastMessage()) {
+@if (toastMessage()) {
   <div class="fixed bottom-6 right-6 z-[200] animate-in fade-in slide-in-from-bottom-4 duration-300">
-    <div
-      class="flex items-center gap-3 rounded-2xl px-5 py-4 text-sm font-semibold shadow-2xl"
-      [ngClass]="toastType() === 'success'
-        ? 'bg-green-50 text-green-700 border border-green-200'
-        : 'bg-red-50 text-red-700 border border-red-200'">
-
-      <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
+    <div class="flex items-center gap-3 rounded-2xl px-5 py-4 text-xs font-bold shadow-2xl uppercase tracking-wider" 
+         [ngClass]="toastType() === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'">
+      <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm text-sm">
         {{ toastType() === 'success' ? '✓' : '!' }}
       </span>
-
       <span>{{ toastMessage() }}</span>
     </div>
   </div>

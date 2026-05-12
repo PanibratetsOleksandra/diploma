@@ -7,6 +7,7 @@ import { UserService } from '../../../core/services/user.service';
 import { of } from 'rxjs';
 import { OrderStatus } from '../../../core/enums/order-status.enum';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
@@ -18,6 +19,7 @@ export class AdminPanelComponent implements OnInit {
   productService = inject(ProductService);
   userService = inject(UserService);
 private router = inject(Router);
+public authService = inject(AuthService);
   editingProductId: number | null = null;
   activeTab: 'products' | 'users' | 'stats' | 'orders' = 'products';
   revenueTab = signal<'months' | 'years'>('months');
@@ -52,7 +54,7 @@ orderStatuses = Object.values(OrderStatus);
         }
       },
       error: (err) => {
-        console.error('Помилка завантаження товарів: - admin-panel.ts:55', err);
+        console.error('Помилка завантаження товарів: - admin-panel.ts:57', err);
         this.productService.products.set(this.demoProducts);
       }
     });
@@ -66,7 +68,7 @@ orderStatuses = Object.values(OrderStatus);
       next: (data) => {
         this.orders.set(data);
       },
-      error: (err) => console.error('Помилка завантаження замовлень: - admin-panel.ts:69', err)
+      error: (err) => console.error('Помилка завантаження замовлень: - admin-panel.ts:71', err)
     });
   }
 // admin-panel.ts
@@ -268,7 +270,7 @@ navigateToProduct(item: any) {
   deleteProduct(id: number) {
     if (confirm('Ви впевнені, що хочете видалити цей виріб?')) {
       this.productService.deleteProduct(id).subscribe({
-        next: () => console.log('Товар видалено - admin-panel.ts:271'),
+        next: () => console.log('Товар видалено - admin-panel.ts:273'),
         error: (err) => alert('Не вдалося видалити товар.')
       });
     }
@@ -296,15 +298,22 @@ navigateToProduct(item: any) {
     { id: 1, name: 'Лонгслів "Магія Роду"', description: 'Ручний розпис з використанням традиційних українських орнаментів у сучасному стилі.', materials: '100% Бавовна', price: 2450, availableSizes: ['S', 'M', 'L'], photos: [{ url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=400', isMain: true }] }
   ];
 
+// 🔥 ЧИСТА ФІЛЬТРАЦІЯ: Виводимо в таблицю ТІЛЬКИ користувачів з роллю "User"
+  get filteredUsers(): any[] {
+    const allUsers = this.userService.users() || [];
+    const currentAdminId = this.authService.currentUser()?.id;
 
+    return allUsers.filter(user => {
+      // 1. Перевіряємо, чи масив ролей користувача містить роль 'User' (регістронезалежно)
+      const hasUserRole = user.roles?.some((role: string) => role.toLowerCase() === 'user');
+      
+      // 2. Перевіряємо, щоб це не був твій власний акаунт, з якого ти зараз сидиш
+      const isNotMe = user.id !== currentAdminId;
 
-
-
-
-
-
-
-  // admin-panel.ts (Додаємо обчислювальні геттери для аналітики)
+      // Користувач проходить у таблицю, тільки якщо він клієнт і це не поточний адмін
+      return hasUserRole && isNotMe;
+    });
+  }
 
 // 1. Загальний дохід (Revenue)
 get totalRevenue(): number {

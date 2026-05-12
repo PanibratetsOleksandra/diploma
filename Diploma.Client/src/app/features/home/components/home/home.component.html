@@ -27,7 +27,7 @@
 
     <div class="w-full lg:w-1/2 flex justify-center animate-in fade-in slide-in-from-right-8 duration-700">
       <div class="relative w-full max-w-lg aspect-square rounded-[3.5rem] overflow-hidden shadow-2xl border-4 border-white/50 group">
-        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=600" alt="Sasha Painting Jacket" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+      <img [src]="imageService.getFullImageUrl('images/main/main1.jpg')" alt="Sasha Painting Jacket" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
         <div class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-3xl shadow-xl flex items-center gap-3 border border-gray-100">
           <div class="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white font-bold text-lg">✨</div>
           <div>
@@ -44,7 +44,7 @@
       
       <div class="w-full lg:w-1/2">
         <div class="aspect-[4/3] w-full rounded-[2.5rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner">
-          <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=600" alt="Brushes & Acrylic Paints" class="w-full h-full object-cover">
+        <img [src]="imageService.getFullImageUrl('images/main/main2.jpg')" alt="Bag" class="w-full h-full object-cover">
         </div>
       </div>
 
@@ -161,41 +161,5 @@
     </div>
   </section>
 
-  <section class="max-w-7xl mx-auto px-6 lg:px-12 pb-24 space-y-12">
-    <div class="text-center space-y-2">
-      <span class="text-[10px] font-black uppercase tracking-widest text-[#E06A00]">Testimonials</span>
-      <h2 class="text-3xl lg:text-4xl font-black italic uppercase tracking-tighter text-gray-950">Що говорять наші поціновувачі мистецтва</h2>
-      <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Відгуки клієнтів, які вже замовили свій унікальний розпис</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      @for (review of reviews(); track review.name) {
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
-          <div class="space-y-4">
-            <div class="flex text-amber-400 gap-1">
-              @for (star of [1,2,3,4,5]; track star) {
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.9 1.303-.9 1.603 0l1.22 3.69h3.882c.969 0 1.371 1.24.588 1.81l-3.141 2.28 1.221 3.69c.3.9-.713 1.64-1.503 1.07l-3.141-2.28-3.141 2.28c-.79.57-1.803-.17-1.503-1.07l1.22-3.69-3.141-2.28c-.788-.57-.386-1.81.588-1.81h3.882l1.22-3.69z"/>
-                </svg>
-              }
-            </div>
-            <p class="text-sm text-gray-500 italic leading-relaxed">
-              "{{ review.text }}"
-            </p>
-          </div>
-
-          <div class="flex items-center gap-3 pt-6 border-t border-gray-50 mt-6">
-            <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 font-black flex items-center justify-center text-sm">
-              {{ review.name.substring(0, 1).toUpperCase() }}
-            </div>
-            <div>
-              <h4 class="text-xs font-black text-gray-950">{{ review.name }}</h4>
-              <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">{{ review.role }}</span>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
-  </section>
 
 </div>

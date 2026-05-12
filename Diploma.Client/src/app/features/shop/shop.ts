@@ -29,6 +29,8 @@ export class ShopComponent implements OnInit {
 
   categories = ['All', 'Denim', 'Leather', 'Cotton', 'Silk', 'Accessories'];
   allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  selectedType = signal<string>('Усі вироби');
+  types = ['Усі вироби', 'Футболка', 'Худі', 'Світшот', 'Куртка', 'Шоппер'];
 
   ngOnInit() {
     this.productService.getProducts().subscribe();
@@ -69,6 +71,21 @@ export class ShopComponent implements OnInit {
       );
     }
 
+    if (this.selectedType() !== 'Усі вироби') {
+      products = products.filter(p => {
+        const name = p.name.toLowerCase();
+        const type = this.selectedType();
+
+        if (type === 'Футболка') return name.includes('футболк') || name.includes('t-shirt') || name.includes('лонгслів');
+        if (type === 'Худі')     return name.includes('худі') || name.includes('hoodie');
+        if (type === 'Світшот')  return name.includes('світшот') || name.includes('sweatshirt');
+        if (type === 'Куртка')   return name.includes('куртк') || name.includes('джинс');
+        if (type === 'Шоппер')   return name.includes('шоппер') || name.includes('сумк') || name.includes('tote');
+        
+        return name.includes(type.toLowerCase());
+      });
+    }
+
     // 4. Фільтр за ціною
     if (this.minPrice() !== null) products = products.filter(p => p.price >= this.minPrice()!);
     if (this.maxPrice() !== null) products = products.filter(p => p.price <= this.maxPrice()!);
@@ -80,6 +97,9 @@ export class ShopComponent implements OnInit {
       return b.id - a.id;
     });
   });
+
+
+  
 
   getProductImage(product: Product): string {
     const mainPhoto = product.photos?.find(p => p.isMain) || product.photos?.[0];
@@ -93,12 +113,12 @@ export class ShopComponent implements OnInit {
   }
 
 isNewProduct(createdAt: string | Date | undefined): boolean {
-  console.log('DATE: - shop.ts:96', createdAt);
+  console.log('DATE: - shop.ts:116', createdAt);
 
   if (!createdAt) return false;
 
   const dateAdded = new Date(createdAt);
-  console.log('PARSED: - shop.ts:101', dateAdded);
+  console.log('PARSED: - shop.ts:121', dateAdded);
 
   if (isNaN(dateAdded.getTime())) return false;
 
@@ -106,13 +126,14 @@ isNewProduct(createdAt: string | Date | undefined): boolean {
   const diffTime = today.getTime() - dateAdded.getTime();
   const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
-  console.log('DAYS: - shop.ts:109', diffDays);
+  console.log('DAYS: - shop.ts:129', diffDays);
 
   return diffDays >= -1 && diffDays <= 14;
 }
   resetFilters() {
   this.searchQuery.set('');
   this.selectedCategory.set('All');
+  this.selectedType.set('Усі вироби');
   this.selectedSizes.set([]);
   this.minPrice.set(null);
   this.maxPrice.set(null);
