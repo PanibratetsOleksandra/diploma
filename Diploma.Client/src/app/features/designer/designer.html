@@ -190,26 +190,67 @@
           <li class="flex items-start gap-2"><span>•</span> Обов'язково збережіть готовий макет</li> 
         </ul> 
       </div> 
-      <div class="rounded-3xl bg-white p-6 shadow-sm border border-gray-100"> 
-        <h2 class="mb-5 text-sm font-black uppercase tracking-widest text-gray-400"> Розрахунок вартості </h2> 
-        <div class="space-y-4 text-xs font-bold text-gray-700"> 
-          <div class="flex justify-between"> 
-            <span class="text-slate-400 font-medium uppercase tracking-wider text-[10px]">Базовий виріб</span> 
-            <span>1800 - 2500 ₴</span> 
-          </div> 
-          <div class="flex justify-between"> 
-            <span class="text-slate-400 font-medium uppercase tracking-wider text-[10px]">Художній розпис</span> 
-            <span>1200 - 3500 ₴</span> 
-          </div> 
-          <hr class="border-gray-100" /> 
-          <div class="flex justify-between text-sm"> 
-            <span class="text-gray-900 font-black">Орієнтовна вартість</span> 
-            <span class="font-black text-[#E06A00]">3000 - 6000 ₴</span> 
-          </div> 
-          <p class="text-[10px] text-slate-400 font-medium leading-relaxed"> * Фінальна ціна залежить від обраного матеріалу основи та складності деталізації нанесеного малюнка. </p> 
-        </div> 
-      </div> 
-    </div> 
+     <div class="rounded-3xl bg-white p-6 shadow-sm border border-gray-100">
+  <h2 class="mb-5 text-sm font-black uppercase tracking-widest text-gray-400">Розрахунок вартості</h2>
+  <div class="space-y-4">
+    
+    <div class="flex justify-between items-center text-sm font-bold">
+      <span class="text-gray-400 uppercase text-[8px]">Базовий виріб ({{ selectedGarment() }})</span>
+      <span class="text-gray-900">{{ basePrice() }} ₴</span>
+    </div>
 
+    <div class="flex justify-between items-center text-sm font-bold">
+      <div class="flex flex-col">
+        <span class="text-gray-400 uppercase text-[8px]">Художній розпис</span>
+        @if (complexityFactor() > 1) {
+          <span class="text-[8px] text-orange-500 font-black uppercase mt-1">
+            Складність: x{{ complexityFactor() }}
+          </span>
+        }
+      </div>
+      <span class="text-gray-900">{{ dynamicArtPrice() }} ₴</span>
+    </div>
+
+    <div class="pt-4 border-t border-dashed border-gray-100">
+      <div class="flex justify-between items-end">
+        <div>
+          <span class="block text-[9px] font-black uppercase text-gray-400 mb-1">Орієнтовна вартість за макет</span>
+          <span class="text-3xl font-black italic text-orange-500 tracking-tighter">
+            {{ totalEstimatedPrice() }} ₴
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+@if (toastMessage()) {
+  <div class="fixed bottom-10 right-10 z-[200] animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div class="flex items-center gap-4 rounded-[2rem] px-6 py-4 shadow-2xl border backdrop-blur-md transition-all"
+         [ngClass]="toastType() === 'success' ? 'bg-white/90 border-green-100' : 'bg-red-50/90 border-red-100'">
+      
+      <div class="flex h-10 w-10 items-center justify-center rounded-full shadow-sm"
+           [ngClass]="toastType() === 'success' ? 'bg-black text-white' : 'bg-red-500 text-white'">
+        @if (toastType() === 'success') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+          </svg>
+        } @else {
+          <span class="font-black text-lg">!</span>
+        }
+      </div>
+
+      <div>
+        <p class="text-sm font-bold text-gray-900 leading-none">{{ toastMessage() }}</p>
+      </div>
+      
+      <button (click)="toastMessage.set('')" class="ml-4 text-gray-300 hover:text-gray-500 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+}
   </div> 
 </div>

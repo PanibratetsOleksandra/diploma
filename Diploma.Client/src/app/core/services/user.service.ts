@@ -96,4 +96,25 @@ updateOrderStatus(orderId: number, status: OrderStatus): Observable<any> {
   );
 }
 
+// --- МЕТОДИ ДЛЯ КЕРУВАННЯ ЦІНАМИ ОСНОВ (ГАРМЕНТІВ) ---
+
+  // Отримати всі ціни (використовується в адмінці та конструкторі)
+  getGarmentPrices(): Observable<any[]> {
+    return this.api.get<any[]>('garmentprices');
+  }
+
+  // Оновити базову ціну для конкретного типу одягу
+  updateGarmentPrice(id: number, basePrice: number): Observable<any> {
+    // Відправляємо саме число (decimal), як очікує наш контролер на бекенді
+    return this.api.put<any>(`garmentprices/${id}`, basePrice);
+  }
+
+
+  postGarmentPrice(garment: any): Observable<any> {
+  return this.api.post<any>('garmentprices', garment);
+}
+
+deleteGarmentPrice(id: number): Observable<any> {
+  return this.api.delete<any>(`garmentprices/${id}`);
+}
 }

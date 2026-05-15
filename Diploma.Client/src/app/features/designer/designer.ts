@@ -1,8 +1,9 @@
-import { Component, AfterViewInit, signal, inject, OnInit, HostListener } from '@angular/core';
+import { Component, AfterViewInit, signal, inject, OnInit, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ImageService } from '../../core/services/image.service'; 
+
 
 import { 
   Canvas, 
@@ -16,6 +17,7 @@ import {
 
 import { AuthService } from '../../core/services/auth.service';
 import { DesignerService } from '../../core/services/designer.service';
+import { UserService } from '../../core/services/user.service';
 
 type Tool = 'brush' | 'circle' | 'square' | 'text' | 'upload' | null;
 type Garment = 'tshirt' | 'sweatshirt' | 'hoodie' | 'tote' | 'denimJacket';
@@ -33,10 +35,16 @@ public canvas!: Canvas;
   private history: string[] = [];
   private historyIndex = -1;
   private isRestoring = false;
-
+private userService = inject(UserService);
+garmentPricesList = signal<any[]>([]);
+basePrice = signal<number>(0);         
+artPriceBase = signal<number>(1000);   
+toastMessage = signal('');
+toastType = signal<'success' | 'error'>('success');
   
 frontOverlay = signal<string | null>(null);
 backOverlay = signal<string | null>(null);
+
 
 
   private router = inject(Router);
@@ -106,6 +114,7 @@ public imageService = inject(ImageService);
   }
 
 ngOnInit(): void {
+    this.loadPrices();
   const saved = sessionStorage.getItem('pendingManualDesign');
   if (saved) {
     const data = JSON.parse(saved);
@@ -113,7 +122,7 @@ ngOnInit(): void {
     // Відновлюємо PNG сигнали
     this.frontDesign.set(data.front ?? null);
     this.backDesign.set(data.back ?? null);
-    
+  
     // Відновлюємо JSON стани canvas для обох сторін
     this.frontCanvasJSON = data.frontJSON ?? null;
     this.backCanvasJSON = data.backJSON ?? null;
@@ -130,6 +139,33 @@ ngOnInit(): void {
         sessionStorage.removeItem('pendingManualDesign');
       }, 500);
     }
+  }
+}
+
+
+
+
+// 1. Метод для отримання цін з бекенду
+loadPrices(): void {
+  this.userService.getGarmentPrices().subscribe({
+    next: (data) => {
+      this.garmentPricesList.set(data);
+      // Відразу оновлюємо ціну для початкового виробу (hoodie)
+      this.updatePriceByType(this.selectedGarment());
+    },
+    error: (err) => console.error('Помилка завантаження цін: - designer.ts:156', err)
+  });
+}
+
+// 2. Допоміжний метод для пошуку ціни в списку за типом
+updatePriceByType(type: string): void {
+  const found = this.garmentPricesList().find(
+    p => p.garmentType.toLowerCase() === type.toLowerCase()
+  );
+  if (found) {
+    this.basePrice.set(found.basePrice);
+  } else {
+    this.basePrice.set(1000); 
   }
 }
 
@@ -273,7 +309,7 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
       this.updateLayers();
 
     } catch (e) {
-      console.error('Error loading mockup: - designer.ts:276', e);
+      console.error('Error loading mockup: - designer.ts:312', e);
     }
   }
 
@@ -286,7 +322,7 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
     // Зберігаємо поточну сторону перед зміною виробу
     this.saveCurrentViewState();
     this.selectedGarment.set(garment);
-    // Скидаємо збережені стани при зміні виробу
+    this.updatePriceByType(garment);
     this.frontCanvasJSON = null;
     this.backCanvasJSON = null;
     this.loadGarmentMockup();
@@ -635,11 +671,11 @@ private async renderOtherSideAndSave(): Promise<void> {
   this.designerService.saveManualDesign(payload).subscribe({
     next: () => {
       sessionStorage.removeItem('pendingManualDesign');
-      console.log('✅ Design saved! - designer.ts:638');
+      this.showToast('Дизайн успішно збережено в кабінет!');
     },
     error: (err) => {
-      console.error('❌ Save error: - designer.ts:641', err);
-      console.error('❌ Validation errors: - designer.ts:642', JSON.stringify(err.error?.errors));
+      console.error('❌ Save error: - designer.ts:677', err);
+      console.error('❌ Validation errors: - designer.ts:678', JSON.stringify(err.error?.errors));
     }
   });
 }
@@ -694,7 +730,7 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[view]);
     return dataUrl;
 
   } catch (e) {
-    console.error('Error rendering side: - designer.ts:697', e);
+    console.error('Error rendering side: - designer.ts:733', e);
     tempCanvas.dispose();
     return '';
   }
@@ -737,12 +773,77 @@ private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
     return dataUrl;
 
   } catch (e) {
-    console.error('Error rendering overlay: - designer.ts:740', e);
+    console.error('Error rendering overlay: - designer.ts:776', e);
     tempCanvas.dispose();
     return '';
   }
 }
+// 1. Коефіцієнт складності на основі кількості шарів на ПОТОЧНІЙ стороні
+// (Ми залишаємо це для візуального відображення коефіцієнта під час малювання)
+complexityFactor = computed(() => {
+  const count = this.layers().length;
+  if (count <= 2) return 1;
+  if (count <= 5) return 1.2;
+  return 1.5;
+});
 
+// 2. Розрахунок вартості розпису з урахуванням ОБВОХ сторін
+dynamicArtPrice = computed(() => {
+  const baseArt = 1000;
+  
+  // Функція для підрахунку об'єктів у JSON-рядку
+  const getObjectCount = (jsonString: string | null) => {
+    if (!jsonString) return 0;
+    try {
+      const parsed = JSON.parse(jsonString);
+      return parsed.objects ? parsed.objects.length : 0;
+    } catch { return 0; }
+  };
+
+  // Рахуємо об'єкти на обох сторонах
+  // Важливо: для поточної сторони беремо дані прямо з canvas (this.layers()), 
+  // а для іншої — з її збереженого JSON
+  const currentSideCount = this.layers().length;
+  const otherSideJSON = this.selectedView() === 'front' ? this.backCanvasJSON : this.frontCanvasJSON;
+  const otherSideCount = getObjectCount(otherSideJSON);
+
+  // Логіка нарахування:
+  // Якщо на стороні є хоча б один малюнок, додаємо вартість розпису для цієї сторони
+  let totalArtPrice = 0;
+
+  // Рахуємо ціну для першої сторони (якщо не порожня)
+  if (currentSideCount > 0) {
+    totalArtPrice += baseArt * this.calculateFactor(currentSideCount);
+  }
+
+  // Рахуємо ціну для другої сторони (якщо не порожня)
+  if (otherSideCount > 0) {
+    totalArtPrice += baseArt * this.calculateFactor(otherSideCount);
+  }
+
+  // Якщо обидві сторони порожні, але користувач у конструкторі — показуємо мін. ціну 1 сторони
+  return totalArtPrice > 0 ? Math.round(totalArtPrice) : baseArt;
+});
+
+// Допоміжний метод (поза computed)
+private calculateFactor(count: number): number {
+  if (count <= 2) return 1;
+  if (count <= 5) return 1.2;
+  return 1.5;
+}
+
+totalEstimatedPrice = computed(() => {
+  return this.basePrice() + this.dynamicArtPrice();
+});
+showToast(message: string, type: 'success' | 'error' = 'success'): void {
+  this.toastMessage.set(message);
+  this.toastType.set(type);
+  
+  // Приховуємо повідомлення через 3 секунди
+  setTimeout(() => {
+    this.toastMessage.set('');
+  }, 3000);
+}
 
 }
 

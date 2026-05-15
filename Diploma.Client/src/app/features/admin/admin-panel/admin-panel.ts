@@ -8,10 +8,11 @@ import { of } from 'rxjs';
 import { OrderStatus } from '../../../core/enums/order-status.enum';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { FormsModule } from '@angular/forms'; 
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,FormsModule,],
   templateUrl: './admin-panel.html'
 })
 export class AdminPanelComponent implements OnInit {
@@ -21,8 +22,9 @@ export class AdminPanelComponent implements OnInit {
 private router = inject(Router);
 public authService = inject(AuthService);
   editingProductId: number | null = null;
-  activeTab: 'products' | 'users' | 'stats' | 'orders' = 'products';
+activeTab: 'products' | 'users' | 'stats' | 'orders' | 'prices' = 'products';
   revenueTab = signal<'months' | 'years'>('months');
+  garmentPrices = signal<any[]>([]);
   
   sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   selectedSizes: string[] = [];
@@ -34,6 +36,8 @@ public authService = inject(AuthService);
   orders = signal<any[]>([]);
   selectedOrder = signal<any | null>(null);
   isOrderDetailsOpen = signal(false);
+  toastMessage = signal('');
+  toastType = signal<'success' | 'error'>('success');
 
   // Статуси замовлень
 orderStatuses = Object.values(OrderStatus);
@@ -54,21 +58,23 @@ orderStatuses = Object.values(OrderStatus);
         }
       },
       error: (err) => {
-        console.error('Помилка завантаження товарів: - admin-panel.ts:57', err);
+        console.error('Помилка завантаження товарів: - admin-panel.ts:61', err);
         this.productService.products.set(this.demoProducts);
       }
     });
 
     this.userService.getUsers().subscribe();
-    this.loadRealOrders(); // Завантажуємо реальні замовлення при старті
+    this.loadRealOrders(); 
+    this.loadGarmentPrices();
   }
 
+  
   loadRealOrders() {
     this.userService.getAllOrders().subscribe({
       next: (data) => {
         this.orders.set(data);
       },
-      error: (err) => console.error('Помилка завантаження замовлень: - admin-panel.ts:71', err)
+      error: (err) => console.error('Помилка завантаження замовлень: - admin-panel.ts:77', err)
     });
   }
 // admin-panel.ts
@@ -172,12 +178,15 @@ navigateToProduct(item: any) {
     return photoUrl;
   }
 
-  setTab(tab: 'products' | 'users' | 'stats' | 'orders') {
-    this.activeTab = tab;
-    if (tab === 'orders') {
-      this.loadRealOrders(); // Оновлюємо замовлення при переході на вкладку
-    }
+setTab(tab: 'products' | 'users' | 'stats' | 'orders' | 'prices') {
+  this.activeTab = tab;
+  if (tab === 'orders') {
+    this.loadRealOrders();
   }
+  if (tab === 'prices') {
+    this.loadGarmentPrices(); 
+  }
+}
 
   toggleSize(size: string) {
     if (this.selectedSizes.includes(size)) {
@@ -270,7 +279,7 @@ navigateToProduct(item: any) {
   deleteProduct(id: number) {
     if (confirm('Ви впевнені, що хочете видалити цей виріб?')) {
       this.productService.deleteProduct(id).subscribe({
-        next: () => console.log('Товар видалено - admin-panel.ts:273'),
+        next: () => console.log('Товар видалено - admin-panel.ts:282'),
         error: (err) => alert('Не вдалося видалити товар.')
       });
     }
@@ -691,6 +700,76 @@ get yearlyRevenueData() {
       revenue: yearsData[year],
       heightPercent: Math.min(Math.round((yearsData[year] / maxRevenue) * 100), 100)
     }));
+
+
+    
+}
+
+
+// 3. Метод завантаження
+loadGarmentPrices() {
+  // Використовуємо ApiService або HttpClient
+  this.userService.getGarmentPrices().subscribe({
+    next: (data) => this.garmentPrices.set(data),
+    error: (err) => console.error('Помилка завантаження цін: - admin-panel.ts:714', err)
+  });
+}
+
+// 4. Метод оновлення
+updateGarmentPrice(item: any) {
+  this.userService.updateGarmentPrice(item.id, item.basePrice).subscribe({
+    next: () => {
+      this.showToast(`Ціну на ${item.garmentType} успішно оновлено!`, 'success');
+      this.loadGarmentPrices(); // освіжаємо дані
+    },
+    error: (err) => {
+      this.showToast('Не вдалося оновити ціну', 'error');
+      console.error(err);
+    }
+  });
+}
+
+showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    
+    // Ховаємо повідомлення через 3 секунди
+    setTimeout(() => {
+      this.toastMessage.set('');
+    }, 3000);
+  }
+
+  addNewGarment(type: string, price: number) {
+  if (!type || !price) {
+    this.showToast('Заповніть назву та ціну', 'error');
+    return;
+  }
+
+  const newGarment = {
+    garmentType: type,
+    basePrice: price
+  };
+
+  // Викликаємо сервіс (потрібно буде додати метод postGarmentPrice у UserService)
+  this.userService.postGarmentPrice(newGarment).subscribe({
+    next: () => {
+      this.showToast(`Виріб ${type} додано!`, 'success');
+      this.loadGarmentPrices(); // Оновлюємо список
+    },
+    error: (err) => this.showToast('Такий тип вже існує або помилка сервера', 'error')
+  });
+}
+
+deleteGarmentPrice(id: number) {
+  if (confirm('Ви впевнені, що хочете видалити цей тип виробу? Це може вплинути на конструктор.')) {
+    this.userService.deleteGarmentPrice(id).subscribe({
+      next: () => {
+        this.showToast('Категорію видалено', 'success');
+        this.loadGarmentPrices(); // Оновлюємо список
+      },
+      error: () => this.showToast('Помилка при видаленні', 'error')
+    });
+  }
 }
 
 }
