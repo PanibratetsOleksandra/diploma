@@ -22,4 +22,8 @@ deleteDesign(id: number) {
   return this.api.delete<any>(`ai/designs/${id}`);
 }
 
+translatePrompt(text: string): Observable<{ translatedPrompt: string }> {
+  return this.api.post<{ translatedPrompt: string }>('ai/translate-prompt', { text });
+}
+
 }

@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+
 
 
 namespace diploma.api.Controllers
@@ -169,9 +172,60 @@ namespace diploma.api.Controllers
             }
         }
 
+        [HttpPost("translate-prompt")]
+        public async Task<IActionResult> TranslatePrompt([FromBody] TranslateRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Text))
+                return BadRequest("Text is empty");
 
+            var apiKey = _configuration["HuggingFace:ApiKey"];
 
+            var url =
+                "https://router.huggingface.co/hf-inference/models/Helsinki-NLP/opus-mt-uk-en";
+
+            var requestBody = new
+            {
+                inputs = request.Text
+            };
+
+            try
+            {
+                using var message = new HttpRequestMessage(HttpMethod.Post, url);
+
+                message.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", apiKey);
+
+                message.Content = JsonContent.Create(requestBody);
+
+                var response = await _httpClient.SendAsync(message);
+
+                var responseText = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return StatusCode((int)response.StatusCode, responseText);
+                }
+
+                using var doc = JsonDocument.Parse(responseText);
+
+                var translatedText = doc.RootElement[0]
+                    .GetProperty("translation_text")
+                    .GetString();
+
+                return Ok(new
+                {
+                    translatedPrompt = translatedText
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Translation failed: {ex.Message}");
+            }
         }
+
+        public class TranslateRequest { public string Text { get; set; } = null!; }
+
+    }
 
     public class AiRequest
     {

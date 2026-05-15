@@ -25,6 +25,22 @@ toastType = signal<'success' | 'error'>('success');
   generatedImage = signal<string | null>(null);
 public authService = inject(AuthService);
 private router = inject(Router);
+// 🛡️ Константи для валідації
+private readonly MAX_FIELD_LENGTH = 250;
+private readonly FORBIDDEN_PATTERNS = [
+  /фото|photograph|photo|3d рендер|3d render|qr.?код|qr.?code|штрих.?код|barcode/i,
+  /мікро.?текст|microtext|пікселі|pixels|вектор|vector|svg|png|jpg|resolution|роздільн/i,
+  /nike|adidas|gucci|louis vuitton|supreme|balenciaga|off.?white|бренд|brand/i
+];
+
+private readonly FORBIDDEN_CATEGORIES = [
+  'взуття', 'кросівки', 'кеди', 'шкарпетки', 'сумка', 'штани', 'джинси',
+  'фотографія людини', 'реалістичне обличчя', '3d hologram', 'moving animation'
+];
+
+// Сигнал для відстеження помилок по кожному полю окремо
+fieldErrors = signal<Record<string, string>>({});
+
 
 ngOnInit(): void {
   const savedImage = sessionStorage.getItem('pendingAiImage');
@@ -42,85 +58,195 @@ showToast(message: string, type: 'success' | 'error' = 'success'): void {
   }, 3000);
 }
 
-  examples = [
-    'Clean apparel mockup of a white oversized T-shirt with a centered hand-painted daisy illustration. Minimal composition, soft brush strokes, slightly textured paint effect, balanced placement on chest area, isolated on white background, high-quality fashion mockup.',
-    'Modern black hoodie with a minimalist geometric print in black and white, clean sharp lines, abstract shapes, centered chest placement, high contrast, streetwear aesthetic, isolated on white background, realistic clothing mockup.',
-    'Summer T-shirt design featuring a stylized blue ocean wave, flowing dynamic shape, soft gradients and highlights, centered front print, light and fresh aesthetic, white T-shirt mockup, clean background, high-quality apparel design.',
-    'Streetwear black T-shirt with a grunge splatter print in black and deep red, chaotic paint splashes, distressed texture, edgy urban aesthetic, slightly off-center composition, bold contrast, high-quality fashion mockup, isolated on white background.',
-    'Light blue denim jacket with a pastel floral design on the back, soft delicate flowers, watercolor style, gentle color palette, large centered back print, aesthetic fashion mockup, clean white background, high detail.',
-    'Black T-shirt with a cyberpunk-inspired front print in neon pink and electric blue, glowing elements, futuristic design, digital glitch effects, centered composition, high contrast, modern streetwear mockup, white background.'
-  ];
+
+
+
+examples = [
+  'Біла оверсайз футболка з великим центральним принтом: соняшник у стилі ботанічної ілюстрації, тонкі лінії олівцем, пастельно-жовтий та зелений, реалістична деталізація пелюсток, на білому тлі, якісний мокап одягу.',
+  'Чорне худі з мінімалістичним написом у стилі Old English на грудях, великі літери, білий і золотий кольори, вивітрена текстура, вулична естетика, ізольоване на білому тлі, реалістичний мокап.',
+  'Молочне оверсайз худі з великим принтом на спині: японська хвиля Хокусай у переосмисленому пастельному стилі, рожевий та блакитний градієнт, чисті контури, естетика 90-х, білий фон, деталізований мокап.',
+  'Чорна футболка з рок-принтом: череп у квітах у стилі гравюри, чорно-білий, деталізовані штрихи, темна вулична естетика, центральне розміщення, ізоляція на білому, реалістична тканина.',
+  'Пісочний лонгслів з принтом на рукаві: геометричний орнамент у стилі вишиванки, теракота та бордо, етнічні мотиви, акуратне розміщення вздовж рукава, сучасна інтерпретація, якісний мокап.',
+  'Білий бомбер з вишивкою на грудях: троянда в реалістичному стилі, яскраво-червоний та зелений, обємний ефект, вінтажна естетика, невелике розміщення на лівому боці, детальний мокап куртки.'
+];
+
+
 
   generate(): void {
-    const vision = this.userVision().trim();
+const vision = this.userVision();
+  const visionError = this.validateVisionText(vision);
+  
+  // Перевірка головного тексту та наявності будь-яких помилок у полях
+  const hasFieldErrors = Object.values(this.fieldErrors()).some(err => err !== '');
 
-    if (!vision) return;
-
-    this.isLoading.set(true);
-    this.errorMessage.set('');
-    this.generatedImage.set(null);
-
-    this.aiService.generateDesign(vision).subscribe({
-      next: (response: any) => {
-        this.generatedImage.set(response?.imageUrl || null);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('AI Error: - ai-assistant.ts:69', err);
-        console.error('AI Error body: - ai-assistant.ts:70', err?.error);
-
-        this.errorMessage.set(
-          typeof err?.error === 'string'
-            ? err.error
-            : 'Failed to generate AI image.'
-        );
-
-        this.isLoading.set(false);
-      }
-    });
+  if (visionError || hasFieldErrors || !vision.trim()) {
+    this.showToast(visionError || 'Будь ласка, виправте помилки у полях', 'error');
+    return;
   }
+
+  this.isLoading.set(true);
+  this.errorMessage.set('');
+  this.generatedImage.set(null);
+
+  // 1. Спочатку "олюднюємо" і перекладаємо промпт через Gemini
+  this.aiService.translatePrompt(vision).subscribe({
+    next: (translationRes) => {
+      const englishPrompt = translationRes.translatedPrompt;
+      console.log('translated prompt: - ai-assistant.ts:95', englishPrompt);
+
+      // 2. Тепер генеруємо зображення, використовуючи англійський текст
+      this.aiService.generateDesign(englishPrompt).subscribe({
+        next: (response: any) => {
+          this.generatedImage.set(response?.imageUrl || null);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          this.errorMessage.set('Помилка генерації зображення.');
+          this.isLoading.set(false);
+        }
+      });
+    },
+    error: (err) => {
+      console.error('Translation error: - ai-assistant.ts:110', err);
+      // Якщо переклад впав, пробуємо згенерувати як є (fallback)
+      this.aiService.generateDesign(vision).subscribe({
+        next: (response: any) => {
+          this.generatedImage.set(response?.imageUrl || null);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+        }
+      });
+    }
+  });
+}
 
 useExample(example: string): void {
   this.userVision.set(example);
   this.closeInspirationModal();
-  this.generate();
 }
 
-  garments = [
-  'white oversized T-shirt',
-  'black hoodie',
-  'summer T-shirt',
-  'denim jacket',
-  'black streetwear T-shirt',
-  'cream sweatshirt'
+
+// ✅ Валідація коротких полів (основа, стиль, кольори)
+validateField(fieldName: string, value: string): string {
+  if (!value.trim()) return '';
+  if (value.trim().length < 3) return 'Опишіть детальніше';
+  if (value.trim().length > this.MAX_FIELD_LENGTH) return `Максимум ${this.MAX_FIELD_LENGTH} символів`;
+
+  for (const pattern of this.FORBIDDEN_PATTERNS) {
+    if (pattern.test(value)) return 'Не підходить для ручного розпису';
+  }
+if (!/[a-zA-Zа-яА-ЯіІїЇєЄґҐ']/.test(value)) return 'Введіть текст, а не лише символи';
+  return '';
+}
+
+// ✅ Валідація головного текстового опису
+validateVisionText(value: string): string {
+  const lowerValue = value.toLowerCase();
+  if (!value.trim()) return '';
+  if (value.trim().length < 10) return 'Опишіть ідею детальніше (мінімум 10 символів)';
+  if (value.trim().length > 250) return 'Максимум 250 символів';      
+if (!/[a-zA-Zа-яА-ЯіІїЇєЄґҐ']/.test(value)) return 'Введіть текст, а не лише символи';
+
+  for (const pattern of this.FORBIDDEN_PATTERNS) {
+    if (pattern.test(value)) return 'Такий вміст ми не зможемо нанести на одяг';
+  }
+  for (const word of this.FORBIDDEN_CATEGORIES) {
+    if (lowerValue.includes(word)) return `Ми не працюємо з категорією: ${word}`;
+  }
+  return '';
+}
+
+// Обробники змін для HTML
+onVisionChange(value: string) {
+  this.userVision.set(value);
+  this.fieldErrors.update(prev => ({ ...prev, vision: this.validateVisionText(value) }));
+}
+
+onCustomGarmentChange(value: string) {
+  this.customGarment.set(value);
+  this.fieldErrors.update(prev => ({ ...prev, garment: this.validateField('garment', value) }));
+  this.buildPrompt();
+}
+
+onCustomPlacementChange(value: string) {
+  this.customPlacement.set(value);
+  this.fieldErrors.update(prev => ({ ...prev, placement: this.validateField('placement', value) }));
+  this.buildPrompt();
+}
+
+onCustomStyleChange(value: string) {
+  this.customStyle.set(value);
+  this.fieldErrors.update(prev => ({ ...prev, style: this.validateField('style', value) }));
+  this.buildPrompt();
+}
+
+onCustomColorsChange(value: string) {
+  this.customColors.set(value);
+  this.fieldErrors.update(prev => ({ ...prev, colors: this.validateField('colors', value) }));
+  this.buildPrompt();
+}
+
+onDesignIdeaChange(value: string) {
+  this.designIdea.set(value);
+  this.fieldErrors.update(prev => ({ ...prev, idea: this.validateField('idea', value) }));
+  this.buildPrompt();
+}
+
+garments = [
+  'біла оверсайз футболка',
+  'чорна футболка стандартного крою',
+  'бежева футболка',
+  'чорне худі',
+  'сіре меланжеве худі',
+  'молочне оверсайз худі',
+  'чорний бомбер',
+  'джинсова куртка',
+  'білий лонгслів',
+  'чорний лонгслів',
+  'темно-синя толстовка без капюшона',
+  'бежевий світшот'
 ];
 
 placements = [
-  'centered chest print',
-  'large back print',
-  'small front logo print',
-  'sleeve print',
-  'slightly off-center front print'
+  'великий центральний принт на грудях',
+  'великий принт на всю спину',
+  'малий лого-принт на лівому боці грудей',
+  'принт по всій поверхні',
+  'принт вздовж рукава',
+  'принт на плечі',
+  'злегка зміщений принт ліворуч на грудях',
+  'горизонтальний принт по низу футболки'
 ];
-
 styles = [
-  'minimalist',
-  'hand-painted',
-  'watercolor',
-  'grunge streetwear',
-  'cyberpunk',
-  'pastel floral',
-  'geometric',
-  'vintage'
+  'мінімалізм — чисті лінії, без зайвих деталей',
+  'ручний розпис — видимі мазки пензля, жива текстура',
+  'акварель — прозорі шари, плавні переходи',
+  'гравюра — штрихування, чорно-білий графічний стиль',
+  'вінтаж / ретро — подряпини, вицвілі кольори, старіння',
+  'стріт-арт / графіті — жирні лінії, урбан-естетика',
+  'аніме / манга — великі очі, динамічні лінії',
+  'кіберпанк — неон, цифрові глітчі, футуризм',
+  'ботанічна ілюстрація — детальні рослини, наукова точність',
+  'геометрія — симетрія, абстрактні форми, орнамент',
+  'вишиванка / етно — традиційні орнаменти, народні мотиви',
+  'японський стиль — мінімалізм, каліграфія, природа'
 ];
 
 colorPalettes = [
-  'black and white',
-  'pastel pink and blue',
-  'deep red and black',
-  'neon pink and electric blue',
-  'soft blue and white',
-  'warm orange and yellow'
+  'чорний та білий (класичний контраст)',
+  'чорний та золотий (розкіш)',
+  'білий та теракота (тепла земля)',
+  'пастельний рожевий та лавандовий',
+  'глибокий бордо та темно-синій',
+  'яскравий неоново-рожевий та електрик',
+  'пісочний, беж та коричневий (нейтральний)',
+  'смарагдовий та золотий',
+  'блакитний та молочно-білий (свіжість)',
+  'червоний та чорний (агресивний контраст)',
+  'олива та коричневий (мілітарі)',
+  'мультиколор — яскрава палітра без обмежень'
 ];
 
 selectedGarment = signal('');
@@ -137,12 +263,12 @@ buildPrompt(): void {
   const idea = this.designIdea().trim();
 
   const prompt =
-    `Clean apparel mockup of a ${garment || 'piece of clothing'} ` +
-    `with a ${placement || 'front print'}. ` +
-    `${idea ? `Design idea: ${idea}. ` : ''}` +
-    `${style ? `Style: ${style}. ` : ''}` +
-    `${colors ? `Color palette: ${colors}. ` : ''}` +
-    `High-quality fashion mockup, realistic clothing, isolated on white background, balanced composition.`;
+    `${garment || 'футболка'} ` +
+    `з ${placement || 'принтом спереду'}. ` +
+    `${idea ? `Головний елемент: ${idea}. ` : ''}` +
+    `${style ? `Стиль: ${style}. ` : ''}` +
+    `${colors ? `Кольори: ${colors}. ` : ''}` +
+    `макет професійного одягу, центральне розташування, реалістична текстура тканини, прозорий фон, висока деталізація, сучасний брендинг у сфері моди`;
 
   this.userVision.set(prompt);
 }
@@ -188,12 +314,12 @@ saveToProfile(): void {
     next: () => {
       this.isSaving.set(false);
       sessionStorage.removeItem('pendingAiImage');
-      this.showToast('✨ Design saved to your collection!', 'success');
+      this.showToast('✨ Дизайн збережено у вашій колекції!', 'success');
     },
     error: (err) => {
       this.isSaving.set(false);
       console.error(err);
-      this.showToast('Something went wrong. Try again.', 'error');
+      this.showToast('Сталася помилка. Спробуйте ще раз.', 'error');
     }
   });
 }
