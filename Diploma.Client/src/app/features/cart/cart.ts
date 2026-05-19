@@ -26,11 +26,11 @@ export class CartComponent {
     this.cartService.updateQuantity(cartId, -1);
   }
 
-  remove(cartId: string | number) {
-    if (confirm('Видалити цей товар з кошика?')) {
-      this.cartService.removeFromCart(cartId);
-    }
+remove(cartId: string | number) {
+  if (confirm('Ви дійсно хочете видалити цей виріб з кошика? ❌')) {
+    this.cartService.removeFromCart(cartId);
   }
+}
 
   getImg(url: string) {
     return this.imageService.getFullImageUrl(url);

@@ -21,4 +21,22 @@ public imageService = inject(ImageService);
     this.authService.logout();
     this.router.navigate(['/']);
   }
+
+
+  navigateToDashboard() {
+    const user = this.authService.currentUser();
+    
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const isAdmin = user.roles?.some(role => role.toLowerCase() === 'admin');
+
+    if (isAdmin) {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate(['/profile']);
+    }
+  }
 }

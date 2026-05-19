@@ -19,7 +19,7 @@ export class ShopComponent implements OnInit {
 
   // Стан фільтрів
   searchQuery = signal('');
-  selectedCategory = signal<string>('All');
+  selectedCategory = signal<string>('Усі матеріали');
   sortBy = signal<string>('newest');
   
   // НОВІ ФІЛЬТРИ
@@ -27,10 +27,10 @@ export class ShopComponent implements OnInit {
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
 
-  categories = ['All', 'Denim', 'Leather', 'Cotton', 'Silk', 'Accessories'];
+categories = ['Усі матеріали', 'Джинс', 'Шкіра', 'Бавовна', 'Шовк', 'Аксесуари'];
   allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   selectedType = signal<string>('Усі вироби');
-  types = ['Усі вироби', 'Футболка', 'Худі', 'Світшот', 'Куртка', 'Шоппер'];
+types = ['Усі вироби', 'Футболка', 'Худі', 'Світшот', 'Куртка', 'Шопер'];
 
   ngOnInit() {
     this.productService.getProducts().subscribe();
@@ -48,16 +48,20 @@ export class ShopComponent implements OnInit {
     let products = this.productService.products();
 
     // 1. Фільтр за категорією
-    if (this.selectedCategory() !== 'All') {
+    if (this.selectedCategory() !== 'Усі матеріали') {
       products = products.filter(p => 
         p.materials.toLowerCase().includes(this.selectedCategory().toLowerCase())
       );
     }
 
     // 2. Пошук за назвою
-    if (this.searchQuery()) {
+if (this.searchQuery()) {
+      const query = this.searchQuery().toLowerCase().trim();
+      
       products = products.filter(p => 
-        p.name.toLowerCase().includes(this.searchQuery().toLowerCase())
+        (p.name?.toLowerCase().includes(query)) ||
+        (p.description?.toLowerCase().includes(query)) ||
+        (p.materials?.toLowerCase().includes(query))
       );
     }
 
@@ -113,26 +117,42 @@ export class ShopComponent implements OnInit {
   }
 
 isNewProduct(createdAt: string | Date | undefined): boolean {
-  console.log('DATE: - shop.ts:116', createdAt);
-
   if (!createdAt) return false;
-
   const dateAdded = new Date(createdAt);
-  console.log('PARSED: - shop.ts:121', dateAdded);
-
   if (isNaN(dateAdded.getTime())) return false;
-
   const today = new Date();
   const diffTime = today.getTime() - dateAdded.getTime();
   const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-  console.log('DAYS: - shop.ts:129', diffDays);
-
   return diffDays >= -1 && diffDays <= 14;
 }
+
+  onMinPriceInput(event: any) {
+    const val = event.target.value;
+    if (!val) {
+      this.minPrice.set(null);
+      return;
+    }
+    const num = +val;
+    this.minPrice.set(num < 0 ? 0 : num); 
+    if (num < 0) event.target.value = 0;  
+  }
+
+
+  onMaxPriceInput(event: any) {
+    const val = event.target.value;
+    if (!val) {
+      this.maxPrice.set(null);
+      return;
+    }
+    const num = +val;
+    this.maxPrice.set(num < 0 ? 0 : num); 
+    if (num < 0) event.target.value = 0;   
+  }
+
+
   resetFilters() {
   this.searchQuery.set('');
-  this.selectedCategory.set('All');
+  this.selectedCategory.set('Усі матеріали');
   this.selectedType.set('Усі вироби');
   this.selectedSizes.set([]);
   this.minPrice.set(null);

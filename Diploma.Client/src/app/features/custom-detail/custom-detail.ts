@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Location } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-custom-detail',
@@ -13,11 +14,15 @@ templateUrl: './custom-detail.html'
 export class CustomDetailComponent implements OnInit {
   private router = inject(Router);
   private location = inject(Location);
+  private authService = inject(AuthService);
 
   // Сигнал для збереження отриманих даних
   customItem = signal<any | null>(null);
 
-// custom-detail.component.ts або custom-detail.ts
+get isAdmin(): boolean {
+    const userRoles = this.authService.currentUser()?.roles || [];
+    return userRoles.some((role: string) => role.toLowerCase() === 'admin');
+  }
 
 ngOnInit() {
   const state = this.location.getState() as any;

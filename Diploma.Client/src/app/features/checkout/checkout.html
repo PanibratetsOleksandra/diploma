@@ -1,6 +1,6 @@
 <div class="min-h-screen pt-32 pb-20 px-6 lg:px-12 bg-gray-50/50 text-gray-900">
   <div class="max-w-6xl mx-auto">
-    <h1 class="text-4xl font-black italic uppercase tracking-tighter mb-10">Checkout</h1>
+    <h1 class="text-4xl font-black italic uppercase tracking-tighter mb-10">Оформлення замовлення</h1>
 
     <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-10 items-start">
       
@@ -8,28 +8,28 @@
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center gap-12">
           <div class="flex items-center gap-3">
             <span [class]="currentStep() === 1 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors">1</span>
-            <span class="text-xs font-black uppercase tracking-widest" [class.text-orange-500]="currentStep() === 1">Shipping</span>
+            <span class="text-xs font-black uppercase tracking-widest" [class.text-orange-500]="currentStep() === 1">Доставка</span>
           </div>
           <div class="h-[1px] bg-gray-100 w-20"></div>
           <div class="flex items-center gap-3">
             <span [class]="currentStep() === 2 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors">2</span>
-            <span class="text-xs font-black uppercase tracking-widest" [class.text-orange-500]="currentStep() === 2">Payment</span>
+            <span class="text-xs font-black uppercase tracking-widest" [class.text-orange-500]="currentStep() === 2">Оплата</span>
           </div>
         </div>
 
         @if (currentStep() === 1) {
           <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-100 space-y-8 animate-in fade-in duration-500">
-            <h2 class="text-2xl font-black italic uppercase tracking-tighter">Shipping Information</h2>
+            <h2 class="text-2xl font-black italic uppercase tracking-tighter">Контактні дані</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="md:col-span-2">
                 <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Email</label>
                 <input [(ngModel)]="contactInfo().email" class="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold">
               </div>
-              <input [(ngModel)]="contactInfo().firstName" placeholder="First Name" class="p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold">
-              <input [(ngModel)]="contactInfo().lastName" placeholder="Last Name" class="p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold">
+              <input [(ngModel)]="contactInfo().firstName" placeholder="Ім'я" class="p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold">
+              <input [(ngModel)]="contactInfo().lastName" placeholder="Прізвище" class="p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold">
               <div class="md:col-span-2">
-                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Phone</label>
+                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Номер телефону</label>
                 <input [(ngModel)]="contactInfo().phone" placeholder="+380..." class="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold">
               </div>
             </div>
@@ -37,21 +37,26 @@
             <hr class="border-gray-100">
 
             <div class="space-y-4">
-              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block pl-2">Select Address</label>
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block pl-2">Виберіть адресу доставки</label>
               
               @for (addr of userAddresses(); track addr.id) {
                 <div class="space-y-3">
                   <div (click)="selectSavedAddress(addr.id)" 
                        [class.border-orange-500]="selectedAddressId() === addr.id && !isNewAddress()"
                        class="flex items-center p-5 border rounded-3xl cursor-pointer hover:bg-gray-50 transition-all">
-                    <div class="flex-1">
-                      <p class="font-black italic text-sm">{{ addr.deliveryService }} — {{ addr.city }}</p>
-                      <p class="text-[10px] font-bold text-gray-400 uppercase mt-1">
-                        {{ addr.region }} @if (addr.warehouseNumber) { | №{{ addr.warehouseNumber }} } 
-                        @if (addr.street) { | {{ addr.street }}, {{ addr.building }} }
-                      </p>
-                    </div>
-                    <button (click)="startEditingSaved(addr); $event.stopPropagation()" class="mr-4 text-[9px] font-black uppercase text-gray-400 hover:text-orange-500 transition">Edit</button>
+             <div class="flex-1">
+  <p class="font-black italic text-sm">
+    {{ addr.deliveryService === 'NovaPoshta' ? 'Нова Пошта' : (addr.deliveryService === 'UkrPoshta' ? 'Укрпошта' : addr.deliveryService) }} — 
+    {{ addr.deliveryType === 'Warehouse' ? 'Відділення' : (addr.deliveryType === 'Postomaten' ? 'Поштомат' : 'Кур\'єр') }}
+  </p>
+  
+  <p class="text-[10px] font-bold text-gray-400 uppercase mt-1">
+    м. {{ addr.city }}, {{ addr.region }} 
+    @if (addr.warehouseNumber) { | №{{ addr.warehouseNumber }} } 
+    @if (addr.street) { | вул. {{ addr.street }}, буд. {{ addr.building }} }
+  </p>
+</div>
+                    <button (click)="startEditingSaved(addr); $event.stopPropagation()" class="mr-4 text-[9px] font-black uppercase text-gray-400 hover:text-orange-500 transition">Редагувати</button>
                     @if (selectedAddressId() === addr.id && !isNewAddress()) { <span class="text-orange-500">✓</span> }
                   </div>
 
@@ -59,8 +64,8 @@
                     <div class="p-8 bg-gray-50 rounded-[2.5rem] space-y-4 animate-in slide-in-from-top-2 duration-300">
                       <ng-container *ngTemplateOutlet="addressForm"></ng-container>
                       <div class="flex gap-2">
-                        <button (click)="saveAddressChanges()" class="flex-1 py-3 bg-black text-white rounded-xl text-[9px] font-black uppercase">Apply Changes</button>
-                        <button (click)="editingAddressId.set(null)" class="flex-1 py-3 bg-white text-gray-400 rounded-xl text-[9px] font-black uppercase border border-gray-100">Cancel</button>
+                        <button (click)="saveAddressChanges()" class="flex-1 py-3 bg-black text-white rounded-xl text-[9px] font-black uppercase">Застосувати зміни</button>
+                        <button (click)="editingAddressId.set(null)" class="flex-1 py-3 bg-white text-gray-400 rounded-xl text-[9px] font-black uppercase border border-gray-100">Відмінити</button>
                       </div>
                     </div>
                   }
@@ -70,7 +75,7 @@
               <div (click)="isNewAddress.set(true); selectedAddressId.set(null); editingAddressId.set(null)" 
                    [class.border-orange-500]="isNewAddress()"
                    class="flex items-center p-5 border border-dashed rounded-3xl cursor-pointer hover:bg-gray-50">
-                <p class="font-black italic text-sm group-hover:text-orange-500">+ Use a new address</p>
+                <p class="font-black italic text-sm group-hover:text-orange-500">+ Використати нову адресу</p>
               </div>
 
               @if (isNewAddress()) {
@@ -81,28 +86,28 @@
             </div>
 
             <button (click)="nextStep()" class="w-full py-5 bg-orange-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-orange-100 mt-6">
-              Continue to Payment
+              Продовжити до оплати
             </button>
           </div>
         }
 
         @if (currentStep() === 2) {
           <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-100 space-y-8 animate-in slide-in-from-right duration-500">
-            <h2 class="text-2xl font-black italic uppercase tracking-tighter">Payment Method</h2>
+            <h2 class="text-2xl font-black italic uppercase tracking-tighter">Спосіб оплати</h2>
             <div class="grid grid-cols-2 gap-4">
               <button (click)="paymentMethod.set('card')" [class.border-orange-500]="paymentMethod() === 'card'" class="p-8 border rounded-3xl text-center bg-gray-50/50 hover:bg-white transition-all">
                 <span class="text-2xl block mb-2">💳</span>
-                <span class="text-[10px] font-black uppercase tracking-widest">Card</span>
+                <span class="text-[10px] font-black uppercase tracking-widest">Карткою на сайті</span>
               </button>
               <button (click)="paymentMethod.set('cash')" [class.border-orange-500]="paymentMethod() === 'cash'" class="p-8 border rounded-3xl text-center bg-gray-50/50 hover:bg-white transition-all">
                 <span class="text-2xl block mb-2">🚚</span>
-                <span class="text-[10px] font-black uppercase tracking-widest">COD</span>
+                <span class="text-[10px] font-black uppercase tracking-widest">При отриманні (НП)</span>
               </button>
             </div>
             <div class="flex gap-4">
               <button (click)="currentStep.set(1)" class="flex-1 py-5 bg-gray-100 text-gray-500 rounded-2xl font-black uppercase text-[10px] tracking-widest">Back</button>
               <button (click)="placeOrder()" [disabled]="isSubmitting()" class="flex-[2] py-5 bg-orange-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-orange-100">
-                {{ isSubmitting() ? 'Processing...' : 'Complete Order' }}
+               {{ isSubmitting() ? 'Обробка...' : 'Підтвердити замовлення' }}
               </button>
             </div>
           </div>
@@ -111,7 +116,7 @@
 
       <aside class="sticky top-32">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-          <h3 class="text-xl font-black italic uppercase tracking-tighter mb-8">Order Summary</h3>
+          <h3 class="text-xl font-black italic uppercase tracking-tighter mb-8">Підсумок замовлення</h3>
           <div class="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             @for (item of cartService.items(); track item.id) {
               <div class="flex gap-4">
@@ -120,7 +125,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <h4 class="text-xs font-black italic truncate leading-tight">{{ item.name }}</h4>
-                  <p class="text-[9px] text-gray-400 font-bold mt-1">Qty: {{ item.quantity }} × {{ item.price }} ₴</p>
+                  <p class="text-[9px] text-gray-400 font-bold mt-1">К-сть:: {{ item.quantity }} × {{ item.price }} ₴</p>
                 </div>
                 <p class="text-xs font-black italic">{{ item.price * item.quantity }} ₴</p>
               </div>
@@ -129,15 +134,17 @@
           <hr class="border-gray-100 my-6">
           <div class="space-y-3">
             <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
-              <span>Subtotal</span>
+              <span>Вартість товарів</span>
               <span class="text-black">{{ cartService.totalPrice() }} ₴</span>
             </div>
             <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
-              <span>Shipping</span>
-              <span class="text-green-500 font-black">Free</span>
+              <span>Доставка</span>
+            <span class="text-gray-400 bg-gray-50 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-gray-100">
+    За тарифами перевізника
+  </span>
             </div>
             <div class="flex justify-between items-end pt-4 border-t border-gray-100">
-              <span class="text-xs font-black uppercase">Total</span>
+              <span class="text-xs font-black uppercase">Загалом до сплати</span>
               <span class="text-2xl font-black italic text-orange-500">{{ cartService.totalPrice() }} ₴</span>
             </div>
           </div>
@@ -147,37 +154,134 @@
   </div>
 </div>
 
+
+@if (toastMessage()) {
+  <div class="fixed bottom-10 right-10 z-[200] animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div class="flex items-center gap-4 rounded-[2rem] px-6 py-4 shadow-2xl border backdrop-blur-md bg-white/90 transition-all"
+         [ngClass]="toastType() === 'success' ? 'border-green-100' : 'border-red-100'">
+      
+      <div class="flex h-10 w-10 items-center justify-center rounded-full shadow-sm text-white animate-in zoom-in duration-300"
+           [ngClass]="toastType() === 'success' ? 'bg-black' : 'bg-red-500'">
+        @if (toastType() === 'success') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+          </svg>
+        } @else {
+          <span class="font-black text-lg">!</span>
+        }
+      </div>
+
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">Оформлення замовлення</p>
+        <p class="text-sm font-bold text-gray-900 leading-none">{{ toastMessage() }}</p>
+      </div>
+
+      <button (click)="toastMessage.set('')" class="ml-4 text-gray-300 hover:text-gray-500 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+}
+
+@if (isPaymentModalOpen()) {
+  <div class="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+    <div class="bg-[#F8F9FA] w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-200 animate-in zoom-in-95 duration-300 flex flex-col">
+      
+      <div class="bg-black text-white px-8 py-6 flex justify-between items-center">
+        <div>
+          <span class="bg-orange-500 text-white font-black text-[8px] uppercase tracking-widest px-2 py-0.5 rounded">Secure Sandbox</span>
+          <h3 class="text-base font-black tracking-tight mt-1">Еквайринг Panibratets Artwear</h3>
+        </div>
+        <button (click)="isPaymentModalOpen.set(false)" [disabled]="isPaying()" class="text-gray-400 hover:text-white transition">✕</button>
+      </div>
+
+      <div class="p-8 space-y-6">
+        <div class="flex justify-between items-end bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+          <div>
+            <p class="text-[9px] font-black uppercase tracking-widest text-gray-400">Сума до сплати</p>
+            <p class="text-2xl font-black italic text-orange-500 mt-1">{{ cartService.totalPrice() }} ₴</p>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-gray-900 to-gray-850 p-6 rounded-2xl text-white shadow-xl space-y-4 relative overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-orange-500/10 rounded-full blur-xl"></div>
+          <div class="flex justify-between items-start">
+            <span class="text-xl">💳</span>
+          </div>
+<div class="space-y-3">
+            <div>
+              <label class="text-[8px] font-mono tracking-wider text-gray-400 block mb-1 uppercase">Номер картки</label>
+              <input [ngModel]="cardData().number" (input)="onCardNumberInput($event)" placeholder="4111 1111 1111 1111" maxlength="19" [disabled]="isPaying()" class="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm font-mono tracking-widest focus:outline-none focus:border-orange-500 text-white">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-[8px] font-mono tracking-wider text-gray-400 block mb-1 uppercase">Термін дії</label>
+                <input [ngModel]="cardData().expiry" (input)="onExpiryInput($event)" placeholder="MM/YY" maxlength="5" [disabled]="isPaying()" class="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm font-mono tracking-widest focus:outline-none focus:border-orange-500 text-center text-white">
+              </div>
+          <div>
+                <label class="text-[8px] font-mono tracking-wider text-gray-400 block mb-1 uppercase">CVV2</label>
+                <input type="text" [ngModel]="maskedCvv()" (input)="onCvvInput($event)" placeholder="***" maxlength="3" [disabled]="isPaying()" class="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm font-mono tracking-widest focus:outline-none focus:border-orange-500 text-center text-white">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-8 bg-white border-t border-gray-100 flex gap-3">
+        <button (click)="simulateCardPayment()" [disabled]="isPaying()" class="flex-[2] py-4 bg-orange-500 hover:bg-orange-600 text-white font-black text-xs uppercase tracking-widest rounded-xl transition shadow-lg shadow-orange-100 flex items-center justify-center gap-2">
+          @if (isPaying()) {
+            <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            Перевірка транзакції...
+          } @else {
+            Оплатити {{ cartService.totalPrice() }} ₴
+          }
+        </button>
+        <button (click)="isPaymentModalOpen.set(false)" [disabled]="isPaying()" class="flex-1 py-4 bg-gray-100 hover:bg-gray-200 text-gray-500 font-black text-xs uppercase tracking-widest rounded-xl transition">
+          Скасувати
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+
+
+
 <ng-template #addressForm>
   <div class="grid grid-cols-2 gap-4">
     <select [(ngModel)]="newAddress().deliveryService" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
-      <option value="NovaPoshta">Nova Poshta</option>
-      <option value="UkrPoshta">UkrPoshta</option>
+      <option value="NovaPoshta">Нова Пошта</option>
+      <option value="UkrPoshta">УкрПошта</option>
     </select>
     <select [(ngModel)]="newAddress().deliveryType" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
-      <option value="Warehouse">Warehouse</option>
-      <option value="Postomaten">Postomaten</option>
-      <option value="Courier">Courier</option>
+      <option value="Warehouse">Відділення</option>
+      <option value="Postomaten">Поштомат</option>
+      <option value="Courier">Кур'єрська доставка</option>
     </select>
   </div>
   <div class="grid grid-cols-2 gap-4">
-    <input [(ngModel)]="newAddress().region" placeholder="Region" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
-    <input [(ngModel)]="newAddress().city" placeholder="City" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
+    <input [(ngModel)]="newAddress().region" placeholder="Область" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
+    <input [(ngModel)]="newAddress().city" placeholder="Місто" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
   </div>
   
   @if (newAddress().deliveryType === 'Courier') {
     <div class="space-y-4">
-      <input [(ngModel)]="newAddress().street" placeholder="Street" class="w-full p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
+      <input [(ngModel)]="newAddress().street" placeholder="Вулиця" class="w-full p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
       <div class="grid grid-cols-3 gap-2">
-        <input [(ngModel)]="newAddress().building" placeholder="Build." class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
-        <input [(ngModel)]="newAddress().floor" placeholder="Floor" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
-        <input [(ngModel)]="newAddress().apartment" placeholder="Appt" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
+        <input [(ngModel)]="newAddress().building" placeholder="Буд." class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
+        <input [(ngModel)]="newAddress().floor" placeholder="Поверх" class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
+        <input [(ngModel)]="newAddress().apartment" placeholder="Кв." class="p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
       </div>
       <label class="flex items-center gap-3 cursor-pointer p-2">
         <input type="checkbox" [(ngModel)]="newAddress().hasElevator" class="w-5 h-5 accent-orange-500">
-        <span class="text-[10px] font-black uppercase text-gray-500">Has Elevator</span>
+        <span class="text-[10px] font-black uppercase text-gray-500">Є ліфт у будинку</span>
       </label>
     </div>
   } @else {
-    <input [(ngModel)]="newAddress().warehouseNumber" placeholder="Warehouse №" class="w-full p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
+    <input [(ngModel)]="newAddress().warehouseNumber" placeholder="№ Відділення / Поштомату" class="w-full p-4 bg-white border-none rounded-2xl text-xs font-bold shadow-sm">
   }
 </ng-template>

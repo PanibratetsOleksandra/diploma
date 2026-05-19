@@ -3,9 +3,9 @@
 
     <div class="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12 pb-6 border-b border-gray-100">
       <div class="text-start space-y-2">
-        <h1 class="text-4xl lg:text-5xl font-black italic uppercase tracking-tighter text-gray-950">Care & Creativity</h1>
+        <h1 class="text-4xl lg:text-5xl font-black italic uppercase tracking-tighter text-gray-950">Догляд та Творчість</h1>
         <p class="text-sm text-gray-400 font-medium max-w-xl">
-          Tips, inspiration, and behind-the-scenes stories from the world of wearable art
+          Поради, натхнення та залаштункові історії зі світу мистецтва, яке можна носити
         </p>
       </div>
 
@@ -22,7 +22,7 @@
           <input type="text" 
                  [ngModel]="searchQuery()" 
                  (ngModelChange)="searchQuery.set($event)"
-                 placeholder="Search articles..." 
+              placeholder="Пошук статей..."
                  class="w-full px-6 py-4 bg-white border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-[#E06A00] transition shadow-sm font-medium">
           @if (searchQuery()) {
             <button (click)="searchQuery.set('')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">✕</button>
@@ -86,7 +86,7 @@
               <div class="flex items-center justify-between pt-4 border-t border-gray-50 mt-4">
                 <span class="text-[10px] font-bold text-gray-400 uppercase">{{ article.readTime }}</span>
                 <button [routerLink]="['/blog', article.id]" class="text-[10px] font-black uppercase tracking-widest text-[#E06A00] group-hover:translate-x-1.5 transition-transform">
-                  Read More →
+                 Читати далі →
                 </button>
               </div>
             </div>
@@ -102,8 +102,8 @@
 
       <div class="space-y-8">
         <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100/80 shadow-sm space-y-4">
-          <h3 class="text-lg font-black italic uppercase tracking-tight text-gray-950">Newsletter</h3>
-          <p class="text-xs text-gray-400 leading-relaxed font-medium">Get weekly tips and inspiration straight to your inbox</p>
+          <h3 class="text-lg font-black italic uppercase tracking-tight text-gray-950">Новини та Дайджест</h3>
+          <p class="text-xs text-gray-400 leading-relaxed font-medium">Отримуй щотижневі поради та натхнення прямо на пошту</p>
           
           @if (newsletterSubscribed()) {
             <div class="p-4 bg-green-50 text-green-700 text-xs font-bold rounded-2xl border border-green-100 text-center animate-in fade-in">
@@ -111,16 +111,16 @@
             </div>
           } @else {
             <div class="space-y-3">
-              <input type="email" [(ngModel)]="newsletterEmail" placeholder="Your email" class="w-full px-4 py-3 bg-gray-50 border-none rounded-xl outline-none focus:ring-2 focus:ring-[#E06A00] transition text-sm font-medium">
+              <input type="email" [(ngModel)]="newsletterEmail" placeholder="Твій Email" class="w-full px-4 py-3 bg-gray-50 border-none rounded-xl outline-none focus:ring-2 focus:ring-[#E06A00] transition text-sm font-medium">
               <button (click)="subscribeNewsletter()" class="w-full py-3 bg-[#E06A00] text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-orange-600 transition shadow-lg">
-                Subscribe
+                Підписатися
               </button>
             </div>
           }
         </div>
 
         <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100/80 shadow-sm">
-          <h3 class="text-lg font-black italic uppercase tracking-tight text-gray-950 mb-6">Popular Tags</h3>
+          <h3 class="text-lg font-black italic uppercase tracking-tight text-gray-950 mb-6">Популярні теги</h3>
           <div class="flex flex-wrap gap-2">
             @for (tag of popularTags; track tag) {
               <button (click)="selectTag(tag)" class="px-3.5 py-2 bg-gray-50 hover:bg-black hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider text-gray-400 transition-all">
@@ -131,7 +131,7 @@
         </div>
 
         <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100/80 shadow-sm space-y-6">
-          <h3 class="text-lg font-black italic uppercase tracking-tight text-gray-950">Recent Articles</h3>
+          <h3 class="text-lg font-black italic uppercase tracking-tight text-gray-950">Останні публікації</h3>
           <div class="space-y-4">
             @for (rec of recentArticles(); track rec.id) {
               <div class="flex items-center gap-3 group cursor-pointer" [routerLink]="['/blog', rec.id]">
@@ -169,15 +169,15 @@
         <div class="space-y-4">
           <div>
             <label class="text-[9px] font-bold uppercase tracking-widest text-gray-400 block mb-1">Заголовок</label>
-            <input formControlName="title" placeholder="How to..." class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-[#E06A00] font-medium text-sm">
+            <input formControlName="title" placeholder="Як..." class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-[#E06A00] font-medium text-sm">
           </div>
 
           <div>
             <label class="text-[9px] font-bold uppercase tracking-widest text-gray-400 block mb-1">Категорія</label>
             <select formControlName="category" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-[#E06A00] font-bold text-xs uppercase tracking-wider text-gray-600">
-              <option value="Care Tips">Care Tips</option>
-              <option value="Inspiration">Inspiration</option>
-              <option value="Behind the Scenes">Behind the Scenes</option>
+              <option value="Care Tips">Поради щодо догляду</option>
+              <option value="Inspiration">Натхнення</option>
+              <option value="Behind the Scenes">За лаштунками</option>
             </select>
           </div>
 
@@ -249,8 +249,35 @@
           </button>
         </div>
 
-      </form>
+    </form>
+    </div>
+  </div>
+} @if (toastMessage()) {
+  <div class="fixed bottom-10 right-10 z-[200] animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div class="flex items-center gap-4 rounded-[2rem] px-6 py-4 shadow-2xl border backdrop-blur-md bg-white/90 transition-all"
+         [ngClass]="toastType() === 'success' ? 'border-green-100' : 'border-red-100'">
+      
+      <div class="flex h-10 w-10 items-center justify-center rounded-full shadow-sm text-white animate-in zoom-in duration-300"
+           [ngClass]="toastType() === 'success' ? 'bg-black' : 'bg-red-500'">
+        @if (toastType() === 'success') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+          </svg>
+        } @else {
+          <span class="font-black text-lg">!</span>
+        }
+      </div>
 
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">Система сповіщень</p>
+        <p class="text-sm font-bold text-gray-900 leading-none">{{ toastMessage() }}</p>
+      </div>
+
+      <button (click)="toastMessage.set('')" class="ml-4 text-gray-300 hover:text-gray-500 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
   </div>
 }

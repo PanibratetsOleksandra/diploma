@@ -19,12 +19,12 @@ export class BlogComponent implements OnInit {
   private blogService = inject(BlogService);
   private userService = inject(UserService);
   private fb = inject(FormBuilder);
-  public imageService = inject(ImageService); // 🔥 Інжектуємо як public, щоб використовувати в HTML шаблоні
+  public imageService = inject(ImageService); 
 public authService = inject(AuthService);
   // Стан даних
   articles = signal<Article[]>([]);
   searchQuery = signal<string>('');
-  selectedCategory = signal<string>('All Articles');
+selectedCategory = signal<string>('Усі статті');
   newsletterEmail = signal<string>('');
   newsletterSubscribed = signal<boolean>(false);
 
@@ -32,6 +32,8 @@ public authService = inject(AuthService);
   imagePreviewUrl = signal<string | null>(null);
 
 isWriter = computed(() => this.authService.isAdmin());
+toastMessage = signal<string>('');
+toastType = signal<'success' | 'error'>('success');
 
   // Керування формою
   isFormOpen = signal<boolean>(false);
@@ -39,21 +41,23 @@ isWriter = computed(() => this.authService.isAdmin());
   blogForm!: FormGroup;
 
   // Категорії та теги
-  categories = ['All Articles', 'Care Tips', 'Inspiration', 'Behind the Scenes'];
-  popularTags = ['#Hand-Painted', '#Care Guide', '#Art Process', '#Color Theory', '#Studio Life', '#Fashion Tips', '#Sustainability', '#Custom Design'];
+  categories = ['Усі статті', 'Поради з догляду', 'Натхнення', 'Залаштунки процесу'];
+ popularTags = ['#РучнийРозпис', '#ДоглядЗаОдягом', '#АртПроцес', '#ТеоріяКольору', '#МагіяРоду', '#FashionПоради', '#SlowFashion', '#КастомнийДизайн'];
 
   // Живий пошук
   filteredArticles = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     const cat = this.selectedCategory();
     return this.articles().filter(article => {
-      const matchesCategory = cat === 'All Articles' || article.category === cat;
+      const matchesCategory = cat === 'Усі статті' || article.category === cat;
       const matchesSearch = article.title.toLowerCase().includes(query) || 
                             article.intro.toLowerCase().includes(query);
       return matchesCategory && matchesSearch;
     });
   });
 
+
+  
   // Останні 3 статті
   recentArticles = computed(() => {
     return [...this.articles()]
@@ -69,9 +73,9 @@ isWriter = computed(() => this.authService.isAdmin());
   initForm() {
     this.blogForm = this.fb.group({
       title: ['', Validators.required],
-      category: ['Care Tips', Validators.required],
-      author: ['Sasha Panibratets', Validators.required],
-      readTime: ['5 min read', Validators.required],
+      category: ['Поради з догляду', Validators.required],
+      author: ['Саша Панібратець', Validators.required],
+      readTime: ['5 хв читання', Validators.required],
       imageUrl: [''],
       intro: ['', Validators.required],
       paragraphsText: ['', Validators.required],
@@ -83,7 +87,7 @@ isWriter = computed(() => this.authService.isAdmin());
   loadArticles() {
     this.blogService.getArticles().subscribe({
       next: (data) => this.articles.set(data),
-      error: (err) => console.error('Error loading articles from API: - blog.ts:86', err)
+      error: (err) => console.error('Error loading articles from API: - blog.ts:90', err)
     });
   }
 
@@ -91,9 +95,9 @@ isWriter = computed(() => this.authService.isAdmin());
     this.editingArticleId.set(null);
     this.removeSelectedFile();
     this.blogForm.reset({
-      category: 'Care Tips',
-      author: 'Sasha Panibratets',
-      readTime: '5 min read',
+      category: 'Поради з догляду',
+      author: 'Саша Панібратець',
+      readTime: '5 хв читання',
       imageUrl: ''
     });
     this.isFormOpen.set(true);
@@ -103,7 +107,6 @@ isWriter = computed(() => this.authService.isAdmin());
     this.editingArticleId.set(article.id || null);
     this.blogForm.patchValue(article);
     if (article.imageUrl) {
-      // Використовуємо твій сервіс для прев'ю при редагуванні
       this.imagePreviewUrl.set(this.imageService.getFullImageUrl(article.imageUrl));
     }
     this.isFormOpen.set(true);
@@ -161,7 +164,7 @@ isWriter = computed(() => this.authService.isAdmin());
           this.loadArticles();
           this.closeModal();
         },
-        error: (err) => console.error('Помилка оновлення: - blog.ts:164', err)
+        error: (err) => console.error('Помилка оновлення: - blog.ts:167', err)
       });
     } else {
       this.blogService.createArticle(formData as any).subscribe({
@@ -190,21 +193,65 @@ isWriter = computed(() => this.authService.isAdmin());
     }
   }
 
-  subscribeNewsletter() {
-    if (this.newsletterEmail() && this.newsletterEmail().includes('@')) {
-      this.newsletterSubscribed.set(true);
-      setTimeout(() => {
-        this.newsletterEmail.set('');
-        this.newsletterSubscribed.set(false);
-      }, 4000);
-    } else {
-      alert('Будь ласка, введи коректну e-mail адресу! 📬');
-    }
+
+showToast(message: string, type: 'success' | 'error' = 'success'): void {
+  this.toastMessage.set(message);
+  this.toastType.set(type);
+  
+  // Ховаємо тост автоматично через 3 секунди
+  setTimeout(() => {
+    this.toastMessage.set('');
+  }, 3000);
+}
+
+
+subscribeNewsletter() {
+  const email = this.newsletterEmail() ? this.newsletterEmail().trim() : '';
+
+
+  if (!email) {
+    this.showToast('Поле Email не може бути порожнім! 📬', 'error');
+    return;
   }
+
+  if (email.length > 50) {
+    this.showToast('Email занадто довгий (максимум 50 символів)! 🛑', 'error');
+    return;
+  }
+
+
+  // Цей вираз перевіряє структуру: текст@текст.домен
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    this.showToast('Некоректний формат адреси! Перевірте наявність @ та домену (.com, .ua) 🧩', 'error');
+    return;
+  }
+
+  this.userService.subscribeToNewsletter(email).subscribe({
+    next: (res) => {
+      this.newsletterSubscribed.set(true);
+      this.showToast('Дякуємо за підписку! Вас додано до бази 📨✨', 'success');
+      this.newsletterEmail.set('');
+      setTimeout(() => this.newsletterSubscribed.set(false), 4000);
+    },
+    error: (err) => {
+      let errorMessage = 'Не вдалося підписатися';
+      if (err.error) {
+        if (typeof err.error === 'string') {
+          errorMessage = err.error;
+        } else if (typeof err.error === 'object' && err.error.message) {
+          errorMessage = err.error.message;
+        }
+      }
+      this.showToast(errorMessage, 'error');
+      console.error('Деталі помилки підписки: - blog.ts:247', err);
+    }
+  });
+}
 
   selectTag(tag: string) {
     const cleanTag = tag.replace('#', '');
     this.searchQuery.set(cleanTag);
-    this.selectedCategory.set('All Articles');
+    this.selectedCategory.set('Усі статті');
   }
 }

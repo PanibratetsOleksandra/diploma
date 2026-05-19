@@ -9,11 +9,15 @@ import { RouterLink } from '@angular/router';
 import { DesignerService } from '../../core/services/designer.service';
 import { CartService } from '../../core/services/cart.service';
 import { CartItem } from '../../core/models/cart-item.model';
+import { OrderStatus } from '../../core/enums/order-status.enum';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-profile',
   standalone: true,
 imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './profile.html'
+  
 })
 export class ProfileComponent implements OnInit {
   [x: string]: any;
@@ -21,6 +25,7 @@ export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private imageService = inject(ImageService);
     private cartService = inject(CartService);
+    
 private aiService = inject(AiService);
   isEditing = signal(false);
   editForm = signal<any>({});
@@ -34,11 +39,12 @@ activeTab = signal<'orders' | 'personal' | 'shipping' | 'ai-designs' | 'creation
     if (!url) return 'https://placehold.net/600x600.png'; // затичка, якщо фото немає
     return this.imageService.getFullImageUrl(url);
   }
-
+private router = inject(Router);
 getAvatarUrl(): string {
   return this.imageService.getFullImageUrl(this.user()?.avatarUrl);
 }
-
+toastMessage = signal<string | null>(null);
+toastType = signal<'success' | 'error'>('success');
 getPreviewUrl(): string {
   return this.imageService.getFullImageUrl(this.editForm().avatarUrl);
 }
@@ -54,7 +60,7 @@ getPreviewUrl(): string {
       },
       
       error: (err) => {
-        console.error('Помилка при завантаженні профілю: - profile.ts:57', err);
+        console.error('Помилка при завантаженні профілю: - profile.ts:63', err);
       }
     });
   }
@@ -84,7 +90,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:87', err)
+      error: (err) => console.error('Помилка оновлення адреси: - profile.ts:93', err)
     });
   } else {
     // СТВОРЕННЯ НОВОЇ (тут все було ок)
@@ -93,7 +99,7 @@ saveAddress() {
         this.loadAddresses();
         this.closeAddressForm();
       },
-      error: (err) => console.error('Помилка збереження адреси: - profile.ts:96', err)
+      error: (err) => console.error('Помилка збереження адреси: - profile.ts:102', err)
     });
   }
 }
@@ -158,7 +164,7 @@ removeAddress(id: number) {
         this.isEditing.set(false);
         this.selectedFile = null;
       },
-      error: (err) => console.error('Error saving profile - profile.ts:161', err)
+      error: (err) => console.error('Error saving profile - profile.ts:167', err)
     });
   }
 
@@ -203,7 +209,7 @@ removeAddress(id: number) {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Будь ласка, оберіть файл зображення.');
+      this.showToast('Будь ласка, оберіть коректний файл зображення.', 'error');
       return;
     }
 
@@ -256,7 +262,7 @@ resetAddressForm() {
       this.myDesigns.set(designs);
     },
     error: (err) => {
-      console.error('Помилка завантаження AI дизайнів: - profile.ts:259', err);
+      console.error('Помилка завантаження AI дизайнів: - profile.ts:265', err);
     }
   });
 }
@@ -267,7 +273,7 @@ loadUserCreations() {
   this.userCreations.set([]); // Очищуємо старі дані перед запитом
   this.designerService.getMyManualDesigns().subscribe({
     next: (data) => this.userCreations.set(data),
-    error: (err) => console.error('Помилка creations: - profile.ts:270', err)
+    error: (err) => console.error('Помилка creations: - profile.ts:276', err)
   });
 }
 setTab(tab: 'orders' | 'personal' | 'shipping' | 'ai-designs' | 'creations') {
@@ -289,7 +295,7 @@ deleteDesign(id: number): void {
       );
     },
     error: (err) => {
-      console.error('Помилка видалення дизайну: - profile.ts:292', err);
+      console.error('Помилка видалення дизайну: - profile.ts:298', err);
     }
   });
 }
@@ -349,7 +355,7 @@ confirmOrder() {
 
   this.cartService.addToCart(cartItem);
   this.isOrderModalOpen.set(false);
-  alert('Додано в кошик! Обидві сторони дизайну збережено. ✨');
+ this.showToast('Додано в кошик! ✨', 'success');
 }
 
 // Метод для безпечного оновлення розміру
@@ -360,6 +366,7 @@ updateOrderSize(newSize: string) {
   }));
 }
 
+
 // profile.component.ts
 orders = signal<any[]>([]);
 
@@ -369,17 +376,23 @@ loadOrders() {
   });
 }
 
-// Метод для відкриття форми замовлення AI дизайну
+showToast(message: string, type: 'success' | 'error' = 'success') {
+  this.toastMessage.set(message);
+  this.toastType.set(type);
+
+  // Через 4 секунди тост автоматично ховається
+  setTimeout(() => {
+    this.toastMessage.set(null);
+  }, 4000);
+}
 openAiOrderForm(design: any) {
-  // Використовуємо той самий об'єкт "selectedCreation", 
-  // але позначаємо, що це AI тип
+
   this.selectedCreation.set({ ...design, isAi: true });
   this.orderCustomDetails.set({ size: 'M', comments: '' });
   this.isOrderModalOpen.set(true);
 }
 
 
-// Додай ці сигнали в клас ProfileComponent
 selectedOrder = signal<any | null>(null);
 isOrderDetailsOpen = signal(false);
 
@@ -393,7 +406,6 @@ closeOrderDetails() {
   this.selectedOrder.set(null);
 }
 
-// Допоміжний метод для парсингу адреси, якщо вона збережена як JSON рядок
 parseShipping(shippingStr: string) {
   try {
     return JSON.parse(shippingStr);
@@ -402,4 +414,42 @@ parseShipping(shippingStr: string) {
   }
 }
     
+  cancelUserOrder(orderId: number) {
+    if (confirm('Ви впевнені, що хочете скасувати це замовлення?')) {
+      this.userService.updateOrderStatus(orderId, OrderStatus.Cancelled).subscribe({
+        next: () => {
+          
+
+          this.orders.update(prevOrders => 
+            prevOrders.map(o => o.id === orderId ? { ...o, status: OrderStatus.Cancelled } : o)
+          );
+
+          this.userOrders.update(prevUserOrders => 
+            prevUserOrders.map(o => o.id === orderId ? { ...o, status: OrderStatus.Cancelled } : o)
+          );
+
+  
+          const currentSelected = this.selectedOrder();
+          if (currentSelected && currentSelected.id === orderId) {
+            this.selectedOrder.set({ ...currentSelected, status: OrderStatus.Cancelled });
+          }
+          this.showToast('Замовлення успішно скасовано.', 'success');
+
+        },
+        error: (err) => {
+         this.showToast('Не вдалося скасувати замовлення. Спробуйте пізніше.', 'error');
+        }
+      });
+    }
+  }
+
+  navigateToProduct(item: any) {
+  this.closeOrderDetails(); // Закриваємо модалку, якщо вона була відкрита
+  const itemId = item.id;
+  
+  // Переходимо на сторінку деталей, прокидаючи стан товару
+  this.router.navigate([`/custom-detail/${itemId}`], {
+    state: { item: item, isShopProduct: item.type === 'product' }
+  });
+}
 }

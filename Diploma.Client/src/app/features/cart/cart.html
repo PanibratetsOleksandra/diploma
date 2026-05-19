@@ -1,6 +1,6 @@
 <div class="min-h-screen pt-32 pb-20 px-6 lg:px-12 bg-gray-50/50">
   <div class="max-w-5xl mx-auto">
-    <h1 class="text-4xl font-black italic uppercase tracking-tighter mb-10">Shopping Bag</h1>
+    <h1 class="text-4xl font-black italic uppercase tracking-tighter mb-10">Кошик</h1>
 
     @if (cartService.items().length > 0) {
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-10">
@@ -17,10 +17,10 @@
   <div class="flex-1 min-w-0">
     <span class="text-[9px] font-black uppercase tracking-widest text-orange-500">{{ item.type }}</span>
     <h3 class="text-lg font-black italic leading-tight truncate group-hover:text-orange-500 transition-colors">{{ item.name }}</h3>
-    <p class="text-sm text-gray-400 font-bold uppercase mt-1">Size: {{ item.size || 'Standard' }}</p>
+    <p class="text-sm text-gray-400 font-bold uppercase mt-1">Розмір: {{ item.size || 'Стандартний' }}</p>
     
     <div class="flex items-center gap-4 mt-4" (click)="$event.stopPropagation()">
-      <button (click)="remove(item.id)" class="text-[10px] font-black uppercase text-red-400 hover:text-red-600 transition">Remove</button>
+      <button (click)="remove(item.id)" class="text-[10px] font-black uppercase text-red-400 hover:text-red-600 transition">Видалити</button>
     </div>
   </div>
   
@@ -33,20 +33,22 @@
 
         <div class="space-y-6">
           <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100 sticky top-32">
-            <h2 class="text-xl font-black italic uppercase tracking-tighter mb-6">Order Summary</h2>
+            <h2 class="text-xl font-black italic uppercase tracking-tighter mb-6">Підсумок замовлення</h2>
             
             <div class="space-y-3 mb-6">
               <div class="flex justify-between text-sm text-gray-500 font-medium">
-                <span>Items ({{ cartService.totalCount() }})</span>
+                <span>Товари({{ cartService.totalCount() }})</span>
                 <span>{{ cartService.totalPrice() }} ₴</span>
               </div>
-              <div class="flex justify-between text-sm text-gray-500 font-medium">
-                <span>Shipping</span>
-                <span class="text-green-500 uppercase font-black text-[10px]">Free</span>
-              </div>
+        <div class="flex justify-between text-sm text-gray-500 font-medium items-center">
+  <span>Доставка</span>
+  <span class="text-gray-400 bg-gray-50 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border border-gray-100">
+    За тарифами перевізника
+  </span>
+</div>
               <hr class="border-gray-100 my-4">
               <div class="flex justify-between items-end">
-                <span class="text-base font-bold">Total Amount</span>
+                <span class="text-base font-bold">Загальна сума</span>
                 <span class="text-3xl font-black italic text-orange-500">{{ cartService.totalPrice() }} ₴</span>
               </div>
             </div>
@@ -54,11 +56,11 @@
           <button 
   routerLink="/checkout" 
   class="w-full py-5 bg-black text-white rounded-2xl font-black uppercase text-[11px] tracking-widest hover:scale-[1.02] transition shadow-xl shadow-gray-200 text-center block">
-  Checkout Now
+ Оформити замовлення
 </button>
             
             <p class="mt-6 text-[10px] text-gray-400 text-center font-medium leading-relaxed">
-              By clicking "Checkout", you agree to our Terms of Service and hand-painting production time (5-7 days).
+            Натискаючи кнопку "Оформити", ви погоджуєтесь з Умовами надання послуг та враховуєте термін ручного розпису виробу (5-7 робочих днів).
             </p>
           </div>
         </div>
@@ -67,10 +69,10 @@
     } @else {
       <div class="bg-white rounded-[3rem] p-20 text-center border border-gray-100 shadow-sm">
         <div class="text-7xl mb-6 opacity-20">🛒</div>
-        <h2 class="text-2xl font-black italic uppercase mb-2">Your bag is empty</h2>
-        <p class="text-gray-400 font-medium mb-10 max-w-xs mx-auto">Looks like you haven't added any wearable art yet.</p>
+        <h2 class="text-2xl font-black italic uppercase mb-2">Ваш кошик порожній</h2>
+        <p class="text-gray-400 font-medium mb-10 max-w-xs mx-auto">Схоже, ви ще не додали жодного витвору мистецтва, який можна носити.</p>
         <button routerLink="/shop" class="px-10 py-4 bg-orange-500 text-white rounded-full font-black uppercase text-[10px] tracking-widest hover:scale-105 transition shadow-lg shadow-orange-100">
-          Start Shopping
+          Перейти до каталогу
         </button>
       </div>
     }
@@ -120,7 +122,7 @@
   
   @if (item.type !== 'product') {
     <div>
-      <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-2">Change Size</label>
+      <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-2">>Змінити розмір</label>
       <div class="flex flex-wrap gap-2">
         @for (s of ['XS', 'S', 'M', 'L', 'XL']; track s) {
           <button 
@@ -134,7 +136,7 @@
     </div>
 
     <div>
-      <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-2">Update Design Wishes</label>
+      <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-2">Оновити побажання до дизайну</label>
       <textarea 
         #notesArea
         (input)="cartService.updateItemDetails(item.id, item.size || 'M', notesArea.value)"
@@ -149,9 +151,9 @@
     <div class="p-6 bg-orange-50 rounded-[2rem] border border-orange-100">
       <div class="flex items-center gap-2 mb-2 text-orange-500">
         <span class="text-sm">✨</span>
-        <span class="text-[9px] font-black uppercase tracking-widest">Unique Art Piece</span>
+        <span class="text-[9px] font-black uppercase tracking-widest">Унікальний арт-об'єкт</span>
       </div>
-      <h4 class="text-lg font-black italic mb-1">One of a Kind</h4>
+      <h4 class="text-lg font-black italic mb-1">В одному екземплярі</h4>
       <p class="text-[11px] text-gray-500 leading-relaxed italic">
         Цей виріб створено в єдиному екземплярі. 
         <br>Розмір: <strong class="text-black">{{ item.size }}</strong>.
@@ -164,7 +166,7 @@
 </div>
 
       <button (click)="cartService.closeDetails()" class="mt-8 w-full py-4 bg-black text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-gray-800 transition">
-        Back to Bag
+       Повернутися до кошика
       </button>
     </div>
   </div>

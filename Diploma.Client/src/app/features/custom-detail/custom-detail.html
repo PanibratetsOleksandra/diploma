@@ -1,104 +1,124 @@
 <div class="min-h-screen bg-gray-50/50 text-gray-900 pt-32 pb-20 px-6 lg:px-12 animate-in fade-in duration-500">
   <div class="max-w-6xl mx-auto">
     
-    <button (click)="goBack()" class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition mb-8">
-      ← Назад до замовлення
+  <button (click)="goBack()" class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition mb-8">
+      @if (isAdmin) {
+        ← Назад до панелі адміна
+      } @else {
+        ← Назад до особистого кабінету
+      }
     </button>
 
     @if (customItem(); as item) {
       <div class="flex flex-col lg:flex-row gap-12 bg-white rounded-[3.5rem] p-8 lg:p-12 shadow-sm border border-gray-100/80">
         
-        <div class="w-full lg:w-1/2 flex flex-col gap-4">
+      <div class="w-full lg:w-1/2 flex flex-col gap-4">
           
-          @if (item.backImage) {
+          @if (item.type === 'manual-design' && (item.backImageUrl || item.backImage)) {
             <div class="grid grid-cols-2 gap-4">
-              <div class="flex flex-col gap-2">
+              
+              <div class="flex flex-col gap-2 animate-in fade-in duration-300">
                 <span class="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">
-                  Вигляд спереду
+                  Вигляд спереду (Front)
                 </span>
-                <div class="aspect-[3/4] w-full rounded-[2rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner">
-                  <img [src]="getFullUrl(item.frontImage)" alt="Front View" class="w-full h-full object-cover">
+                <div class="aspect-[3/4] w-full rounded-[2rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner group relative">
+                  <img [src]="getFullUrl(item.frontImageUrl || item.frontImage || item.imageUrl)" alt="Front View" class="w-full h-full object-cover">
                 </div>
               </div>
 
-              <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-2 animate-in fade-in duration-300">
                 <span class="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">
-                  Вигляд ззаду
+                  Вигляд ззаду (Back)
                 </span>
-                <div class="aspect-[3/4] w-full rounded-[2rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner">
-                  <img [src]="getFullUrl(item.backImage)" alt="Back View" class="w-full h-full object-cover">
+                <div class="aspect-[3/4] w-full rounded-[2rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner group relative">
+                  <img [src]="getFullUrl(item.backImageUrl || item.backImage)" alt="Back View" class="w-full h-full object-cover">
                 </div>
               </div>
+
             </div>
           } @else {
-            <div class="aspect-square w-full rounded-[2.5rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner group relative">
-              <img [src]="getFullUrl(item.frontImage || item.imageUrl)" alt="Custom Concept" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-              
-              <span [class]="item.type === 'ai-design' ? 'bg-purple-600' : 'bg-orange-600'" 
-                    class="absolute top-6 left-6 text-[9px] font-black uppercase tracking-widest text-white px-4 py-2 rounded-full shadow-md">
-                {{ item.type === 'ai-design' ? '⚡ AI GENERATED' : '🎨 HAND CUSTOMIZED' }}
+            <div class="flex flex-col gap-2">
+              <span class="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">
+                Концепт дизайну (Одне фото)
               </span>
+              <div class="aspect-square w-full rounded-[2.5rem] overflow-hidden border border-gray-100 bg-gray-50 shadow-inner">
+                <img [src]="getFullUrl(item.frontImage || item.imageUrl)" alt="Custom Concept" class="w-full h-full object-cover">
+              </div>
             </div>
           }
-
         </div>
 
-        <div class="w-full lg:w-1/2 flex flex-col justify-between py-2">
+        <div class="w-full lg:w-1/2 flex flex-col justify-between space-y-6">
           <div>
-            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Концепт індивідуального замовлення</span>
-            <h1 class="text-4xl font-black italic uppercase tracking-tighter leading-tight mb-4">{{ item.name }}</h1>
-            
-            <div class="flex items-center gap-3 mb-8">
-              <span class="text-2xl font-black text-black">{{ item.price }} ₴</span>
-              <span class="px-3 py-1 bg-gray-100 text-[9px] font-black uppercase tracking-wider rounded-lg text-gray-500">Розмір: {{ item.size || 'M' }}</span>
+            <div class="mb-4">
+              @if (item.type === 'product') {
+                <span class="bg-black text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">Ексклюзив із Shop (Викуплено)</span>
+              } @else if (item.type === 'ai-design') {
+                <span class="bg-purple-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">Згенеровано ШІ-асистентом</span>
+              } @else {
+                <span class="bg-orange-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">Інтерактивний Конструктор</span>
+              }
             </div>
 
-            <div class="space-y-6">
-              @if (item.type === 'ai-design') {
-                <div class="p-6 bg-purple-50/40 border border-purple-100/50 rounded-3xl">
-                  <h4 class="text-[10px] font-black uppercase tracking-widest text-purple-600 mb-3">Prompt (Текстовий запит до ШІ)</h4>
-                  <p class="text-sm font-semibold italic text-gray-700 leading-relaxed">
-                    @if (item.notes) { "{{ item.notes }}" } @else { Опис запиту відсутній }
-                  </p>
-                </div>
-              }
+            <h1 class="text-4xl font-black italic tracking-tighter text-gray-900 leading-none mb-2">
+              {{ item.name }}
+            </h1>
+            <p class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-6">
+              ID Позиції в замовленні: <span class="text-gray-700 font-mono">#{{ item.id }}</span>
+            </p>
 
-              @if (item.type === 'manual-design') {
-                <div class="p-6 bg-orange-50/40 border border-orange-100/50 rounded-3xl">
-                  <h4 class="text-[10px] font-black uppercase tracking-widest text-orange-600 mb-3">Побажання щодо розпису (Конструктор)</h4>
-                  <p class="text-sm font-semibold italic text-gray-700 leading-relaxed">
-                    @if (item.notes) { "{{ item.notes }}" } @else { Клієнт довірився баченню художника }
-                  </p>
-                </div>
-              }
+            <hr class="border-gray-100 my-4">
 
-              <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100">
-                <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Технічні характеристики</h4>
-                <div class="space-y-3 text-xs font-bold uppercase tracking-wider">
-                  <div class="flex justify-between border-b border-gray-100 pb-2">
-                    <span class="text-gray-400">Тип виробу</span>
-                    <span class="text-gray-900">Custom Apparel</span>
-                  </div>
-                  <div class="flex justify-between border-b border-gray-100 pb-2">
-                    <span class="text-gray-400">Фарби для розпису</span>
-                    <span class="text-gray-900">Decola Textile Acrylics</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-400">Догляд</span>
-                    <span class="text-gray-900">Ручне прання (30°C)</span>
-                  </div>
+            <div class="space-y-4">
+              <h3 class="text-[11px] font-black uppercase tracking-widest text-gray-400">Технічні параметри</h3>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                  <p class="text-[9px] font-black uppercase tracking-widest text-gray-400">Необхідний розмір</p>
+                  <p class="text-2xl font-black text-black mt-1">{{ item.size || 'Не вказано' }}</p>
                 </div>
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                  <p class="text-[9px] font-black uppercase tracking-widest text-gray-400">Фінансова вартість</p>
+                  <p class="text-2xl font-black text-orange-500 mt-1">{{ item.price }} ₴</p>
+                </div>
+              </div>
+
+              <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                <p class="text-[9px] font-black uppercase tracking-widest text-gray-400">Кількість у замовленні</p>
+                <p class="text-sm font-bold text-gray-800 mt-1">{{ item.quantity || 1 }} шт.</p>
+              </div>
+            </div>
+
+            <hr class="border-gray-100 my-4">
+
+            <div class="space-y-3">
+              <h3 class="text-[11px] font-black uppercase tracking-widest text-gray-400">Побажання клієнта / Промпт для розпису</h3>
+              <div class="bg-orange-50/50 border border-orange-100 p-5 rounded-2xl">
+                <p class="text-xs text-gray-700 font-medium leading-relaxed italic">
+                  {{ item.notes ? item.notes : 'Клієнт не залишив додаткових текстових коментарів до розпису. Створення суто за наданим ескізом.' }}
+                </p>
               </div>
             </div>
           </div>
 
-          <div class="mt-8 pt-8 border-t border-gray-100 flex gap-4">
-            <button (click)="goBack()" class="flex-1 py-4 bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition shadow-lg shadow-gray-200">
-              Повернутись
-            </button>
+          <div class="p-5 bg-gray-900 text-white rounded-3xl space-y-2 shadow-lg">
+          @if (isAdmin) {
+              <h4 class="text-[8px] font-black uppercase tracking-widest text-gray-400">Пам'ятка адміністратора</h4>
+              <p class="text-[11px] text-gray-300 font-medium leading-relaxed">
+                Ця сторінка відображає заархівовані дані товарної позиції на момент купівлі. Зміни в загальному каталозі не вплинуть на цей макет, що гарантує точність виконання замовлення для художнього розпису.
+              </p>
+            } @else {
+              <h4 class="text-[8px] font-black uppercase tracking-widest text-orange-400">Пам'ятка клієнта</h4>
+              <p class="text-[11px] text-gray-300 font-medium leading-relaxed">
+                Тут відображено точні параметри та унікальний ескіз вашої речі на момент оформлення замовлення. Наші художники вже використовують цей макет у майстерні Panibratets Artwear для створення вашого кастому.
+              </p>
+            }
+            <p class="text-[11px] text-gray-300 font-medium leading-relaxed">
+              Ця сторінка відображає заархівовані дані товарної позиції на момент купівлі. Зміни в загальному каталозі не вплинуть на цей макет, що гарантує точність виконання замовлення для художнього розпису.
+            </p>
           </div>
-        </div>
 
+        </div>
       </div>
     }
   </div>

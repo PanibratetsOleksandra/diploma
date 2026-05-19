@@ -113,34 +113,65 @@ public imageService = inject(ImageService);
     }
   }
 
-ngOnInit(): void {
-    this.loadPrices();
-  const saved = sessionStorage.getItem('pendingManualDesign');
-  if (saved) {
-    const data = JSON.parse(saved);
+// ngOnInit(): void {
+//     this.loadPrices();
+//   const saved = sessionStorage.getItem('pendingManualDesign');
+//   if (saved) {
+//     const data = JSON.parse(saved);
     
-    // Відновлюємо PNG сигнали
-    this.frontDesign.set(data.front ?? null);
-    this.backDesign.set(data.back ?? null);
+//     // Відновлюємо PNG сигнали
+//     this.frontDesign.set(data.front ?? null);
+//     this.backDesign.set(data.back ?? null);
   
-    // Відновлюємо JSON стани canvas для обох сторін
-    this.frontCanvasJSON = data.frontJSON ?? null;
-    this.backCanvasJSON = data.backJSON ?? null;
+//     // Відновлюємо JSON стани canvas для обох сторін
+//     this.frontCanvasJSON = data.frontJSON ?? null;
+//     this.backCanvasJSON = data.backJSON ?? null;
     
-    // Відновлюємо гарментт і сторону
-    if (data.garment) this.selectedGarment.set(data.garment);
-    if (data.view) this.selectedView.set(data.view);
+//     // Відновлюємо гарментт і сторону
+//     if (data.garment) this.selectedGarment.set(data.garment);
+//     if (data.view) this.selectedView.set(data.view);
 
-    // Якщо вже залогінений — одразу зберігаємо і чистимо sessionStorage
-    if (this.authService.currentUser()) {
-      // Невелика затримка щоб canvas встиг ініціалізуватись в ngAfterViewInit
-      setTimeout(() => {
-        this.renderOtherSideAndSave();
-        sessionStorage.removeItem('pendingManualDesign');
-      }, 500);
+//     // Якщо вже залогінений — одразу зберігаємо і чистимо sessionStorage
+//     if (this.authService.currentUser()) {
+//       // Невелика затримка щоб canvas встиг ініціалізуватись в ngAfterViewInit
+//       setTimeout(() => {
+//         this.renderOtherSideAndSave();
+//         sessionStorage.removeItem('pendingManualDesign');
+//       }, 500);
+//     }
+//   }
+// }
+
+// 🔥 ОНОВЛЕНО: Тепер дані з sessionStorage тільки відновлюють макет на екрані, без автозбереження
+  ngOnInit(): void {
+    this.loadPrices();
+    
+    const saved = sessionStorage.getItem('pendingManualDesign');
+    if (saved) {
+      const data = JSON.parse(saved);
+      
+      // 1. Відновлюємо PNG знімки обох сторін
+      this.frontDesign.set(data.front ?? null);
+      this.backDesign.set(data.back ?? null);
+    
+      // 2. Відновлюємо JSON-структуру шарів для Fabric.js
+      this.frontCanvasJSON = data.frontJSON ?? null;
+      this.backCanvasJSON = data.backJSON ?? null;
+      
+      // 3. Відновлюємо обраний тип одягу та сторону полотна
+      if (data.garment) this.selectedGarment.set(data.garment);
+      if (data.view) this.selectedView.set(data.view);
+
+      // 4. Оновлюємо базову ціну під відновлений виріб
+      this.updatePriceByType(this.selectedGarment());
+
+      // Повідомляємо користувача, що його незавершений макет успішно відновлено
+      this.showToast('Ваш макет успішно відновлено! Натисніть "Зберегти макет" для підтвердження.');
+      
+      // Очищуємо сесію, адже макет уже розгорнуто в пам'яті компонента
+      sessionStorage.removeItem('pendingManualDesign');
     }
   }
-}
 
 
 
@@ -153,7 +184,7 @@ loadPrices(): void {
       // Відразу оновлюємо ціну для початкового виробу (hoodie)
       this.updatePriceByType(this.selectedGarment());
     },
-    error: (err) => console.error('Помилка завантаження цін: - designer.ts:156', err)
+    error: (err) => console.error('Помилка завантаження цін: - designer.ts:187', err)
   });
 }
 
@@ -309,7 +340,7 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
       this.updateLayers();
 
     } catch (e) {
-      console.error('Error loading mockup: - designer.ts:312', e);
+      console.error('Error loading mockup: - designer.ts:343', e);
     }
   }
 
@@ -674,8 +705,8 @@ private async renderOtherSideAndSave(): Promise<void> {
       this.showToast('Дизайн успішно збережено в кабінет!');
     },
     error: (err) => {
-      console.error('❌ Save error: - designer.ts:677', err);
-      console.error('❌ Validation errors: - designer.ts:678', JSON.stringify(err.error?.errors));
+      console.error('❌ Save error: - designer.ts:708', err);
+      console.error('❌ Validation errors: - designer.ts:709', JSON.stringify(err.error?.errors));
     }
   });
 }
@@ -730,7 +761,7 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[view]);
     return dataUrl;
 
   } catch (e) {
-    console.error('Error rendering side: - designer.ts:733', e);
+    console.error('Error rendering side: - designer.ts:764', e);
     tempCanvas.dispose();
     return '';
   }
@@ -773,7 +804,7 @@ private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
     return dataUrl;
 
   } catch (e) {
-    console.error('Error rendering overlay: - designer.ts:776', e);
+    console.error('Error rendering overlay: - designer.ts:807', e);
     tempCanvas.dispose();
     return '';
   }

@@ -117,4 +117,12 @@ updateOrderStatus(orderId: number, status: OrderStatus): Observable<any> {
 deleteGarmentPrice(id: number): Observable<any> {
   return this.api.delete<any>(`garmentprices/${id}`);
 }
+
+subscribeToNewsletter(email: string): Observable<any> {
+return this.api.post<any>('newsletter/subscribe', { email });
+}
+// Отримання списку підписників (для адмінки)
+getNewsletterSubscribers(): Observable<any[]> {
+  return this.api.get<any[]>('newsletter/subscribers');
+}
 }
