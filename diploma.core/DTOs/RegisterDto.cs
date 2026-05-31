@@ -1,12 +1,9 @@
-﻿// diploma.core/DTOs/RegisterDto.cs
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace diploma.core.DTOs;
 
 public class RegisterDto
 {
-    //[Required]
-    //public string FullName { get; set; }
     public string? FullName { get; set; }
     [Required]
     [EmailAddress]

@@ -1,4 +1,4 @@
-﻿// diploma.core/DTOs/LoginDto.cs
+﻿
 using System.ComponentModel.DataAnnotations;
 
 namespace diploma.core.DTOs;
