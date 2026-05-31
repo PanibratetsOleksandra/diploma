@@ -1,6 +1,6 @@
 export interface CartItem {
-  id: string | number;      // Унікальний ID для кошика
-  originalId: number;       // ID з бази даних (товару або дизайну)
+  id: string | number;      
+  originalId: number;       
   name: string;
   price: number;
  imageUrl: string;
@@ -9,5 +9,5 @@ export interface CartItem {
   type: 'product' | 'ai-design' | 'manual-design'; 
   size?: string;
   notes?: string;
-
+prompt?: string;
 }

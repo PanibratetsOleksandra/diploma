@@ -2,17 +2,15 @@ import { Component, AfterViewInit, signal, inject, OnInit, HostListener, compute
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ImageService } from '../../core/services/image.service'; 
-
-
-import { 
-  Canvas, 
-  FabricImage, 
-  IText, 
-  Circle, 
-  Rect, 
-  PencilBrush, 
-  FabricObject 
+import { ImageService } from '../../core/services/image.service';
+import {
+  Canvas,
+  FabricImage,
+  IText,
+  Circle,
+  Rect,
+  PencilBrush,
+  FabricObject
 } from 'fabric';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -26,31 +24,27 @@ type GarmentView = 'front' | 'back';
 @Component({
   selector: 'app-designer',
   standalone: true,
-imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './designer.html',
   styleUrl: './designer.scss'
 })
 export class DesignerComponent implements AfterViewInit, OnInit {
-public canvas!: Canvas;
+  public canvas!: Canvas;
   private history: string[] = [];
   private historyIndex = -1;
   private isRestoring = false;
-private userService = inject(UserService);
-garmentPricesList = signal<any[]>([]);
-basePrice = signal<number>(0);         
-artPriceBase = signal<number>(1000);   
-toastMessage = signal('');
-toastType = signal<'success' | 'error'>('success');
-  
-frontOverlay = signal<string | null>(null);
-backOverlay = signal<string | null>(null);
-
-
-
+  private userService = inject(UserService);
+  garmentPricesList = signal<any[]>([]);
+  basePrice = signal<number>(0);
+  artPriceBase = signal<number>(1000);
+  toastMessage = signal('');
+  toastType = signal<'success' | 'error'>('success');
+  frontOverlay = signal<string | null>(null);
+  backOverlay = signal<string | null>(null);
   private router = inject(Router);
   public authService = inject(AuthService);
   private designerService = inject(DesignerService);
-public imageService = inject(ImageService);
+  public imageService = inject(ImageService);
   selectedView = signal<GarmentView>('front');
   selectedTool = signal<Tool>(null);
   selectedGarment = signal<Garment>('hoodie');
@@ -59,47 +53,37 @@ public imageService = inject(ImageService);
   selectedFontSize = signal<number>(34);
   fonts = ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Impact', 'Comic Sans MS'];
   brushWidth = signal<number>(6);
-  selectedOpacity = signal<number>(1); 
+  selectedOpacity = signal<number>(1);
   layers = signal<FabricObject[]>([]);
-
   frontDesign = signal<string | null>(null);
   backDesign = signal<string | null>(null);
-
-  // JSON-стан canvas для кожної сторони окремо
   private frontCanvasJSON: string | null = null;
   private backCanvasJSON: string | null = null;
-
-
- garments = [
+  garments = [
     { id: 'tshirt' as Garment, name: 'T-Shirt', icon: '👕', views: { front: 'images/mockups/tshirt-front.png', back: 'images/mockups/tshirt-back.png' } },
     { id: 'sweatshirt' as Garment, name: 'Sweatshirt', icon: '🧥', views: { front: 'images/mockups/sweatshirt-front.png', back: 'images/mockups/sweatshirt-back.png' } },
     { id: 'hoodie' as Garment, name: 'Hoodie', icon: '👚', views: { front: 'images/mockups/hoodie-front.png', back: 'images/mockups/hoodie-back.png' } },
     { id: 'tote' as Garment, name: 'Tote Bag', icon: '👜', views: { front: 'images/mockups/tote-bag-front.png', back: 'images/mockups/tote-bag-back.png' } },
     { id: 'denimJacket' as Garment, name: 'Denim Jacket', icon: '👔', views: { front: 'images/mockups/denim-jacket-front.png', back: 'images/mockups/denim-jacket-back.png' } }
   ];
-
   colors = [
-    '#000000', '#ffffff', '#ff5f5f', '#4ecdc4', '#45b7d1', 
+    '#000000', '#ffffff', '#ff5f5f', '#4ecdc4', '#45b7d1',
     '#ff9671', '#8dd3c7', '#f9d56e', '#b388c9', '#8795a1'
   ];
 
-// 🔥 Глобальне слухання клавіатури: Видалення та гарячі комбінації Ctrl+Z / Ctrl+Y
-// 🔥 Надійне слухання клавіатури, яке працює на будь-якій розкладці (UA / EN)
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {
     const activeObject = this.canvas?.getActiveObject();
-    
-    // Якщо користувач зараз пише текст, гарячі клавіші не чіпаємо
+
     if (activeObject && activeObject.type === 'i-text' && (activeObject as any).isEditing) {
-      return; 
+      return;
     }
 
-    // 1. Обробка комбінацій Ctrl + Z та Ctrl + Y через фізичні коди клавіш
     if (event.ctrlKey || event.metaKey) {
       if (event.code === 'KeyZ') {
         event.preventDefault();
         this.undo();
-      } 
+      }
       else if (event.code === 'KeyY') {
         event.preventDefault();
         this.redo();
@@ -107,110 +91,67 @@ public imageService = inject(ImageService);
       return;
     }
 
-    // 2. Видалення об'єктів
     if (event.key === 'Delete' || event.key === 'Backspace') {
       this.deleteSelected();
     }
   }
 
-// ngOnInit(): void {
-//     this.loadPrices();
-//   const saved = sessionStorage.getItem('pendingManualDesign');
-//   if (saved) {
-//     const data = JSON.parse(saved);
-    
-//     // Відновлюємо PNG сигнали
-//     this.frontDesign.set(data.front ?? null);
-//     this.backDesign.set(data.back ?? null);
-  
-//     // Відновлюємо JSON стани canvas для обох сторін
-//     this.frontCanvasJSON = data.frontJSON ?? null;
-//     this.backCanvasJSON = data.backJSON ?? null;
-    
-//     // Відновлюємо гарментт і сторону
-//     if (data.garment) this.selectedGarment.set(data.garment);
-//     if (data.view) this.selectedView.set(data.view);
-
-//     // Якщо вже залогінений — одразу зберігаємо і чистимо sessionStorage
-//     if (this.authService.currentUser()) {
-//       // Невелика затримка щоб canvas встиг ініціалізуватись в ngAfterViewInit
-//       setTimeout(() => {
-//         this.renderOtherSideAndSave();
-//         sessionStorage.removeItem('pendingManualDesign');
-//       }, 500);
-//     }
-//   }
-// }
-
-// 🔥 ОНОВЛЕНО: Тепер дані з sessionStorage тільки відновлюють макет на екрані, без автозбереження
   ngOnInit(): void {
     this.loadPrices();
-    
+
     const saved = sessionStorage.getItem('pendingManualDesign');
     if (saved) {
       const data = JSON.parse(saved);
-      
-      // 1. Відновлюємо PNG знімки обох сторін
+
       this.frontDesign.set(data.front ?? null);
       this.backDesign.set(data.back ?? null);
-    
-      // 2. Відновлюємо JSON-структуру шарів для Fabric.js
+
       this.frontCanvasJSON = data.frontJSON ?? null;
       this.backCanvasJSON = data.backJSON ?? null;
-      
-      // 3. Відновлюємо обраний тип одягу та сторону полотна
+
       if (data.garment) this.selectedGarment.set(data.garment);
       if (data.view) this.selectedView.set(data.view);
 
-      // 4. Оновлюємо базову ціну під відновлений виріб
       this.updatePriceByType(this.selectedGarment());
 
-      // Повідомляємо користувача, що його незавершений макет успішно відновлено
       this.showToast('Ваш макет успішно відновлено! Натисніть "Зберегти макет" для підтвердження.');
-      
-      // Очищуємо сесію, адже макет уже розгорнуто в пам'яті компонента
+
       sessionStorage.removeItem('pendingManualDesign');
     }
   }
 
-
-
-
-// 1. Метод для отримання цін з бекенду
-loadPrices(): void {
-  this.userService.getGarmentPrices().subscribe({
-    next: (data) => {
-      this.garmentPricesList.set(data);
-      // Відразу оновлюємо ціну для початкового виробу (hoodie)
-      this.updatePriceByType(this.selectedGarment());
-    },
-    error: (err) => console.error('Помилка завантаження цін: - designer.ts:187', err)
-  });
-}
-
-// 2. Допоміжний метод для пошуку ціни в списку за типом
-updatePriceByType(type: string): void {
-  const found = this.garmentPricesList().find(
-    p => p.garmentType.toLowerCase() === type.toLowerCase()
-  );
-  if (found) {
-    this.basePrice.set(found.basePrice);
-  } else {
-    this.basePrice.set(1000); 
+  loadPrices(): void {
+    this.userService.getGarmentPrices().subscribe({
+      next: (data) => {
+        this.garmentPricesList.set(data);
+        this.updatePriceByType(this.selectedGarment());
+      },
+      error: (err) => console.error('Помилка завантаження цін: - designer.ts:129', err)
+    });
   }
-}
 
-ngAfterViewInit(): void {
-  this.canvas = new Canvas('designerCanvas', {
-    width: 560,
-    height: 560,
-    backgroundColor: '#f7f8fa',
-    preserveObjectStacking: true
-  });
+  updatePriceByType(type: string): void {
+    const found = this.garmentPricesList().find(
+      p => p.garmentType.toLowerCase() === type.toLowerCase()
+    );
+    if (found) {
+      this.basePrice.set(found.basePrice);
+    } else {
+      this.basePrice.set(1000);
+    }
+  }
 
-  this.canvas.on('object:added', () => this.onCanvasChanged());
-  this.canvas.on('object:modified', () => this.onCanvasChanged());
-  this.canvas.on('object:removed', () => this.onCanvasChanged());
+  ngAfterViewInit(): void {
+    this.canvas = new Canvas('designerCanvas', {
+      width: 560,
+      height: 560,
+      backgroundColor: '#f7f8fa',
+      preserveObjectStacking: true
+    });
+
+    this.canvas.on('object:added', () => this.onCanvasChanged());
+    this.canvas.on('object:modified', () => this.onCanvasChanged());
+    this.canvas.on('object:removed', () => this.onCanvasChanged());
 
     this.canvas.on('selection:created', (e) => {
       const active = e.selected?.[0];
@@ -226,7 +167,6 @@ ngAfterViewInit(): void {
       const active = e.selected?.[0];
       if (active) {
         this.selectedOpacity.set(active.opacity ?? 1);
-        // Якщо це текст, підтягуємо його параметри в повзунки
         if (active.type === 'i-text') {
           this.selectedFontFamily.set((active as any).fontFamily ?? 'Arial');
           this.selectedFontSize.set((active as any).fontSize ?? 34);
@@ -244,10 +184,9 @@ ngAfterViewInit(): void {
         }
       }
     });
-  this.loadGarmentMockup();
-}
+    this.loadGarmentMockup();
+  }
 
-  // Зберігає JSON user-об'єктів поточної сторони (без мокапу)
   private saveCurrentViewState(): void {
     const userObjects = this.canvas
       .getObjects()
@@ -266,7 +205,6 @@ ngAfterViewInit(): void {
     }
   }
 
-  // Зберігає PNG-знімок поточної сторони (для saveDesign)
   private saveCurrentView(): void {
     this.saveCurrentViewState();
 
@@ -278,12 +216,11 @@ ngAfterViewInit(): void {
     }
   }
 
-  // Єдина точка завантаження — мокап + відновлення JSON поточної сторони
   async loadGarmentMockup(): Promise<void> {
     const garment = this.garments.find(g => g.id === this.selectedGarment());
     if (!garment) return;
 
-const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedView()]);
+    const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedView()]);
 
     this.canvas.clear();
     this.canvas.backgroundColor = '#f7f8fa';
@@ -307,20 +244,17 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
         name: 'mockup'
       });
 
-      // Отримуємо збережений JSON для поточної сторони
       const savedJSON = this.selectedView() === 'front'
         ? this.frontCanvasJSON
         : this.backCanvasJSON;
 
       if (savedJSON) {
-        // Відновлюємо canvas: мокап + user-об'єкти з JSON
         const parsed = JSON.parse(savedJSON);
         await this.canvas.loadFromJSON({
           version: '6.0.0',
-        objects: [img.toObject() as any, ...parsed.objects]
+          objects: [img.toObject() as any, ...parsed.objects]
         });
 
-        // Після loadFromJSON — знову робимо мокап non-interactive
         const mockupObj = this.canvas
           .getObjects()
           .find(o => (o as any).name === 'mockup');
@@ -330,7 +264,7 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
           this.canvas.sendObjectToBack(mockupObj);
         }
       } else {
-        // Перше завантаження — просто додаємо мокап
+
         this.canvas.add(img);
         this.canvas.sendObjectToBack(img);
       }
@@ -340,17 +274,15 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
       this.updateLayers();
 
     } catch (e) {
-      console.error('Error loading mockup: - designer.ts:343', e);
+      console.error('Error loading mockup: - designer.ts:277', e);
     }
   }
 
-  // Більше не використовується окремо — залишено для сумісності
   async loadSavedView(): Promise<void> {
     await this.loadGarmentMockup();
   }
 
   chooseGarment(garment: Garment): void {
-    // Зберігаємо поточну сторону перед зміною виробу
     this.saveCurrentViewState();
     this.selectedGarment.set(garment);
     this.updatePriceByType(garment);
@@ -360,11 +292,11 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
   }
 
   updateBrushWidth(width: number): void {
-  this.brushWidth.set(width);
-  if (this.canvas && this.canvas.isDrawingMode && this.canvas.freeDrawingBrush) {
-    this.canvas.freeDrawingBrush.width = width;
+    this.brushWidth.set(width);
+    if (this.canvas && this.canvas.isDrawingMode && this.canvas.freeDrawingBrush) {
+      this.canvas.freeDrawingBrush.width = width;
+    }
   }
-}
 
   chooseTool(tool: Tool): void {
     this.selectedTool.set(tool);
@@ -374,7 +306,7 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
       this.canvas.isDrawingMode = true;
       const brush = new PencilBrush(this.canvas);
       brush.color = this.selectedColor();
-  brush.width = this.brushWidth();
+      brush.width = this.brushWidth();
       this.canvas.freeDrawingBrush = brush;
     } else if (tool === 'circle') {
       this.addCircle();
@@ -383,7 +315,7 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
     } else if (tool === 'text') {
       this.addText();
     }
-    
+
   }
 
   selectColor(color: string): void {
@@ -399,17 +331,14 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
     }
   }
 
-
-  // 🔥 Функція зміни прозорості обраного об'єкта
   updateSelectedOpacity(opacity: number): void {
     this.selectedOpacity.set(opacity);
     const active = this.canvas?.getActiveObject();
-    
-    // Змінюємо прозорість тільки якщо об'єкт виділено і це не фоновий мокап
+
     if (active && (active as any).name !== 'mockup') {
       active.set('opacity', opacity);
       this.canvas.renderAll();
-      this.saveHistory(); // Зберігаємо крок в історію Ctrl+Z
+      this.saveHistory();
     }
   }
 
@@ -448,8 +377,8 @@ const imageUrl = this.imageService.getFullImageUrl(garment.views[this.selectedVi
     const text = new IText('Your Text', {
       left: 280,
       top: 280,
-   fontSize: this.selectedFontSize(),
-fontFamily: this.selectedFontFamily(),
+      fontSize: this.selectedFontSize(),
+      fontFamily: this.selectedFontFamily(),
       fill: this.selectedColor(),
       originX: 'center',
       originY: 'center',
@@ -459,7 +388,6 @@ fontFamily: this.selectedFontFamily(),
     this.canvas.add(text);
     this.canvas.setActiveObject(text);
   }
-// 🔥 Зміна шрифту для виділеного тексту
   updateFontFamily(font: string): void {
     this.selectedFontFamily.set(font);
     const active = this.canvas?.getActiveObject();
@@ -470,7 +398,6 @@ fontFamily: this.selectedFontFamily(),
     }
   }
 
-  // 🔥 Зміна розміру для виділеного тексту
   updateFontSize(size: number): void {
     this.selectedFontSize.set(size);
     const active = this.canvas?.getActiveObject();
@@ -481,7 +408,7 @@ fontFamily: this.selectedFontFamily(),
     }
   }
 
-  
+
   uploadImage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -516,36 +443,30 @@ fontFamily: this.selectedFontFamily(),
     }
   }
 
-  // 🔥 Функція для дублювання обраного об'єкта
   duplicateSelected(): void {
     const active = this.canvas.getActiveObject();
-    
-    // Перевіряємо, чи є активний об'єкт і чи це не фоновий мокап одягу
+
     if (active && (active as any).name !== 'mockup') {
       active.clone().then((cloned) => {
         this.canvas.discardActiveObject();
-        
-        // Зміщуємо клонований об'єкт трохи вбік і вниз, щоб користувач побачив копію
+
         cloned.set({
           left: cloned.left! + 20,
           top: cloned.top! + 20,
           evented: true
         });
 
-        // Якщо це текстове поле, скидаємо стан редагування для копії
         if (cloned.type === 'i-text') {
           (cloned as any).isEditing = false;
         }
 
         this.canvas.add(cloned);
-        this.canvas.setActiveObject(cloned); // Автоматично виділяємо нову копію
+        this.canvas.setActiveObject(cloned);
         this.canvas.renderAll();
       });
     }
   }
 
-
-  // 🔥 Віддзеркалити ліворуч / праворуч (по горизонталі)
   flipHorizontal(): void {
     const active = this.canvas?.getActiveObject();
     if (active && (active as any).name !== 'mockup') {
@@ -555,7 +476,7 @@ fontFamily: this.selectedFontFamily(),
     }
   }
 
-  // 🔥 Віддзеркалити вгору / вниз (по вертикалі)
+
   flipVertical(): void {
     const active = this.canvas?.getActiveObject();
     if (active && (active as any).name !== 'mockup') {
@@ -618,7 +539,6 @@ fontFamily: this.selectedFontFamily(),
     return (layer as any).name || layer.type || 'Layer';
   }
 
-  // Перемикання сторони: зберегти → переключити → завантажити
   rotateLeft(): void {
     this.saveCurrentViewState();
     this.selectedView.set(this.selectedView() === 'front' ? 'back' : 'front');
@@ -639,242 +559,218 @@ fontFamily: this.selectedFontFamily(),
     link.click();
   }
 
-saveDesign(): void {
-  this.saveCurrentView();
+  saveDesign(): void {
+    this.saveCurrentView();
 
-  if (!this.authService.currentUser()) {
-    // Зберігаємо повний стан перед редіректом
-    const front = this.frontDesign();
-    const back = this.backDesign();
-    
-    sessionStorage.setItem('pendingManualDesign', JSON.stringify({
-      front,
-      back,
-      frontJSON: this.frontCanvasJSON,
-      backJSON: this.backCanvasJSON,
-      garment: this.selectedGarment(),
-      view: this.selectedView()
-    }));
+    if (!this.authService.currentUser()) {
+      const front = this.frontDesign();
+      const back = this.backDesign();
 
-    this.router.navigate(['/login'], { queryParams: { returnUrl: '/designer' } });
-    return;
+      sessionStorage.setItem('pendingManualDesign', JSON.stringify({
+        front,
+        back,
+        frontJSON: this.frontCanvasJSON,
+        backJSON: this.backCanvasJSON,
+        garment: this.selectedGarment(),
+        view: this.selectedView()
+      }));
+
+      this.router.navigate(['/login'], { queryParams: { returnUrl: '/designer' } });
+      return;
+    }
+
+    this.renderOtherSideAndSave();
+  }
+  private async renderOtherSideAndSave(): Promise<void> {
+    const currentView = this.selectedView();
+    const otherView: GarmentView = currentView === 'front' ? 'back' : 'front';
+
+    const currentDesign = currentView === 'front' ? this.frontDesign() : this.backDesign();
+
+    const otherJSON = otherView === 'front' ? this.frontCanvasJSON : this.backCanvasJSON;
+
+    let otherDesign: string | null = otherView === 'front'
+      ? this.frontDesign()
+      : this.backDesign();
+
+    if (otherJSON || !otherDesign) {
+      otherDesign = await this.renderSideToDataUrl(otherView, otherJSON);
+      if (otherView === 'front') {
+        this.frontDesign.set(otherDesign);
+      } else {
+        this.backDesign.set(otherDesign);
+      }
+    }
+
+    const front = currentView === 'front' ? currentDesign : otherDesign;
+    const back = currentView === 'back' ? currentDesign : otherDesign;
+
+    if (!front && !back) return;
+
+    const payload = {
+      frontBase64: front ?? '',
+      backBase64: back ?? '',
+      garmentType: this.selectedGarment()
+    };
+
+    this.designerService.saveManualDesign(payload).subscribe({
+      next: () => {
+        sessionStorage.removeItem('pendingManualDesign');
+        this.showToast('Дизайн успішно збережено в кабінет!');
+      },
+      error: (err) => {
+        console.error('❌ Save error: - designer.ts:622', err);
+        console.error('❌ Validation errors: - designer.ts:623', JSON.stringify(err.error?.errors));
+      }
+    });
   }
 
-  this.renderOtherSideAndSave();
-}
-private async renderOtherSideAndSave(): Promise<void> {
-  const currentView = this.selectedView();
-  const otherView: GarmentView = currentView === 'front' ? 'back' : 'front';
+  private async renderSideToDataUrl(view: GarmentView, savedJSON: string | null): Promise<string> {
+    const garment = this.garments.find(g => g.id === this.selectedGarment());
+    if (!garment) return '';
 
-  // Отримуємо вже збережений знімок поточної сторони
-  const currentDesign = currentView === 'front' ? this.frontDesign() : this.backDesign();
+    const imageUrl = this.imageService.getFullImageUrl(garment.views[view]);
 
-  // Отримуємо збережений JSON іншої сторони
-  const otherJSON = otherView === 'front' ? this.frontCanvasJSON : this.backCanvasJSON;
+    const tempCanvasEl = document.createElement('canvas');
+    tempCanvasEl.width = 560;
+    tempCanvasEl.height = 560;
 
-  let otherDesign: string | null = otherView === 'front'
-    ? this.frontDesign()
-    : this.backDesign();
-
-  // Якщо інша сторона має об'єкти або ще не має PNG — рендеримо її
-  if (otherJSON || !otherDesign) {
-    otherDesign = await this.renderSideToDataUrl(otherView, otherJSON);
-
-    // Зберігаємо результат у сигнал
-    if (otherView === 'front') {
-      this.frontDesign.set(otherDesign);
-    } else {
-      this.backDesign.set(otherDesign);
-    }
-  }
-
-  const front = currentView === 'front' ? currentDesign : otherDesign;
-  const back  = currentView === 'back'  ? currentDesign : otherDesign;
-
-  if (!front && !back) return;
-
-  const payload = {
-    frontBase64: front ?? '',
-    backBase64: back ?? '',
-    garmentType: this.selectedGarment()
-  };
-
-  this.designerService.saveManualDesign(payload).subscribe({
-    next: () => {
-      sessionStorage.removeItem('pendingManualDesign');
-      this.showToast('Дизайн успішно збережено в кабінет!');
-    },
-    error: (err) => {
-      console.error('❌ Save error: - designer.ts:708', err);
-      console.error('❌ Validation errors: - designer.ts:709', JSON.stringify(err.error?.errors));
-    }
-  });
-}
-
-// Рендерить вказану сторону у тимчасовий off-screen canvas і повертає dataUrl
-private async renderSideToDataUrl(view: GarmentView, savedJSON: string | null): Promise<string> {
-  const garment = this.garments.find(g => g.id === this.selectedGarment());
-  if (!garment) return '';
-
-const imageUrl = this.imageService.getFullImageUrl(garment.views[view]);
-
-  // Створюємо тимчасовий canvas поза DOM
-  const tempCanvasEl = document.createElement('canvas');
-  tempCanvasEl.width = 560;
-  tempCanvasEl.height = 560;
-
-  const tempCanvas = new Canvas(tempCanvasEl, {
-    width: 560,
-    height: 560,
-    backgroundColor: '#f7f8fa'
-  });
-
-  try {
-    const img = await FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' });
-    const scale = Math.min(560 / img.width!, 560 / img.height!);
-
-    img.set({
-      scaleX: scale,
-      scaleY: scale,
-      left: 280,
-      top: 280,
-      originX: 'center',
-      originY: 'center',
-      selectable: false,
-      evented: false,
-      name: 'mockup'
+    const tempCanvas = new Canvas(tempCanvasEl, {
+      width: 560,
+      height: 560,
+      backgroundColor: '#f7f8fa'
     });
 
-    if (savedJSON) {
-      const parsed = JSON.parse(savedJSON);
+    try {
+      const img = await FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' });
+      const scale = Math.min(560 / img.width!, 560 / img.height!);
+
+      img.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: 280,
+        top: 280,
+        originX: 'center',
+        originY: 'center',
+        selectable: false,
+        evented: false,
+        name: 'mockup'
+      });
+
+      if (savedJSON) {
+        const parsed = JSON.parse(savedJSON);
+        await tempCanvas.loadFromJSON({
+          version: '6.0.0',
+          objects: [{ ...img.toObject(), name: 'mockup' } as any, ...parsed.objects]
+        });
+      } else {
+        tempCanvas.add(img);
+      }
+
+      tempCanvas.renderAll();
+      const dataUrl = tempCanvas.toDataURL({ format: 'png', multiplier: 2 });
+      tempCanvas.dispose();
+      return dataUrl;
+
+    } catch (e) {
+      console.error('Error rendering side: - designer.ts:676', e);
+      tempCanvas.dispose();
+      return '';
+    }
+  }
+
+  private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
+    if (!savedJSON) return '';
+
+    const parsed = JSON.parse(savedJSON);
+    const userObjects = parsed.objects.filter((obj: any) => obj.name !== 'mockup');
+
+    if (userObjects.length === 0) return '';
+
+    const tempCanvasEl = document.createElement('canvas');
+    tempCanvasEl.width = 560;
+    tempCanvasEl.height = 560;
+
+    const tempCanvas = new Canvas(tempCanvasEl, {
+      width: 560,
+      height: 560,
+      backgroundColor: ''
+    });
+
+    try {
       await tempCanvas.loadFromJSON({
         version: '6.0.0',
-        objects: [{ ...img.toObject(), name: 'mockup' } as any, ...parsed.objects]
+        objects: userObjects
       });
-    } else {
-      tempCanvas.add(img);
+
+      tempCanvas.renderAll();
+      const dataUrl = tempCanvas.toDataURL({
+        format: 'png',
+        multiplier: 2,
+        enableRetinaScaling: true
+      });
+
+      tempCanvas.dispose();
+      return dataUrl;
+
+    } catch (e) {
+      console.error('Error rendering overlay: - designer.ts:717', e);
+      tempCanvas.dispose();
+      return '';
     }
-
-    tempCanvas.renderAll();
-    const dataUrl = tempCanvas.toDataURL({ format: 'png', multiplier: 2 });
-    tempCanvas.dispose();
-    return dataUrl;
-
-  } catch (e) {
-    console.error('Error rendering side: - designer.ts:764', e);
-    tempCanvas.dispose();
-    return '';
   }
-}
 
-
-// Рендерить ТІЛЬКИ користувацькі шари на прозорому фоні для 3D-текстури
-private async renderOverlayOnly(savedJSON: string | null): Promise<string> {
-  if (!savedJSON) return '';
-
-  const parsed = JSON.parse(savedJSON);
-  const userObjects = parsed.objects.filter((obj: any) => obj.name !== 'mockup');
-  
-  if (userObjects.length === 0) return '';
-
-  const tempCanvasEl = document.createElement('canvas');
-  tempCanvasEl.width = 560;
-  tempCanvasEl.height = 560;
-
-  const tempCanvas = new Canvas(tempCanvasEl, {
-    width: 560,
-    height: 560,
-    backgroundColor: '' 
+  complexityFactor = computed(() => {
+    const count = this.layers().length;
+    if (count <= 2) return 1;
+    if (count <= 5) return 1.2;
+    return 1.5;
   });
 
-  try {
-    await tempCanvas.loadFromJSON({
-      version: '6.0.0',
-      objects: userObjects
-    });
+  dynamicArtPrice = computed(() => {
+    const baseArt = 1000;
 
-    tempCanvas.renderAll();
-    const dataUrl = tempCanvas.toDataURL({ 
-      format: 'png',
-      multiplier: 2,
-      enableRetinaScaling: true
-    });
+    const getObjectCount = (jsonString: string | null) => {
+      if (!jsonString) return 0;
+      try {
+        const parsed = JSON.parse(jsonString);
+        return parsed.objects ? parsed.objects.length : 0;
+      } catch { return 0; }
+    };
 
-    tempCanvas.dispose();
-    return dataUrl;
+    const currentSideCount = this.layers().length;
+    const otherSideJSON = this.selectedView() === 'front' ? this.backCanvasJSON : this.frontCanvasJSON;
+    const otherSideCount = getObjectCount(otherSideJSON);
 
-  } catch (e) {
-    console.error('Error rendering overlay: - designer.ts:807', e);
-    tempCanvas.dispose();
-    return '';
-  }
-}
-// 1. Коефіцієнт складності на основі кількості шарів на ПОТОЧНІЙ стороні
-// (Ми залишаємо це для візуального відображення коефіцієнта під час малювання)
-complexityFactor = computed(() => {
-  const count = this.layers().length;
-  if (count <= 2) return 1;
-  if (count <= 5) return 1.2;
-  return 1.5;
-});
+    let totalArtPrice = 0;
 
-// 2. Розрахунок вартості розпису з урахуванням ОБВОХ сторін
-dynamicArtPrice = computed(() => {
-  const baseArt = 1000;
-  
-  // Функція для підрахунку об'єктів у JSON-рядку
-  const getObjectCount = (jsonString: string | null) => {
-    if (!jsonString) return 0;
-    try {
-      const parsed = JSON.parse(jsonString);
-      return parsed.objects ? parsed.objects.length : 0;
-    } catch { return 0; }
-  };
+    if (currentSideCount > 0) {
+      totalArtPrice += baseArt * this.calculateFactor(currentSideCount);
+    }
 
-  // Рахуємо об'єкти на обох сторонах
-  // Важливо: для поточної сторони беремо дані прямо з canvas (this.layers()), 
-  // а для іншої — з її збереженого JSON
-  const currentSideCount = this.layers().length;
-  const otherSideJSON = this.selectedView() === 'front' ? this.backCanvasJSON : this.frontCanvasJSON;
-  const otherSideCount = getObjectCount(otherSideJSON);
+    if (otherSideCount > 0) {
+      totalArtPrice += baseArt * this.calculateFactor(otherSideCount);
+    }
 
-  // Логіка нарахування:
-  // Якщо на стороні є хоча б один малюнок, додаємо вартість розпису для цієї сторони
-  let totalArtPrice = 0;
+    return totalArtPrice > 0 ? Math.round(totalArtPrice) : baseArt;
+  });
 
-  // Рахуємо ціну для першої сторони (якщо не порожня)
-  if (currentSideCount > 0) {
-    totalArtPrice += baseArt * this.calculateFactor(currentSideCount);
+  private calculateFactor(count: number): number {
+    if (count <= 2) return 1;
+    if (count <= 5) return 1.2;
+    return 1.5;
   }
 
-  // Рахуємо ціну для другої сторони (якщо не порожня)
-  if (otherSideCount > 0) {
-    totalArtPrice += baseArt * this.calculateFactor(otherSideCount);
+  totalEstimatedPrice = computed(() => {
+    return this.basePrice() + this.dynamicArtPrice();
+  });
+  showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    setTimeout(() => {
+      this.toastMessage.set('');
+    }, 3000);
   }
-
-  // Якщо обидві сторони порожні, але користувач у конструкторі — показуємо мін. ціну 1 сторони
-  return totalArtPrice > 0 ? Math.round(totalArtPrice) : baseArt;
-});
-
-// Допоміжний метод (поза computed)
-private calculateFactor(count: number): number {
-  if (count <= 2) return 1;
-  if (count <= 5) return 1.2;
-  return 1.5;
-}
-
-totalEstimatedPrice = computed(() => {
-  return this.basePrice() + this.dynamicArtPrice();
-});
-showToast(message: string, type: 'success' | 'error' = 'success'): void {
-  this.toastMessage.set(message);
-  this.toastType.set(type);
-  
-  // Приховуємо повідомлення через 3 секунди
-  setTimeout(() => {
-    this.toastMessage.set('');
-  }, 3000);
-}
 
 }
 

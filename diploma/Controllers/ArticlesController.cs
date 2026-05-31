@@ -36,34 +36,34 @@ namespace diploma.api.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            // 📸 Зберігаємо фотографію безпосередньо у твою папку wwwroot/images/blog/
+   
             if (imageFile != null && imageFile.Length > 0)
             {
-                // Формуємо повний шлях до твоєї папки "wwwroot/images/blog"
+            
                 var blogFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "blog");
 
-                // Про всяк випадок перевіряємо, чи існує папка (якщо ні — створимо її)
+          
                 if (!Directory.Exists(blogFolder))
                 {
                     Directory.CreateDirectory(blogFolder);
                 }
 
-                // Генеруємо унікальне ім'я файлу, щоб не перезаписати фотки з однаковими назвами
+    
                 var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(imageFile.FileName);
                 var filePath = Path.Combine(blogFolder, uniqueFileName);
 
-                // Записуємо фізичний файл на диск комп'ютера
+  
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await imageFile.CopyToAsync(fileStream);
                 }
 
-                // Шлях, який ми віддамо фронтенду для тегу <img [src]="...">
+       
                 article.ImageUrl = $"/images/blog/{uniqueFileName}";
             }
             else
             {
-                // Заглушка за замовчуванням, якщо статтю створили без фотографії
+     
                 article.ImageUrl = "/images/blog/default-blog.jpg";
             }
 
@@ -73,7 +73,7 @@ namespace diploma.api.Controllers
             return Ok(article);
         }
 
-        // Отримати всі статті
+   
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -83,7 +83,7 @@ namespace diploma.api.Controllers
             return Ok(articles);
         }
 
-        // Отримати статтю за ID
+ 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -92,7 +92,7 @@ namespace diploma.api.Controllers
             return Ok(article);
         }
 
-        // Видалити статтю
+    
         [HttpDelete("{id}")]
         [Authorize(Roles = Roles.ADMIN)]
         public async Task<IActionResult> Delete(int id)
@@ -100,7 +100,7 @@ namespace diploma.api.Controllers
             var article = await _context.Articles.FindAsync(id);
             if (article == null) return NotFound();
 
-            // Якщо ми видаляємо статтю, гарним тоном буде видалити і її файл з диска
+     
             if (!string.IsNullOrEmpty(article.ImageUrl) && !article.ImageUrl.Contains("default-blog"))
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", article.ImageUrl.TrimStart('/'));
@@ -122,7 +122,7 @@ namespace diploma.api.Controllers
             var article = await _context.Articles.FindAsync(id);
             if (article == null) return NotFound();
 
-            // Оновлюємо текстові поля
+        
             article.Title = dto.Title;
             article.Category = dto.Category;
             article.Author = dto.Author;
@@ -132,10 +132,10 @@ namespace diploma.api.Controllers
             article.BulletsText = dto.BulletsText;
             article.Quote = dto.Quote;
 
-            // Якщо завантажили нове фото — замінюємо
+     
             if (imageFile != null && imageFile.Length > 0)
             {
-                // Видаляємо старе фото з диска
+               
                 if (!string.IsNullOrEmpty(article.ImageUrl) && !article.ImageUrl.Contains("default-blog"))
                 {
                     var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", article.ImageUrl.TrimStart('/'));
@@ -143,7 +143,7 @@ namespace diploma.api.Controllers
                         System.IO.File.Delete(oldPath);
                 }
 
-                // Зберігаємо нове
+             
                 var blogFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "blog");
                 if (!Directory.Exists(blogFolder))
                     Directory.CreateDirectory(blogFolder);
@@ -158,7 +158,7 @@ namespace diploma.api.Controllers
 
                 article.ImageUrl = $"/images/blog/{uniqueFileName}";
             }
-            // Якщо нового файлу нема — imageUrl залишається як є
+            
 
             await _context.SaveChangesAsync();
             return Ok(article);

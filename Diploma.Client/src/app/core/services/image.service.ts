@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class ImageService {
-  // private apiUrl = 'http://localhost:5000';
   private apiUrl = 'https://localhost:7001';
 
   getFullImageUrl(path: string | null | undefined): string {
@@ -12,27 +11,22 @@ export class ImageService {
 
     const normalizedPath = path.trim().replace(/\\/g, '/');
 
-    // base64 preview
     if (normalizedPath.startsWith('data:image/')) {
       return normalizedPath;
     }
 
-    // already full url
     if (normalizedPath.startsWith('http://') || normalizedPath.startsWith('https://')) {
       return normalizedPath;
     }
 
-    // if backend returns /images/...
     if (normalizedPath.startsWith('/images/')) {
       return `${this.apiUrl}${normalizedPath}`;
     }
 
-    // if backend returns images/...
     if (normalizedPath.startsWith('images/')) {
       return `${this.apiUrl}/${normalizedPath}`;
     }
 
-    // if backend returns only filename
     if (!normalizedPath.startsWith('/')) {
       return `${this.apiUrl}/${normalizedPath}`;
     }

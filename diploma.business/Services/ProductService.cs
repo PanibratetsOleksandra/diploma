@@ -13,7 +13,7 @@ namespace diploma.business.Services
             _context = context;
         }
 
-        // Метод для оновлення товару
+  
         public async Task UpdateProductAsync(Product product)
         {
             var existingProduct = await _context.Products
@@ -22,14 +22,14 @@ namespace diploma.business.Services
 
             if (existingProduct != null)
             {
-                // Оновлюємо поля
+       
                 existingProduct.Name = product.Name;
                 existingProduct.Description = product.Description;
                 existingProduct.Price = product.Price;
                 existingProduct.Materials = product.Materials;
                 existingProduct.AvailableSizes = product.AvailableSizes;
 
-                // Оновлюємо фото (якщо прийшло нове)
+              
                 if (product.Photos.Any())
                 {
                     existingProduct.Photos = product.Photos;

@@ -8,7 +8,7 @@ namespace diploma.core.Entities
     {
         public int Id { get; set; }
         public string Url { get; set; } = string.Empty;
-        public bool IsMain { get; set; } // Головне фото для прев'ю
+        public bool IsMain { get; set; } 
         public int ProductId { get; set; }
     }
 }

@@ -1,52 +1,72 @@
-<div class="flex flex-col bg-white font-sans text-gray-900">
-  <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between"> <div class="flex items-center gap-4 cursor-pointer" routerLink="/"> <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-100 shadow-md flex items-center justify-center bg-gray-50 transition-transform hover:scale-105">
-          <img [src]="imageService.getFullImageUrl('images/main/logo.jpg')" 
-               alt="Panibratets Artwear Logo" 
-               class="w-full h-full object-cover">
-        </div>
-        
-        <span class="text-2xl font-extrabold italic uppercase tracking-tighter text-gray-950">Panibratets Artwear</span>
+<nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+
+    <div class="flex items-center gap-4 cursor-pointer" routerLink="/">
+      <div
+        class="w-12 h-12 rounded-full overflow-hidden border border-gray-100 shadow-sm flex items-center justify-center bg-gray-50">
+        <img [src]="imageService.getFullImageUrl('images/main/logo.jpg')" class="w-full h-full object-cover">
       </div>
-
-      <div class="hidden md:flex items-center gap-8">
-        <a routerLink="/" class="text-sm font-semibold hover:text-[#E06A00] transition">Головна</a>
-        <a routerLink="/shop" class="text-sm font-semibold hover:text-[#E06A00] transition">Магазин</a>
-        <a routerLink="/ai-assistant" class="text-sm font-semibold hover:text-[#E06A00] transition">ШІ Асистент</a>
-        <a routerLink="/designer" class="text-sm font-semibold hover:text-[#E06A00] transition">2D Конструктор</a>
-        <a routerLink="/blog" class="text-sm font-semibold hover:text-[#E06A00] transition">Блог</a>
-      </div>
-
- <div class="flex items-center gap-3 border-l border-gray-200 pl-5">
-          @if (!authService.currentUser()) {
-            <a routerLink="/login" class="text-sm font-bold hover:text-[#E06A00] transition">Увійти</a>
-            <a routerLink="/register" class="bg-black text-white px-5 py-2.5 rounded-full text-xs font-black hover:bg-gray-800 transition shadow-sm uppercase tracking-widest">Реєстрація</a>
-          } @else {
-            <div class="flex items-center gap-3">
-              <button (click)="navigateToDashboard()" class="flex items-center gap-2 px-5 py-2.5 bg-gray-50 hover:bg-black hover:text-white rounded-full text-xs font-black uppercase tracking-widest transition-all duration-300">
-                <span>Кабінет</span>
-                <span class="text-xs">👤</span>
-              </button>
-              
-              <button (click)="logout()" class="text-xs font-bold text-gray-400 hover:text-red-500 transition ml-2">
-                Вийти
-              </button>
-            </div>
-          }
-        </div>
-
-        <button routerLink="/cart" class="relative hover:text-[#E06A00] transition p-2.5 flex items-center" title="Кошик">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
-          </svg>
-          @if (cartService.totalCount() > 0) {
-            <span class="absolute top-0 right-0 bg-[#E06A00] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold animate-bounce">
-              {{ cartService.totalCount() }}
-            </span>
-          }
-        </button>
-
-      
-
+      <span class="text-xl font-extrabold italic uppercase tracking-tighter hidden sm:block">Panibratets Artwear</span>
     </div>
-  </nav>
-</div>
+
+    <div class="hidden md:flex items-center gap-8">
+      <a routerLink="/" class="text-sm font-semibold hover:text-[#E06A00] transition">Головна</a>
+      <a routerLink="/shop" class="text-sm font-semibold hover:text-[#E06A00] transition">Магазин</a>
+      <a routerLink="/ai-assistant" class="text-sm font-semibold hover:text-[#E06A00] transition">ШІ Асистент</a>
+      <a routerLink="/designer" class="text-sm font-semibold hover:text-[#E06A00] transition">Конструктор</a>
+      <a routerLink="/blog" class="text-sm font-semibold hover:text-[#E06A00] transition">Блог</a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-3">
+        @if (!authService.currentUser()) {
+        <a routerLink="/login" class="text-xs font-bold hover:text-[#E06A00]">Увійти</a>
+        <a routerLink="/register"
+          class="bg-black text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Реєстрація</a>
+        } @else {
+        <button (click)="navigateToDashboard()"
+          class="px-4 py-2 bg-gray-50 rounded-full text-[10px] font-black uppercase">Кабінет</button>
+        <button (click)="logout()"
+          class="text-[10px] font-bold text-gray-400 hover:text-red-500 transition">Вийти</button>
+        }
+      </div>
+
+      <button routerLink="/cart" class="relative p-2 flex items-center">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-width="1.5" />
+        </svg>
+        @if (cartService.totalCount() > 0) {
+        <span
+          class="absolute top-0 right-0 bg-[#E06A00] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold animate-bounce">{{
+          cartService.totalCount() }}</span>
+        }
+      </button>
+
+      <button (click)="isMenuOpen.set(!isMenuOpen())" class="md:hidden p-2">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  @if (isMenuOpen()) {
+  <div class="md:hidden bg-white border-t border-gray-100 p-6 flex flex-col gap-4 shadow-xl">
+    <a routerLink="/" (click)="isMenuOpen.set(false)" class="font-bold uppercase text-sm">Головна</a>
+    <a routerLink="/shop" (click)="isMenuOpen.set(false)" class="font-bold uppercase text-sm">Магазин</a>
+    <a routerLink="/ai-assistant" (click)="isMenuOpen.set(false)" class="font-bold uppercase text-sm">ШІ Асистент</a>
+    <a routerLink="/designer" (click)="isMenuOpen.set(false)" class="font-bold uppercase text-sm">Конструктор</a>
+    <a routerLink="/blog" (click)="isMenuOpen.set(false)" class="font-bold uppercase text-sm">Блог</a>
+    <hr>
+    <button (click)="navigateToDashboard(); isMenuOpen.set(false)"
+      class="text-left font-bold uppercase text-sm">Кабінет</button>
+
+    @if (authService.currentUser()) {
+    <button (click)="logout(); isMenuOpen.set(false)"
+      class="text-left font-bold uppercase text-sm text-red-500">Вийти</button>
+    } @else {
+    <a routerLink="/login" (click)="isMenuOpen.set(false)" class="font-bold uppercase text-sm">Увійти</a>
+    }
+  </div>
+  }
+</nav>

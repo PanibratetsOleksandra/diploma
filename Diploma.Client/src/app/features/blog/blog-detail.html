@@ -2,7 +2,7 @@
   <div class="max-w-4xl mx-auto">
     
     <button (click)="goBack()" class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition mb-8">
-      ← Back to Blog
+      ← Назад до блогу
     </button>
 
     @if (article(); as item) {
@@ -10,7 +10,7 @@
         
         <div class="space-y-4">
           <span class="px-4 py-1.5 bg-orange-100 text-orange-600 text-[9px] font-black uppercase tracking-widest rounded-full shadow-sm inline-block">
-            {{ item.category }}
+           {{ getCategoryLabel(item.category) }}
           </span>
           
           <h1 class="text-4xl lg:text-6xl font-black italic tracking-tighter text-gray-950 leading-[1.05]">
@@ -51,7 +51,7 @@
 
           @if (parsedBullets().length > 0) {
             <div class="p-8 bg-white border border-gray-100 rounded-3xl shadow-inner space-y-4">
-              <h4 class="text-xs font-black uppercase tracking-widest text-gray-400">Important Takeaways & Rules:</h4>
+              <h4 class="text-xs font-black uppercase tracking-widest text-gray-400">Основні поради та правила:</h4>
               <ul class="space-y-3">
                 @for (bullet of parsedBullets(); track bullet) {
                   <li class="flex gap-3 text-sm animate-in slide-in-from-left duration-300">
@@ -67,7 +67,7 @@
 
         <div class="pt-8 border-t border-gray-100 flex justify-center">
           <button (click)="goBack()" class="px-8 py-4 bg-black text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition shadow-lg shadow-gray-200">
-            Back to Articles list
+            Повернутися до статей
           </button>
         </div>
 

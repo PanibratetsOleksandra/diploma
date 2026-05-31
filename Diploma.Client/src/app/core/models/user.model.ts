@@ -2,10 +2,8 @@ export interface User {
   id: string;
   userName: string;
   email: string;
-  fullName?: string; // залишаємо як опціональне
+  fullName?: string; 
   roles: string[];
-  
-  // НОВІ ПОЛЯ
   firstName?: string;
   lastName?: string;
   middleName?: string;

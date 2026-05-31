@@ -17,7 +17,6 @@ export class CartComponent {
   public imageService = inject(ImageService);
   activePhotoIndex = signal(0);
 
-  // Функції для зручності в шаблоні
   increase(cartId: string | number) {
     this.cartService.updateQuantity(cartId, 1);
   }
@@ -26,25 +25,24 @@ export class CartComponent {
     this.cartService.updateQuantity(cartId, -1);
   }
 
-remove(cartId: string | number) {
-  if (confirm('Ви дійсно хочете видалити цей виріб з кошика? ❌')) {
-    this.cartService.removeFromCart(cartId);
+  remove(cartId: string | number) {
+    if (confirm('Ви дійсно хочете видалити цей виріб з кошика? ❌')) {
+      this.cartService.removeFromCart(cartId);
+    }
   }
-}
 
   getImg(url: string) {
     return this.imageService.getFullImageUrl(url);
   }
-  
-closeDetails() {
+
+  closeDetails() {
     this.cartService.closeDetails();
   }
 
-// Оновлюємо метод відкриття деталей
-viewDetails(item: CartItem) {
-    this.activePhotoIndex.set(0); // Скидаємо галерею на перше фото
-    this.cartService.viewDetails(item); // Викликаємо метод сервісу
+  viewDetails(item: CartItem) {
+    this.activePhotoIndex.set(0);
+    this.cartService.viewDetails(item);
   }
 
-  
+
 }

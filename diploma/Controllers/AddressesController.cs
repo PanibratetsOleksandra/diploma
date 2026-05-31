@@ -1,4 +1,5 @@
-﻿using diploma.core.Entities;
+﻿using diploma.business.Services;
+using diploma.core.Entities;
 using diploma.dal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +12,15 @@ using System.Security.Claims;
 public class AddressesController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IAddressService _addressService;
 
-    public AddressesController(AppDbContext context)
+    public AddressesController(AppDbContext context, IAddressService addressService)
     {
         _context = context;
+        _addressService = addressService;
     }
 
-    // Отримати всі адреси поточного юзера
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserAddress>>> GetMyAddresses()
     {
@@ -27,7 +30,7 @@ public class AddressesController : ControllerBase
             .ToListAsync();
     }
 
-    // Додати нову адресу
+
     [HttpPost]
     public async Task<ActionResult<UserAddress>> AddAddress(UserAddress address)
     {
@@ -40,7 +43,7 @@ public class AddressesController : ControllerBase
         return Ok(address);
     }
 
-    // Видалити адресу
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAddress(int id)
     {
@@ -60,24 +63,9 @@ public class AddressesController : ControllerBase
     public async Task<IActionResult> UpdateAddress(int id, UserAddress updatedAddress)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var address = await _context.UserAddresses
-            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-
+        if(userId == null) return NotFound();
+        var address = await _addressService.UpdateAddress(userId, id, updatedAddress);
         if (address == null) return NotFound();
-
-        // Оновлюємо поля
-        address.DeliveryService = updatedAddress.DeliveryService;
-        address.DeliveryType = updatedAddress.DeliveryType;
-        address.Region = updatedAddress.Region;
-        address.City = updatedAddress.City;
-        address.WarehouseNumber = updatedAddress.WarehouseNumber;
-        address.Street = updatedAddress.Street;
-        address.Building = updatedAddress.Building;
-        address.Floor = updatedAddress.Floor;
-        address.Apartment = updatedAddress.Apartment;
-        address.HasElevator = updatedAddress.HasElevator;
-
-        await _context.SaveChangesAsync();
         return Ok(address);
     }
 }

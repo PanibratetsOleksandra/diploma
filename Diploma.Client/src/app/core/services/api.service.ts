@@ -20,15 +20,8 @@ export class ApiService {
     return this.http.delete<T>(`${this.baseUrl}/${path}`);
   }
 
-  // put<T>(path: string, body: any, p0: { headers: { 'Content-Type': string; }; }): Observable<T> {
-  //   return this.http.put<T>(`${this.baseUrl}/${path}`, body);
-  // }
-
-  // api.service.ts
 
 put<T>(path: string, body: any, options?: { headers?: any }): Observable<T> {
-  // Тепер options (або твій p0) є опціональним завдяки знаку "?"
-  // Якщо ти захочеш колись передати заголовки, ми передаємо їх у http-запит:
   return this.http.put<T>(`${this.baseUrl}/${path}`, body, options);
 }
 }

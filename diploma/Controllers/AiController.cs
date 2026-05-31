@@ -91,7 +91,7 @@ namespace diploma.api.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(request.Base64Image)) return BadRequest("No image data");
 
-            // Конвертуємо Base64 у файл
+        
             var base64Data = request.Base64Image.Substring(request.Base64Image.IndexOf(",") + 1);
             var imageBytes = Convert.FromBase64String(base64Data);
 
@@ -132,7 +132,7 @@ namespace diploma.api.Controllers
             if (string.IsNullOrWhiteSpace(apiKey))
                 return BadRequest("Hugging Face API key is missing.");
 
-            // FLUX.1-dev is shown in HF quick start for text-to-image
+         
             var url = "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell";
 
             var prompt =

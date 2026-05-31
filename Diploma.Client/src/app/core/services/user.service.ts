@@ -7,24 +7,15 @@ import { OrderStatus } from '../../core/enums/order-status.enum';
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private api = inject(ApiService);
-  
-  // Існуючий сигнал для списку (адмінка)
   users = signal<User[]>([]);
   
-  // НОВИЙ сигнал для поточного користувача (кабінет)
   currentUser = signal<User | null>(null);
-
-  // --- МЕТОДИ ДЛЯ КАБІНЕТУ (НОВІ) ---
-
-  // Отримати дані саме того, хто залогінений
 getProfile(): Observable<User> {
   return this.api.get<User>('users/profile').pipe(
     tap(user => {
-      // Створюємо об'єкт користувача з усіма полями
       const mappedUser: User = { 
         ...user, 
         roles: user.roles || ['User'],
-        // Якщо раптом firstName порожній, можемо взяти UserName
         firstName: user.firstName || user.userName 
       };
       this.currentUser.set(mappedUser);
@@ -32,7 +23,6 @@ getProfile(): Observable<User> {
   );
 }
 
-  // --- МЕТОДИ ДЛЯ АДМІНКИ (ІСНУЮЧІ) ---
 
   getUsers(): Observable<User[]> {
     return this.api.get<User[]>('users').pipe(
@@ -77,17 +67,13 @@ createOrder(orderData: any): Observable<any> {
   return this.api.post<any>('orders', orderData);
 }
 
-// user.service.ts
 getMyOrders(): Observable<any[]> {
-  return this.api.get<any[]>('orders/my'); // Створимо такий ендпоінт на беці
+  return this.api.get<any[]>('orders/my');
 }
 
-
-// Отримати всі замовлення для адмінки
 getAllOrders(): Observable<any[]> {
   return this.api.get<any[]>('orders');
 }
-
 
 updateOrderStatus(orderId: number, status: OrderStatus): Observable<any> {
   return this.api.put<any>(
@@ -96,19 +82,13 @@ updateOrderStatus(orderId: number, status: OrderStatus): Observable<any> {
   );
 }
 
-// --- МЕТОДИ ДЛЯ КЕРУВАННЯ ЦІНАМИ ОСНОВ (ГАРМЕНТІВ) ---
-
-  // Отримати всі ціни (використовується в адмінці та конструкторі)
   getGarmentPrices(): Observable<any[]> {
     return this.api.get<any[]>('garmentprices');
   }
 
-  // Оновити базову ціну для конкретного типу одягу
   updateGarmentPrice(id: number, basePrice: number): Observable<any> {
-    // Відправляємо саме число (decimal), як очікує наш контролер на бекенді
     return this.api.put<any>(`garmentprices/${id}`, basePrice);
   }
-
 
   postGarmentPrice(garment: any): Observable<any> {
   return this.api.post<any>('garmentprices', garment);
@@ -121,7 +101,7 @@ deleteGarmentPrice(id: number): Observable<any> {
 subscribeToNewsletter(email: string): Observable<any> {
 return this.api.post<any>('newsletter/subscribe', { email });
 }
-// Отримання списку підписників (для адмінки)
+
 getNewsletterSubscribers(): Observable<any[]> {
   return this.api.get<any[]>('newsletter/subscribers');
 }

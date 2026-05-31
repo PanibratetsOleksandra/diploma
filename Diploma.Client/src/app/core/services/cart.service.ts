@@ -3,17 +3,15 @@ import { CartItem } from '../models/cart-item.model';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  // Основний стан кошика
   private cartItems = signal<CartItem[]>(this.loadCartFromStorage());
-selectedItem = signal<CartItem | null>(null);
-isDetailsOpen = signal(false);
-  // Обчислювальні значення (автоматично оновлюються)
+  selectedItem = signal<CartItem | null>(null);
+  isDetailsOpen = signal(false);
   items = computed(() => this.cartItems());
   totalCount = computed(() => this.cartItems().reduce((acc, item) => acc + item.quantity, 0));
   totalPrice = computed(() => this.cartItems().reduce((acc, item) => acc + (item.price * item.quantity), 0));
 
   constructor() {
-    // Ефект: щоразу, коли змінюється cartItems, зберігаємо їх у LocalStorage
+
     effect(() => {
       localStorage.setItem('panibratets_cart', JSON.stringify(this.cartItems()));
     });
@@ -21,12 +19,11 @@ isDetailsOpen = signal(false);
 
   addToCart(item: CartItem) {
     this.cartItems.update(prev => {
-      // Перевіряємо, чи є вже такий товар з таким самим розміром
       const existing = prev.find(i => i.originalId === item.originalId && i.type === item.type && i.size === item.size);
-      
+
       if (existing) {
-        return prev.map(i => i === existing 
-          ? { ...i, quantity: i.quantity + 1 } 
+        return prev.map(i => i === existing
+          ? { ...i, quantity: i.quantity + 1 }
           : i
         );
       }
@@ -58,32 +55,31 @@ isDetailsOpen = signal(false);
   }
 
   viewDetails(item: CartItem) {
-  this.selectedItem.set(item);
-  this.isDetailsOpen.set(true);
-}
-
-closeDetails() {
-  this.isDetailsOpen.set(false);
-  this.selectedItem.set(null);
-}
-
-// CartService.ts
-
-updateItemDetails(cartId: string | number, newSize: string, newNotes: string) {
-  this.cartItems.update(prev => prev.map(item => {
-    if (item.id === cartId) {
-   
-      const finalSize = item.type === 'product' ? item.size : newSize;
-      return { ...item, size: finalSize, notes: newNotes };
-    }
-    return item;
-  }));
-
-  const currentSelected = this.selectedItem();
-  if (currentSelected && currentSelected.id === cartId) {
-    const finalSize = currentSelected.type === 'product' ? currentSelected.size : newSize;
-    this.selectedItem.set({ ...currentSelected, size: finalSize, notes: newNotes });
+    this.selectedItem.set(item);
+    this.isDetailsOpen.set(true);
   }
-}
+
+  closeDetails() {
+    this.isDetailsOpen.set(false);
+    this.selectedItem.set(null);
+  }
+
+
+  updateItemDetails(cartId: string | number, newSize: string, newNotes: string) {
+    this.cartItems.update(prev => prev.map(item => {
+      if (item.id === cartId) {
+
+        const finalSize = item.type === 'product' ? item.size : newSize;
+        return { ...item, size: finalSize, notes: newNotes };
+      }
+      return item;
+    }));
+
+    const currentSelected = this.selectedItem();
+    if (currentSelected && currentSelected.id === cartId) {
+      const finalSize = currentSelected.type === 'product' ? currentSelected.size : newSize;
+      this.selectedItem.set({ ...currentSelected, size: finalSize, notes: newNotes });
+    }
+  }
 
 }

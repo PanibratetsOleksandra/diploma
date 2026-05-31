@@ -1,4 +1,5 @@
-﻿using diploma.core.Entities;
+﻿using diploma.core;
+using diploma.core.Entities;
 using diploma.dal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")] // Тільки ти як адмін можеш міняти ціни
+[Authorize(Roles = Roles.ADMIN)]
 public class GarmentPricesController : ControllerBase
 {
     private readonly AppDbContext _context;

@@ -1,535 +1,571 @@
 <div class="min-h-screen pt-32 pb-20 px-6 lg:px-12 bg-gray-50/50 text-gray-900">
   <div class="max-w-7xl mx-auto">
-    
+
     <div class="flex gap-8">
-      
+
       <aside class="w-[280px] flex-shrink-0 sticky top-32 self-start space-y-6">
 
-    <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-100">
-  <div class="relative">
-    <div class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
-      @if (getAvatarUrl()) {
-        <img [src]="getAvatarUrl()" alt="Avatar" class="w-full h-full object-cover">
-      } @else {
-        <span class="text-4xl">🎨</span>
-      }
-    </div>
-  </div>
-  <div>
-    <h4 class="font-bold text-lg">{{ user()?.firstName }} {{ user()?.lastName }}</h4>
-    <p class="text-sm text-gray-500">@{{ user()?.nickname || user()?.userName }}</p>
-  </div>
-</div>
+        <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-100">
+          <div class="relative">
+            <div
+              class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
+              @if (getAvatarUrl()) {
+              <img [src]="getAvatarUrl()" alt="Avatar" class="w-full h-full object-cover">
+              } @else {
+              <span class="text-4xl">🎨</span>
+              }
+            </div>
+          </div>
+          <div>
+            <h4 class="font-bold text-lg">{{ user()?.firstName }} {{ user()?.lastName }}</h4>
+            <p class="text-sm text-gray-500">@{{ user()?.nickname || user()?.userName }}</p>
+          </div>
+        </div>
 
         <nav class="bg-white p-3 rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
           <div class="space-y-0.5">
             <!-- Orders Tab -->
-            <button (click)="activeTab.set('orders')" 
+            <button (click)="activeTab.set('orders')"
               class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
-              [class.bg-orange-50]="activeTab() === 'orders'"
-              [class.text-orange-600]="activeTab() === 'orders'"
+              [class.bg-orange-50]="activeTab() === 'orders'" [class.text-orange-600]="activeTab() === 'orders'"
               [class.hover:bg-gray-50]="activeTab() !== 'orders'">
               <span class="text-lg" [class.opacity-40]="activeTab() !== 'orders'">📦</span>
-              <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'orders'">Мої замовлення</span>
+              <span class="text-[11px] font-black uppercase tracking-widest"
+                [class.text-gray-500]="activeTab() !== 'orders'">Мої замовлення</span>
             </button>
 
-  
-            <button (click)="activeTab.set('personal')" 
+
+            <button (click)="activeTab.set('personal')"
               class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
-              [class.bg-orange-50]="activeTab() === 'personal'"
-              [class.text-orange-600]="activeTab() === 'personal'"
+              [class.bg-orange-50]="activeTab() === 'personal'" [class.text-orange-600]="activeTab() === 'personal'"
               [class.hover:bg-gray-50]="activeTab() !== 'personal'">
               <span class="text-lg" [class.opacity-40]="activeTab() !== 'personal'">👤</span>
-              <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'personal'">Особисті дані</span>
+              <span class="text-[11px] font-black uppercase tracking-widest"
+                [class.text-gray-500]="activeTab() !== 'personal'">Особисті дані</span>
             </button>
 
 
-          <button (click)="setTab('shipping')" 
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group" 
-        [class.bg-orange-50]="activeTab() === 'shipping'" 
-        [class.text-orange-600]="activeTab() === 'shipping'">
-  <span class="text-lg">📍</span>
-  <span class="text-[11px] font-black uppercase tracking-widest">Адреса доставки</span>
-</button>
-<button
-  (click)="setTab('ai-designs')"
-  class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
-  [class.bg-orange-50]="activeTab() === 'ai-designs'"
-  [class.text-orange-600]="activeTab() === 'ai-designs'"
-  [class.hover:bg-gray-50]="activeTab() !== 'ai-designs'">
+            <button (click)="setTab('shipping')"
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
+              [class.bg-orange-50]="activeTab() === 'shipping'" [class.text-orange-600]="activeTab() === 'shipping'">
+              <span class="text-lg">📍</span>
+              <span class="text-[11px] font-black uppercase tracking-widest">Адреса доставки</span>
+            </button>
+            <button (click)="setTab('ai-designs')"
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
+              [class.bg-orange-50]="activeTab() === 'ai-designs'" [class.text-orange-600]="activeTab() === 'ai-designs'"
+              [class.hover:bg-gray-50]="activeTab() !== 'ai-designs'">
 
-  <span class="text-lg" [class.opacity-40]="activeTab() !== 'ai-designs'">✨</span>
-  <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'ai-designs'">
-    ШІ-Генерації
-  </span>
-</button>
+              <span class="text-lg" [class.opacity-40]="activeTab() !== 'ai-designs'">✨</span>
+              <span class="text-[11px] font-black uppercase tracking-widest"
+                [class.text-gray-500]="activeTab() !== 'ai-designs'">
+                ШІ-Генерації
+              </span>
+            </button>
 
-<button
-  (click)="setTab('creations')"
-  class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
-  [class.bg-orange-50]="activeTab() === 'creations'"
-  [class.text-orange-600]="activeTab() === 'creations'"
-  [class.hover:bg-gray-50]="activeTab() !== 'creations'">
+            <button (click)="setTab('creations')"
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition group"
+              [class.bg-orange-50]="activeTab() === 'creations'" [class.text-orange-600]="activeTab() === 'creations'"
+              [class.hover:bg-gray-50]="activeTab() !== 'creations'">
 
-  <span class="text-lg" [class.opacity-40]="activeTab() !== 'creations'">✨</span>
-  <span class="text-[11px] font-black uppercase tracking-widest" [class.text-gray-500]="activeTab() !== 'creations'">
-    Мої дизайни
-  </span>
-</button>
+              <span class="text-lg" [class.opacity-40]="activeTab() !== 'creations'">✨</span>
+              <span class="text-[11px] font-black uppercase tracking-widest"
+                [class.text-gray-500]="activeTab() !== 'creations'">
+                Мої дизайни
+              </span>
+            </button>
             <hr class="my-2 border-gray-100">
-          
+
           </div>
         </nav>
       </aside>
 
-    
-      <main class="flex-1 min-w-0 space-y-8">
-        
-        <!-- MY ORDERS SECTION -->
-     @if (activeTab() === 'orders') {
-  <div class="space-y-6 animate-in fade-in duration-500">
-    <div class="flex items-end justify-between mb-2">
-      <h3 class="text-3xl font-black italic uppercase tracking-tighter">Мої замовлення</h3>
-      <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ orders().length }} замовлень</span>
-    </div>
 
-    @if (orders().length > 0) {
-      <div class="grid gap-4">
-        @for (order of orders(); track order.id) {
-          <div class="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm hover:border-orange-200 transition-all group">
-            <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
-              <div>
-                <span class="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-gray-100 rounded-full mb-2 inline-block">Замовлення #{{ order.id }}</span>
-                <p class="text-xs text-gray-400 font-medium">{{ order.createdAt | date:'dd MMMM yyyy, HH:mm' }}</p>
-              </div>
-              <div class="text-right">
-                <span [class]="{
+      <main class="flex-1 min-w-0 space-y-8">
+
+        <!-- MY ORDERS SECTION -->
+        @if (activeTab() === 'orders') {
+        <div class="space-y-6 animate-in fade-in duration-500">
+          <div class="flex items-end justify-between mb-2">
+            <h3 class="text-3xl font-black italic uppercase tracking-tighter">Мої замовлення</h3>
+            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ orders().length }}
+              замовлень</span>
+          </div>
+
+          @if (orders().length > 0) {
+          <div class="grid gap-4">
+            @for (order of orders(); track order.id) {
+            <div
+              class="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm hover:border-orange-200 transition-all group">
+              <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+                <div>
+                  <span
+                    class="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-gray-100 rounded-full mb-2 inline-block">Замовлення
+                    #{{ order.id }}</span>
+                  <p class="text-xs text-gray-400 font-medium">{{ order.createdAt | date:'dd MMMM yyyy, HH:mm' }}</p>
+                </div>
+                <div class="text-right">
+                  <span [class]="{
                   'bg-orange-100 text-orange-600': order.status === 'Pending',
                   'bg-blue-100 text-blue-600': order.status === 'Processing',
                   'bg-green-100 text-green-600': order.status === 'Shipped'
                 }" class="text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl">
-                  {{ order.status }}
-                </span>
-                <p class="text-2xl font-black italic mt-2">{{ order.totalAmount }} ₴</p>
-              </div>
-            </div>
-
-    <div class="flex flex-wrap gap-3 p-4 bg-gray-50/50 rounded-3xl">
-  @for (item of order.items; track item.id) {
-    <div (click)="navigateToProduct(item)"
-         [class.cursor-pointer]="item.type !== 'product'"
-         class="relative group/item transition-transform duration-300 hover:scale-110 active:scale-95">
-      
-      <div class="w-16 h-16 rounded-2xl overflow-hidden border border-white shadow-sm bg-white flex-shrink-0 group-hover/item:border-orange-400 group-hover/item:shadow-md transition-all">
-        <img [src]="getImg(item.frontImageUrl || item.imageUrl)" class="w-full h-full object-cover">
-      </div>
-      
-      @if (item.quantity > 1) {
-        <span class="absolute -top-2 -right-2 bg-black text-white text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
-          {{ item.quantity }}
-        </span>
-      }
-      
-      <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/item:block bg-black text-white text-[8px] font-black uppercase px-2 py-1 rounded whitespace-nowrap z-10 shadow-xl">
-        {{ item.name }} ({{ item.size }}) — {{ item.type === 'product' ? 'Shop' : 'Кастом 🎨' }}
-      </div>
-    </div>
-  }
-</div>
-
-            <div class="mt-6 flex justify-end">
-
-              @if (order.status === 'Pending') {
-        <button (click)="cancelUserOrder(order.id)" 
-                class="text-xs font-bold uppercase tracking-wider text-red-500 hover:text-red-700 transition px-3 py-1.5 rounded-xl hover:bg-red-50">
-          Скасувати замовлення
-        </button>
-      }
-
-            <button (click)="viewOrderDetails(order)" 
-        class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-orange-500 transition-colors">
-Деталі →
-</button>
-            </div>
-          </div>
-        }
-      </div>
-    } @else {
-      <div class="bg-white rounded-[3rem] p-20 text-center border border-gray-100">
-        <div class="text-6xl mb-6 opacity-20">📦</div>
-        <h4 class="text-xl font-black italic uppercase mb-2">Замовлень ще немає</h4>
-        <p class="text-gray-400 text-sm mb-8">Час створити своє перше замовлення!</p>
-        <button routerLink="/shop" class="px-8 py-4 bg-black text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition shadow-lg">Перейти до магазину</button>
-      </div>
-    }
-  </div>
-}
-        
-
-        @if (activeTab() === 'ai-designs') {
-  <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-    <div class="flex justify-between items-center mb-8 flex-wrap gap-3">
-      <h3 class="text-2xl font-black italic uppercase tracking-tighter">
-        Мої AI-дизайни
-      </h3>
-
-      <button
-        routerLink="/ai-assistant"
-        class="px-6 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">
-        Створити дизайн
-      </button>
-    </div>
-
-    @if (myDesigns().length > 0) {
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        @for (design of myDesigns(); track design.id) {
-          <div class="group rounded-3xl overflow-hidden border border-gray-100 bg-white shadow-sm hover:shadow-xl transition">
-            <div class="aspect-square bg-gray-50 overflow-hidden">
-            <div class="relative aspect-square bg-gray-50 overflow-hidden">
-  <img
-    [src]="getDesignImageUrl(design.imageUrl)"
-    alt="AI Design"
-    class="w-full h-full object-cover transition duration-500 group-hover:scale-105"
-  />
-
-  <button
-    type="button"
-    (click)="deleteDesign(design.id)"
-    class="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-red-500 shadow-md opacity-0 transition group-hover:opacity-100 hover:bg-red-50">
-    ✕
-  </button>
-</div>
-            </div>
-
-            <div class="p-4">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                {{ design.createdAt | date:'dd MMM yyyy' }}
-              </p>
-
-              <p class="mt-2 text-xs text-gray-500 line-clamp-2">
-                {{ design.prompt }}
-              </p>
-
-
-              <button (click)="openAiOrderForm(design)" 
-              class="text-[10px] font-black uppercase tracking-widest text-orange-500 hover:text-orange-700 transition flex items-center gap-1">
-        Замовити розпис →
-      </button>
-            </div>
-            
-          </div>
-        }
-      </div>
-    } @else {
-      <div class="flex flex-col items-center justify-center py-20 text-center">
-        <div class="text-6xl mb-4 opacity-20">✨</div>
-
-        <p class="text-gray-400 italic font-medium max-w-xs mx-auto text-sm">
-          У вас ще немає збережених AI-дизайнів.
-        </p>
-
-        <button
-          routerLink="/ai-assistant"
-          class="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-[9px] tracking-widest hover:scale-105 transition">
-          Створити перший дизайн
-        </button>
-      </div>
-    }
-  </div>
-}
-
-@if (activeTab() === 'creations') {
-  <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-    <div class="flex justify-between items-center mb-8 flex-wrap gap-3">
-      <h3 class="text-2xl font-black italic uppercase tracking-tighter">Мої дизайни</h3>
-      <button routerLink="/designer" class="px-6 py-3 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">
-        Відкрити редактор
-      </button>
-    </div>
-
-    @if (userCreations().length > 0) {
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        @for (item of userCreations(); track item.id) {
-          <div class="group bg-gray-50 rounded-[2.5rem] p-6 border border-transparent hover:border-orange-200 transition-all duration-500 relative">
-            
-            <button (click)="deleteCreation(item.id)" class="absolute right-4 top-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50">
-              ✕
-            </button>
-
-            <div class="flex gap-4">
-              <div class="flex-1 space-y-2">
-                <p class="text-[8px] font-black uppercase tracking-widest text-center text-gray-400">Вигляд спереду</p>
-                <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-white shadow-inner border border-gray-100">
-                  <img [src]="getDesignImageUrl(item.frontImageUrl)" alt="Front" class="w-full h-full object-contain p-2">
+                    {{ order.status }}
+                  </span>
+                  <p class="text-2xl font-black italic mt-2">{{ order.totalAmount }} ₴</p>
                 </div>
               </div>
 
-              <div class="flex-1 space-y-2">
-                <p class="text-[8px] font-black uppercase tracking-widest text-center text-gray-400">Вигляд ззаду</p>
-                <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-white shadow-inner border border-gray-100">
-                  <img [src]="getDesignImageUrl(item.backImageUrl)" alt="Back" class="w-full h-full object-contain p-2">
+              <div class="flex flex-wrap gap-3 p-4 bg-gray-50/50 rounded-3xl">
+                @for (item of order.items; track item.id) {
+                <div (click)="navigateToProduct(item)" [class.cursor-pointer]="item.type !== 'product'"
+                  class="relative group/item transition-transform duration-300 hover:scale-110 active:scale-95">
+
+                  <div
+                    class="w-16 h-16 rounded-2xl overflow-hidden border border-white shadow-sm bg-white flex-shrink-0 group-hover/item:border-orange-400 group-hover/item:shadow-md transition-all">
+                    <img [src]="getImg(item.frontImageUrl || item.imageUrl)" class="w-full h-full object-cover">
+                  </div>
+
+                  @if (item.quantity > 1) {
+                  <span
+                    class="absolute -top-2 -right-2 bg-black text-white text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+                    {{ item.quantity }}
+                  </span>
+                  }
+
+                  <div
+                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/item:block bg-black text-white text-[8px] font-black uppercase px-2 py-1 rounded whitespace-nowrap z-10 shadow-xl">
+                    {{ item.name }} ({{ item.size }}) — {{ item.type === 'product' ? 'Shop' : 'Кастом 🎨' }}
+                  </div>
                 </div>
+                }
+              </div>
+
+              <div class="mt-6 flex justify-end">
+
+                @if (order.status === 'Pending') {
+                <button (click)="cancelUserOrder(order.id)"
+                  class="text-xs font-bold uppercase tracking-wider text-red-500 hover:text-red-700 transition px-3 py-1.5 rounded-xl hover:bg-red-50">
+                  Скасувати замовлення
+                </button>
+                }
+
+                <button (click)="viewOrderDetails(order)"
+                  class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-orange-500 transition-colors">
+                  Деталі →
+                </button>
               </div>
             </div>
-
-            <div class="mt-6 flex justify-between items-end border-t border-gray-200 pt-4">
-              <div>
-                <span class="px-2 py-1 bg-orange-100 text-orange-600 rounded-md text-[8px] font-black uppercase tracking-tighter">
-                  {{ item.garmentType }}
-                </span>
-                <p class="mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                  Створено: {{ item.createdAt | date:'dd.MM.yyyy' }}
-                </p>
-              </div>
-          <button (click)="openOrderForm(item)" 
-        class="text-[10px] font-black uppercase tracking-widest text-black hover:text-orange-500 transition">
-  Замовити розпис →
-</button>
-            </div>
-          </div>
-        }
-      </div>
-    } @else {
-      <div class="flex flex-col items-center justify-center py-20 text-center">
-        <div class="text-6xl mb-4 opacity-20">🎨</div>
-        <p class="text-gray-400 italic font-medium max-w-xs mx-auto text-sm">
-          У вас ще немає власних дизайнів. Час створити щось унікальне!
-        </p>
-      </div>
-    }
-  </div>
-}
-
-        @if (activeTab() === 'personal') {
-          <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-            <div class="flex justify-between items-center mb-8">
-              <h3 class="text-2xl font-black italic uppercase tracking-tighter">Особисті дані</h3>
-              @if (!isEditing()) {
-                <button (click)="startEditing()" class="px-5 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">Редагувати</button>
-              }
-            </div>
-            
-            @if (!isEditing()) {
-              <!-- AVATAR DISPLAY -->
-              <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-100">
-                <div class="relative">
-                  <div class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
-                    @if (getAvatarUrl()) {
-                      <img [src]="getAvatarUrl()" alt="Avatar" class="w-full h-full object-cover">
-                    } @else {
-                      <span class="text-4xl">🎨</span>
-                    }
-                  </div>
-                </div>
-                <div>
-                  <h4 class="font-bold text-lg">{{ user()?.firstName }} {{ user()?.lastName }}</h4>
-                  <p class="text-sm text-gray-500">@{{ user()?.nickname || user()?.userName }}</p>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
-                <div class="space-y-1">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Повне ім’я</label>
-                  <p class="text-base font-bold italic">{{ user()?.lastName }} {{ user()?.firstName }} {{ user()?.middleName }}</p>
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Нікнейм</label>
-                  <p class="text-base font-bold italic text-orange-500">@{{ user()?.nickname || user()?.userName }}</p>
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Дата народження</label>
-                  <p class="text-base font-medium">{{ (user()?.birthDate | date:'dd.MM.yyyy') || '—' }}</p>
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Стать</label>
-                  <p class="text-base font-medium">{{ getGenderLabel(user()?.gender) }}</p>
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Email</label>
-                  <p class="text-base font-medium">{{ user()?.email }}</p>
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Телефон</label>
-                  <p class="text-base font-medium">{{ user()?.phoneNumber || '—' }}</p>
-                </div>
-              </div>
-            } @else {
-  
-              <form (ngSubmit)="saveProfile()" class="space-y-6 max-w-3xl">
-            
-                <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
-                  <div class="relative group cursor-pointer" (click)="triggerFileInput(fileInput)">
-                    <div class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
-                      @if (getPreviewUrl()) {
-                        <img [src]="getPreviewUrl()" alt="Avatar preview" class="w-full h-full object-cover">
-                      } @else {
-                        <span class="text-4xl">🎨</span>
-                      }
-                    </div>
-                    <div class="absolute inset-0 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-all">
-  
-  <img 
-    [src]="getAvatarUrl()" 
-    class="w-full h-full object-cover brightness-50"
-  >
-
-  <!-- ТЕКСТ -->
-  <div class="absolute inset-0 flex items-center justify-center">
-    <span class="text-white text-xs font-bold uppercase">
-      Змінити
-    </span>
-  </div>
-
-</div>
-                  </div>
-                  <div>
-                    <p class="text-sm font-bold">Фото профілю</p>
-                    <p class="text-xs text-gray-400">Натисніть на фото щоб змінити його</p>
-                  </div>
-                  <input #fileInput type="file" accept="image/*" (change)="onAvatarSelected($event)" class="hidden">
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Прізвище</label>
-                    <input [(ngModel)]="editForm().lastName" name="lastName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-                  </div>
-                  <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Ім'я</label>
-                    <input [(ngModel)]="editForm().firstName" name="firstName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-                  </div>
-                  <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">По батькові</label>
-                    <input [(ngModel)]="editForm().middleName" name="middleName" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Нікнейм</label>
-                    <input [(ngModel)]="editForm().nickname" name="nickname" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-                  </div>
-                  <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Дата народження</label>
-                    <input type="date" [(ngModel)]="editForm().birthDate" name="birthDate" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-                  </div>
-                </div>
-                
-                <div class="space-y-1">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Номер телефону</label>
-                  <input [(ngModel)]="editForm().phoneNumber" name="phoneNumber" type="tel" placeholder="+380..." class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-                </div>
-
-                <div class="space-y-1">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Стать</label>
-                  <select [(ngModel)]="editForm().gender" name="gender" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
-                    <option value="Not Specified">Не хочу говорити</option>
-                    <option value="Female">Жінка</option>
-                    <option value="Male">Чоловік</option>
-                    <option value="Other">Творча душа</option>
-                  </select>
-                </div>
-
-                <div class="flex gap-3 pt-4">
-                  <button type="submit" class="px-8 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-200 hover:scale-105 transition">Зберегти зміни</button>
-                  <button type="button" (click)="cancelEditing()" class="px-8 py-3 bg-gray-100 text-gray-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition">Cancel</button>
-                </div>
-              </form>
             }
           </div>
+          } @else {
+          <div class="bg-white rounded-[3rem] p-20 text-center border border-gray-100">
+            <div class="text-6xl mb-6 opacity-20">📦</div>
+            <h4 class="text-xl font-black italic uppercase mb-2">Замовлень ще немає</h4>
+            <p class="text-gray-400 text-sm mb-8">Час створити своє перше замовлення!</p>
+            <button routerLink="/shop"
+              class="px-8 py-4 bg-black text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition shadow-lg">Перейти
+              до магазину</button>
+          </div>
+          }
+        </div>
+        }
+
+
+        @if (activeTab() === 'ai-designs') {
+        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+          <div class="flex justify-between items-center mb-8 flex-wrap gap-3">
+            <h3 class="text-2xl font-black italic uppercase tracking-tighter">
+              Мої AI-дизайни
+            </h3>
+
+            <button routerLink="/ai-assistant"
+              class="px-6 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">
+              Створити дизайн
+            </button>
+          </div>
+
+          @if (myDesigns().length > 0) {
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            @for (design of myDesigns(); track design.id) {
+            <div
+              class="group rounded-3xl overflow-hidden border border-gray-100 bg-white shadow-sm hover:shadow-xl transition">
+              <div class="aspect-square bg-gray-50 overflow-hidden">
+                <div class="relative aspect-square bg-gray-50 overflow-hidden">
+                  <img [src]="getDesignImageUrl(design.imageUrl)" alt="AI Design"
+                    class="w-full h-full object-cover transition duration-500 group-hover:scale-105" />
+
+                  <button type="button" (click)="deleteDesign(design.id)"
+                    class="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-red-500 shadow-md opacity-0 transition group-hover:opacity-100 hover:bg-red-50">
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-4">
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                  {{ design.createdAt | date:'dd MMM yyyy' }}
+                </p>
+
+                <p class="mt-2 text-xs text-gray-500 line-clamp-2">
+                  {{ design.prompt }}
+                </p>
+
+
+                <button (click)="openAiOrderForm(design)"
+                  class="text-[10px] font-black uppercase tracking-widest text-orange-500 hover:text-orange-700 transition flex items-center gap-1">
+                  Замовити розпис →
+                </button>
+              </div>
+
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="text-6xl mb-4 opacity-20">✨</div>
+
+            <p class="text-gray-400 italic font-medium max-w-xs mx-auto text-sm">
+              У вас ще немає збережених AI-дизайнів.
+            </p>
+
+            <button routerLink="/ai-assistant"
+              class="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-[9px] tracking-widest hover:scale-105 transition">
+              Створити перший дизайн
+            </button>
+          </div>
+          }
+        </div>
+        }
+
+        @if (activeTab() === 'creations') {
+        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+          <div class="flex justify-between items-center mb-8 flex-wrap gap-3">
+            <h3 class="text-2xl font-black italic uppercase tracking-tighter">Мої дизайни</h3>
+            <button routerLink="/designer"
+              class="px-6 py-3 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">
+              Відкрити редактор
+            </button>
+          </div>
+
+          @if (userCreations().length > 0) {
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            @for (item of userCreations(); track item.id) {
+            <div
+              class="group bg-gray-50 rounded-[2.5rem] p-6 border border-transparent hover:border-orange-200 transition-all duration-500 relative">
+
+              <button (click)="deleteCreation(item.id)"
+                class="absolute right-4 top-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50">
+                ✕
+              </button>
+
+              <div class="flex gap-4">
+                <div class="flex-1 space-y-2">
+                  <p class="text-[8px] font-black uppercase tracking-widest text-center text-gray-400">Вигляд спереду
+                  </p>
+                  <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-white shadow-inner border border-gray-100">
+                    <img [src]="getDesignImageUrl(item.frontImageUrl)" alt="Front"
+                      class="w-full h-full object-contain p-2">
+                  </div>
+                </div>
+
+                <div class="flex-1 space-y-2">
+                  <p class="text-[8px] font-black uppercase tracking-widest text-center text-gray-400">Вигляд ззаду</p>
+                  <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-white shadow-inner border border-gray-100">
+                    <img [src]="getDesignImageUrl(item.backImageUrl)" alt="Back"
+                      class="w-full h-full object-contain p-2">
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 flex justify-between items-end border-t border-gray-200 pt-4">
+                <div>
+                  <span
+                    class="px-2 py-1 bg-orange-100 text-orange-600 rounded-md text-[8px] font-black uppercase tracking-tighter">
+                    {{ item.garmentType }}
+                  </span>
+                  <p class="mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                    Створено: {{ item.createdAt | date:'dd.MM.yyyy' }}
+                  </p>
+                </div>
+                <button (click)="openOrderForm(item)"
+                  class="text-[10px] font-black uppercase tracking-widest text-black hover:text-orange-500 transition">
+                  Замовити розпис →
+                </button>
+              </div>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="text-6xl mb-4 opacity-20">🎨</div>
+            <p class="text-gray-400 italic font-medium max-w-xs mx-auto text-sm">
+              У вас ще немає власних дизайнів. Час створити щось унікальне!
+            </p>
+          </div>
+          }
+        </div>
+        }
+
+        @if (activeTab() === 'personal') {
+        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+          <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-black italic uppercase tracking-tighter">Особисті дані</h3>
+            @if (!isEditing()) {
+            <button (click)="startEditing()"
+              class="px-5 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">Редагувати</button>
+            }
+          </div>
+
+          @if (!isEditing()) {
+          <!-- AVATAR DISPLAY -->
+          <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-100">
+            <div class="relative">
+              <div
+                class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
+                @if (getAvatarUrl()) {
+                <img [src]="getAvatarUrl()" alt="Avatar" class="w-full h-full object-cover">
+                } @else {
+                <span class="text-4xl">🎨</span>
+                }
+              </div>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg">{{ user()?.firstName }} {{ user()?.lastName }}</h4>
+              <p class="text-sm text-gray-500">@{{ user()?.nickname || user()?.userName }}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Повне ім’я</label>
+              <p class="text-base font-bold italic">{{ user()?.lastName }} {{ user()?.firstName }} {{ user()?.middleName
+                }}</p>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Нікнейм</label>
+              <p class="text-base font-bold italic text-orange-500">@{{ user()?.nickname || user()?.userName }}</p>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Дата народження</label>
+              <p class="text-base font-medium">{{ (user()?.birthDate | date:'dd.MM.yyyy') || '—' }}</p>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Стать</label>
+              <p class="text-base font-medium">{{ getGenderLabel(user()?.gender) }}</p>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Email</label>
+              <p class="text-base font-medium">{{ user()?.email }}</p>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Телефон</label>
+              <p class="text-base font-medium">{{ user()?.phoneNumber || '—' }}</p>
+            </div>
+          </div>
+          } @else {
+
+          <form (ngSubmit)="saveProfile()" class="space-y-6 max-w-3xl">
+
+            <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
+              <div class="relative group cursor-pointer" (click)="triggerFileInput(fileInput)">
+                <div
+                  class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
+                  @if (getPreviewUrl()) {
+                  <img [src]="getPreviewUrl()" alt="Avatar preview" class="w-full h-full object-cover">
+                  } @else {
+                  <span class="text-4xl">🎨</span>
+                  }
+                </div>
+                <div
+                  class="absolute inset-0 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-all">
+
+                  <img [src]="getAvatarUrl()" class="w-full h-full object-cover brightness-50">
+
+                  <!-- ТЕКСТ -->
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-white text-xs font-bold uppercase">
+                      Змінити
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-bold">Фото профілю</p>
+                <p class="text-xs text-gray-400">Натисніть на фото щоб змінити його</p>
+              </div>
+              <input #fileInput type="file" accept="image/*" (change)="onAvatarSelected($event)" class="hidden">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Прізвище</label>
+                <input [(ngModel)]="editForm().lastName" name="lastName"
+                  class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Ім'я</label>
+                <input [(ngModel)]="editForm().firstName" name="firstName"
+                  class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">По батькові</label>
+                <input [(ngModel)]="editForm().middleName" name="middleName"
+                  class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Нікнейм</label>
+                <input [(ngModel)]="editForm().nickname" name="nickname"
+                  class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Дата
+                  народження</label>
+                <input type="date" [(ngModel)]="editForm().birthDate" name="birthDate"
+                  class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Номер телефону</label>
+              <input [(ngModel)]="editForm().phoneNumber" name="phoneNumber" type="tel" placeholder="+380..."
+                class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Стать</label>
+              <select [(ngModel)]="editForm().gender" name="gender"
+                class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-orange-500 text-sm font-bold">
+                <option value="Not Specified">Не хочу говорити</option>
+                <option value="Female">Жінка</option>
+                <option value="Male">Чоловік</option>
+                <option value="Other">Творча душа</option>
+              </select>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+              <button type="submit"
+                class="px-8 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-orange-200 hover:scale-105 transition">Зберегти
+                зміни</button>
+              <button type="button" (click)="cancelEditing()"
+                class="px-8 py-3 bg-gray-100 text-gray-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition">Cancel</button>
+            </div>
+          </form>
+          }
+        </div>
         }
 
         <!-- SHIPPING SECTION -->
- @if (activeTab() === 'shipping') {
-  <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-    <div class="flex justify-between items-center mb-6">
-      <h3 class="text-2xl font-black italic uppercase tracking-tighter">Адреси доставки</h3>
-      @if (!isAddingAddress()) {
-        <button (click)="isAddingAddress.set(true)" class="px-5 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">+ Додати адресу</button>
-      }
-    </div>
-
-    @if (isAddingAddress()) {
-      <form (ngSubmit)="saveAddress()" class="space-y-6 animate-in fade-in duration-500">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-1">
-            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Служба доставки</label>
-            <select [(ngModel)]="newAddress.deliveryService" name="deliveryService" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
-              <option value="NovaPoshta">Нова Пошта</option>
-              <option value="UkrPoshta">Укрпошта</option>
-            </select>
+        @if (activeTab() === 'shipping') {
+        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-black italic uppercase tracking-tighter">Адреси доставки</h3>
+            @if (!isAddingAddress()) {
+            <button (click)="isAddingAddress.set(true)"
+              class="px-5 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition">+
+              Додати адресу</button>
+            }
           </div>
 
-          <div class="space-y-1">
-            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Тип доставки</label>
-            <select [(ngModel)]="newAddress.deliveryType" name="deliveryType" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
-              <option value="Warehouse">Відділення</option>
-                <option value="Postomaten">Поштомат</option>
-              <option value="Courier">Кур'єр</option>
-            </select>
-          </div>
-        </div>
+          @if (isAddingAddress()) {
+          <form (ngSubmit)="saveAddress()" class="space-y-6 animate-in fade-in duration-500">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Служба
+                  доставки</label>
+                <select [(ngModel)]="newAddress.deliveryService" name="deliveryService"
+                  class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+                  <option value="NovaPoshta">Нова Пошта</option>
+                  <option value="UkrPoshta">Укрпошта</option>
+                </select>
+              </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input [(ngModel)]="newAddress.region" name="region" placeholder="Область" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
-          <input [(ngModel)]="newAddress.city" name="city" placeholder="Місто/Село" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
-        </div>
-
-        @if (newAddress.deliveryType === 'Warehouse' || newAddress.deliveryType === 'Postomaten') {
-          <div class="space-y-1">
-            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">
-              {{ newAddress.deliveryType === 'Postomaten' ? 'Номер поштомату' : 'Номер відділення' }}
-            </label>
-            <input [(ngModel)]="newAddress.warehouseNumber" name="warehouseNumber" placeholder="№" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
-          </div>
-        }
-
-        @if (newAddress.deliveryType === 'Courier') {
-          <div class="space-y-4 pt-2">
-            <input [(ngModel)]="newAddress.street" name="street" placeholder="Вулиця" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
-            <div class="grid grid-cols-3 gap-3">
-              <input [(ngModel)]="newAddress.building" name="building" placeholder="Будівля" class="px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
-              <input [(ngModel)]="newAddress.floor" name="floor" placeholder="Поверх" class="px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+              <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">Тип доставки</label>
+                <select [(ngModel)]="newAddress.deliveryType" name="deliveryType"
+                  class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+                  <option value="Warehouse">Відділення</option>
+                  <option value="Postomaten">Поштомат</option>
+                  <option value="Courier">Кур'єр</option>
+                </select>
+              </div>
             </div>
-            <label class="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" [(ngModel)]="newAddress.hasElevator" name="hasElevator" class="w-5 h-5 accent-orange-500">
-              <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Є ліфт</span>
-            </label>
-          </div>
-        }
 
-        <div class="flex gap-3">
-          <button type="submit" class="px-8 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest">Зберегти адресу</button>
-          <button type="button" (click)="isAddingAddress.set(false)" class="px-8 py-3 bg-gray-100 text-gray-400 rounded-xl text-[9px] font-black uppercase tracking-widest">Скасувати</button>
-        </div>
-      </form>
-    } @else {
-      <div class="space-y-3">
-        @for (addr of userAddresses(); track addr.id) {
-          <div class="p-5 border border-gray-100 rounded-2xl flex justify-between items-center group">
-            <div>
-              <p class="font-black italic text-sm">{{ addr.deliveryService }} - {{ addr.deliveryType }}</p>
-              <p class="text-gray-500 text-[11px] mt-1">
-                {{ addr.city }}, {{ addr.region }} 
-                @if (addr.warehouseNumber) { | №{{ addr.warehouseNumber }} }
-                @if (addr.street) { | {{ addr.street }}, {{ addr.building }} }
-              </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input [(ngModel)]="newAddress.region" name="region" placeholder="Область"
+                class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+              <input [(ngModel)]="newAddress.city" name="city" placeholder="Місто/Село"
+                class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
             </div>
-         <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
 
-  <button (click)="startEditAddress(addr)" class="p-2 text-orange-500 hover:bg-orange-50 rounded-xl transition">
-    <span class="text-[10px] font-black uppercase tracking-widest">Редагувати</span>
-  </button>
-  <button (click)="removeAddress(addr.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-xl transition">
-    <span class="text-[10px] font-black uppercase tracking-widest">Видалити</span>
-  </button>
-</div>
+            @if (newAddress.deliveryType === 'Warehouse' || newAddress.deliveryType === 'Postomaten') {
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2">
+                {{ newAddress.deliveryType === 'Postomaten' ? 'Номер поштомату' : 'Номер відділення' }}
+              </label>
+              <input [(ngModel)]="newAddress.warehouseNumber" name="warehouseNumber" placeholder="№"
+                class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+            </div>
+            }
+
+            @if (newAddress.deliveryType === 'Courier') {
+            <div class="space-y-4 pt-2">
+              <input [(ngModel)]="newAddress.street" name="street" placeholder="Вулиця"
+                class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+              <div class="grid grid-cols-3 gap-3">
+                <input [(ngModel)]="newAddress.building" name="building" placeholder="Будівля"
+                  class="px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+                <input [(ngModel)]="newAddress.floor" name="floor" placeholder="Поверх"
+                  class="px-4 py-3 bg-gray-50 rounded-xl border-none text-sm font-bold">
+              </div>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="newAddress.hasElevator" name="hasElevator"
+                  class="w-5 h-5 accent-orange-500">
+                <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Є ліфт</span>
+              </label>
+            </div>
+            }
+
+            <div class="flex gap-3">
+              <button type="submit"
+                class="px-8 py-3 bg-orange-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest">Зберегти
+                адресу</button>
+              <button type="button" (click)="isAddingAddress.set(false)"
+                class="px-8 py-3 bg-gray-100 text-gray-400 rounded-xl text-[9px] font-black uppercase tracking-widest">Скасувати</button>
+            </div>
+          </form>
+          } @else {
+          <div class="space-y-3">
+            @for (addr of userAddresses(); track addr.id) {
+            <div class="p-5 border border-gray-100 rounded-2xl flex justify-between items-center group">
+              <div>
+                <p class="font-black italic text-sm">{{ addr.deliveryService }} - {{ addr.deliveryType }}</p>
+                <p class="text-gray-500 text-[11px] mt-1">
+                  {{ addr.city }}, {{ addr.region }}
+                  @if (addr.warehouseNumber) { | №{{ addr.warehouseNumber }} }
+                  @if (addr.street) { | {{ addr.street }}, {{ addr.building }} }
+                </p>
+              </div>
+              <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+
+                <button (click)="startEditAddress(addr)"
+                  class="p-2 text-orange-500 hover:bg-orange-50 rounded-xl transition">
+                  <span class="text-[10px] font-black uppercase tracking-widest">Редагувати</span>
+                </button>
+                <button (click)="removeAddress(addr.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-xl transition">
+                  <span class="text-[10px] font-black uppercase tracking-widest">Видалити</span>
+                </button>
+              </div>
+            </div>
+            }
           </div>
+          }
+        </div>
         }
-      </div>
-    }
-  </div>
-}
       </main>
 
     </div>
@@ -537,96 +573,110 @@
 
 
   @if (isOrderModalOpen()) {
-<div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-  <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl animate-in fade-in zoom-in duration-300">
-    <div class="flex justify-between items-center mb-6">
-      <h3 class="text-xl font-black italic uppercase tracking-tighter">Замовлення розпису</h3>
-      <button (click)="isOrderModalOpen.set(false)" class="text-gray-400 hover:text-black">✕</button>
-    </div>
-
-    <div class="space-y-6">
-      <div>
-        <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-3">Оберіть розмір</label>
-        <div class="flex flex-wrap gap-2">
-         @for (s of ['XS', 'S', 'M', 'L', 'XL']; track s) {
-  <button 
-    (click)="updateOrderSize(s)" 
-    [class]="orderCustomDetails().size === s ? 'bg-black text-white border-black' : 'bg-white text-gray-400 border-gray-200'"
-    class="w-10 h-10 rounded-xl border text-[10px] font-bold transition-all">
-    {{s}}
-  </button>
-}
-        </div>
+  <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl animate-in fade-in zoom-in duration-300">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-black italic uppercase tracking-tighter">Замовлення розпису</h3>
+        <button (click)="isOrderModalOpen.set(false)" class="text-gray-400 hover:text-black">✕</button>
       </div>
 
-      <div>
-        <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-3">Побажання до дизайну</label>
-        <textarea 
-          [(ngModel)]="orderCustomDetails().comments"
-          placeholder="Наприклад: 'Хочу трохи менше синього' або 'Додайте маленьке серце на рукаві'..."
-          class="w-full p-4 bg-gray-50 border-none rounded-2xl text-xs font-medium focus:ring-2 focus:ring-orange-500 min-h-[100px] resize-none"
-        ></textarea>
-      </div>
-
-      <button (click)="confirmOrder()"
-              class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-[1.02] transition shadow-lg shadow-orange-100">
-       Додати до кошика ✨
-      </button>
-    </div>
-  </div>
-</div>
-}
-
-@if (isOrderDetailsOpen() && selectedOrder(); as order) {
-  <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" (click)="closeOrderDetails()">
-    <div class="bg-white w-full max-w-4xl rounded-[3rem] overflow-hidden shadow-2xl flex flex-col md:flex-row animate-in zoom-in duration-300" (click)="$event.stopPropagation()">
-      
-     <div class="w-full md:w-1/2 bg-gray-50 p-10 overflow-y-auto max-h-[80vh]">
-  <h3 class="text-xl font-black italic uppercase tracking-tighter mb-8">Товари у замовленні</h3>
-  <div class="space-y-6">
-    @for (item of order.items; track item.id) {
-      <div (click)="navigateToProduct(item)"
-           class="flex gap-4 p-4 bg-white rounded-3xl border border-gray-100 shadow-sm cursor-pointer hover:border-black hover:shadow-md transition-all duration-300 group/card relative">
-        
-        <div class="flex gap-2 flex-shrink-0">
-          <div class="w-20 h-20 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 relative flex-shrink-0">
-            <img [src]="getImg(item.frontImageUrl || item.imageUrl)" class="w-full h-full object-cover">
-            @if (item.type === 'manual-design') {
-              <span class="absolute bottom-1 left-1 bg-black/60 text-[7px] text-white font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">Front</span>
+      <div class="space-y-6">
+        <div>
+          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-3">Оберіть розмір</label>
+          <div class="flex flex-wrap gap-2">
+            @for (s of ['XS', 'S', 'M', 'L', 'XL']; track s) {
+            <button (click)="updateOrderSize(s)"
+              [class]="orderCustomDetails().size === s ? 'bg-black text-white border-black' : 'bg-white text-gray-400 border-gray-200'"
+              class="w-10 h-10 rounded-xl border text-[10px] font-bold transition-all">
+              {{s}}
+            </button>
             }
           </div>
-
-          @if (item.type === 'manual-design' && item.backImageUrl) {
-            <div class="w-20 h-20 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 relative flex-shrink-0 animate-in zoom-in-95 duration-300">
-              <img [src]="getImg(item.backImageUrl)" class="w-full h-full object-cover">
-              <span class="absolute bottom-1 left-1 bg-orange-600 text-[7px] text-white font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">Back</span>
-            </div>
-          }
         </div>
 
-        <div class="flex-1 min-w-0">
-          <h4 class="text-sm font-black italic leading-tight truncate group-hover/card:text-orange-500 transition-colors">{{ item.name }}</h4>
-          <div class="flex gap-2 mt-1 flex-wrap">
-            <span class="text-[8px] font-black px-2 py-0.5 bg-orange-100 text-orange-600 rounded uppercase">{{ item.size }}</span>
-            <span class="text-[8px] font-black px-2 py-0.5 bg-gray-100 text-gray-500 rounded uppercase">К-сть: {{ item.quantity }}</span>
-            <span class="text-[8px] font-black px-2 py-0.5 bg-black text-white rounded uppercase">{{ item.type }}</span>
+        <div>
+          <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-3">Побажання до
+            дизайну</label>
+          <textarea [(ngModel)]="orderCustomDetails().comments"
+            placeholder="Наприклад: 'Хочу трохи менше синього' або 'Додайте маленьке серце на рукаві'..."
+            class="w-full p-4 bg-gray-50 border-none rounded-2xl text-xs font-medium focus:ring-2 focus:ring-orange-500 min-h-[100px] resize-none"></textarea>
+        </div>
+
+        <button (click)="confirmOrder()"
+          class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-[1.02] transition shadow-lg shadow-orange-100">
+          Додати до кошика ✨
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  @if (isOrderDetailsOpen() && selectedOrder(); as order) {
+  <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+    (click)="closeOrderDetails()">
+    <div
+      class="bg-white w-full max-w-4xl rounded-[3rem] overflow-hidden shadow-2xl flex flex-col md:flex-row animate-in zoom-in duration-300"
+      (click)="$event.stopPropagation()">
+
+      <div class="w-full md:w-1/2 bg-gray-50 p-10 overflow-y-auto max-h-[80vh]">
+        <h3 class="text-xl font-black italic uppercase tracking-tighter mb-8">Товари у замовленні</h3>
+        <div class="space-y-6">
+          @for (item of order.items; track item.id) {
+          <div (click)="navigateToProduct(item)"
+            class="flex gap-4 p-4 bg-white rounded-3xl border border-gray-100 shadow-sm cursor-pointer hover:border-black hover:shadow-md transition-all duration-300 group/card relative">
+
+            <div class="flex gap-2 flex-shrink-0">
+              <div
+                class="w-20 h-20 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 relative flex-shrink-0">
+                <img [src]="getImg(item.frontImageUrl || item.imageUrl)" class="w-full h-full object-cover">
+                @if (item.type === 'manual-design') {
+                <span
+                  class="absolute bottom-1 left-1 bg-black/60 text-[7px] text-white font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">Front</span>
+                }
+              </div>
+
+              @if (item.type === 'manual-design' && item.backImageUrl) {
+              <div
+                class="w-20 h-20 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 relative flex-shrink-0 animate-in zoom-in-95 duration-300">
+                <img [src]="getImg(item.backImageUrl)" class="w-full h-full object-cover">
+                <span
+                  class="absolute bottom-1 left-1 bg-orange-600 text-[7px] text-white font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">Back</span>
+              </div>
+              }
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <h4
+                class="text-sm font-black italic leading-tight truncate group-hover/card:text-orange-500 transition-colors">
+                {{ item.name }}</h4>
+              <div class="flex gap-2 mt-1 flex-wrap">
+                <span class="text-[8px] font-black px-2 py-0.5 bg-orange-100 text-orange-600 rounded uppercase">{{
+                  item.size }}</span>
+                <span class="text-[8px] font-black px-2 py-0.5 bg-gray-100 text-gray-500 rounded uppercase">К-сть: {{
+                  item.quantity }}</span>
+                <span class="text-[8px] font-black px-2 py-0.5 bg-black text-white rounded uppercase">{{ item.type
+                  }}</span>
+              </div>
+              @if (item.notes) {
+              <p class="text-[10px] text-gray-400 italic mt-2 leading-relaxed line-clamp-2">"{{ item.notes }}"</p>
+              }
+              <p class="text-sm font-black mt-2 text-gray-900">{{ item.price }} ₴</p>
+            </div>
           </div>
-          @if (item.notes) {
-            <p class="text-[10px] text-gray-400 italic mt-2 leading-relaxed line-clamp-2">"{{ item.notes }}"</p>
           }
-          <p class="text-sm font-black mt-2 text-gray-900">{{ item.price }} ₴</p>
         </div>
       </div>
-    }
-  </div>
-</div>
 
       <div class="w-full md:w-1/2 p-10 flex flex-col relative">
-        <button (click)="closeOrderDetails()" class="absolute top-8 right-8 text-gray-300 hover:text-black transition">✕</button>
-        
+        <button (click)="closeOrderDetails()"
+          class="absolute top-8 right-8 text-gray-300 hover:text-black transition">✕</button>
+
         <div class="mb-8">
-          <span class="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-black text-white rounded-full">Деталі замовлення</span>
-          <h2 class="text-3xl font-black italic uppercase tracking-tighter mt-4 leading-tight">Замовлення №{{ order.id }}</h2>
+          <span
+            class="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-black text-white rounded-full">Деталі
+            замовлення</span>
+          <h2 class="text-3xl font-black italic uppercase tracking-tighter mt-4 leading-tight">Замовлення №{{ order.id
+            }}</h2>
           <p class="text-xs text-gray-400 font-bold mt-1 uppercase">{{ order.createdAt | date:'medium' }}</p>
         </div>
 
@@ -639,7 +689,8 @@
               <p class="text-[11px] font-bold text-gray-500 uppercase mt-1 leading-relaxed">
                 {{ shipping.region }}<br>
                 @if (shipping.deliveryType === 'Warehouse') { №{{ shipping.warehouseNumber }} }
-                @else { {{ shipping.street }}, {{ shipping.building }} @if(shipping.apartment){, apt. {{shipping.apartment}} } }
+                @else { {{ shipping.street }}, {{ shipping.building }} @if(shipping.apartment){, apt.
+                {{shipping.apartment}} } }
               </p>
             </div>
           </div>
@@ -659,28 +710,31 @@
           </div>
         </div>
 
-        <button (click)="closeOrderDetails()" 
-                class="mt-10 w-full py-4 bg-black text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-gray-800 transition">
+        <button (click)="closeOrderDetails()"
+          class="mt-10 w-full py-4 bg-black text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-gray-800 transition">
           Закрити
         </button>
       </div>
     </div>
   </div>
-}
+  }
 
-@if (toastMessage()) {
-    <div class="fixed bottom-10 right-10 z-[200] animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div class="flex items-center gap-4 rounded-3xl px-6 py-4 text-xs font-black uppercase tracking-wider border shadow-2xl backdrop-blur-md"
-           [ngClass]="toastType() === 'success' ? 'bg-green-50/90 text-green-700 border-green-200' : 'bg-red-50/90 text-red-700 border-red-200'">
-        
-        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm text-sm transform scale-100 animate-pulse">
-          {{ toastType() === 'success' ? '✓' : '!' }}
-        </span>
-        
-        <span class="leading-relaxed max-w-xs">{{ toastMessage() }}</span>
-        
-        <button (click)="toastMessage.set(null)" class="text-gray-400 hover:text-black transition-colors ml-2 text-[10px]">✕</button>
-      </div>
+  @if (toastMessage()) {
+  <div class="fixed bottom-10 right-10 z-[200] animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div
+      class="flex items-center gap-4 rounded-3xl px-6 py-4 text-xs font-black uppercase tracking-wider border shadow-2xl backdrop-blur-md"
+      [ngClass]="toastType() === 'success' ? 'bg-green-50/90 text-green-700 border-green-200' : 'bg-red-50/90 text-red-700 border-red-200'">
+
+      <span
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm text-sm transform scale-100 animate-pulse">
+        {{ toastType() === 'success' ? '✓' : '!' }}
+      </span>
+
+      <span class="leading-relaxed max-w-xs">{{ toastMessage() }}</span>
+
+      <button (click)="toastMessage.set(null)"
+        class="text-gray-400 hover:text-black transition-colors ml-2 text-[10px]">✕</button>
     </div>
+  </div>
   }
 </div>

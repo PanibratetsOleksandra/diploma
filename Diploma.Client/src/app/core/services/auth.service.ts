@@ -3,23 +3,12 @@ import { Observable, tap } from 'rxjs';
 import { ApiService } from './api.service';
 import { AuthResponse, LoginRequest } from '../models/auth.model';
 import { jwtDecode } from 'jwt-decode';
-
-interface DecodedToken {
-  nameid: string;
-  email: string;
-  fullName: string;
-  role: string | string[];
-  exp: number;
-}
+import { DecodedToken } from '../models/decoded-token.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private api = inject(ApiService);
-  
-  // Зберігаємо сирий рядок токена
   currentUserToken = signal<string | null>(localStorage.getItem('token'));
-
-  // Обчислювальний Signal (computed), який автоматично розшифровує токен
   currentUser = computed(() => {
     const token = this.currentUserToken();
     if (!token) return null;
@@ -27,7 +16,7 @@ export class AuthService {
     try {
       const decoded = jwtDecode<DecodedToken>(token);
       
-      // Перевіряємо, чи не прострочений токен (exp у секундах)
+
       const isExpired = Math.floor(Date.now() / 1000) >= decoded.exp;
       if (isExpired) {
         this.logout();
@@ -38,11 +27,11 @@ export class AuthService {
         id: decoded.nameid,
         email: decoded.email,
         fullName: decoded.fullName,
-        // Перетворюємо ролі в масив, бо Identity може слати як один рядок, так і список
+       
         roles: Array.isArray(decoded.role) ? decoded.role : [decoded.role]
       };
     } catch (error) {
-      console.error('Помилка декодування токена: - auth.service.ts:45', error);
+      console.error('Помилка декодування токена: - auth.service.ts:34', error);
       return null;
     }
   });
@@ -76,7 +65,6 @@ export class AuthService {
   isAdmin(): boolean {
     const user = this.currentUser();
     if (!user || !user.roles) return false;
-    
     return user.roles.some(role => role.toLowerCase() === 'admin');
   }
 

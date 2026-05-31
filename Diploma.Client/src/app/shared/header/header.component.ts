@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -14,18 +14,20 @@ import { ImageService } from '../../core/services/image.service';
 })
 export class HeaderComponent {
   public authService = inject(AuthService);
-  public cartService = inject(CartService); // Додаємо цей рядок
+  public cartService = inject(CartService);
   private router = inject(Router);
-public imageService = inject(ImageService);
+  public imageService = inject(ImageService);
+  isMenuOpen = signal(false);
   logout() {
     this.authService.logout();
     this.router.navigate(['/']);
+    this.isMenuOpen.set(false);
   }
 
-
   navigateToDashboard() {
+    this.isMenuOpen.set(false);
     const user = this.authService.currentUser();
-    
+
     if (!user) {
       this.router.navigate(['/login']);
       return;

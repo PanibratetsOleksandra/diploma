@@ -1,4 +1,5 @@
-﻿using diploma.core.Entities;
+﻿using diploma.core;
+using diploma.core.Entities;
 using diploma.dal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ public class NewsletterController : ControllerBase
     }
 
     [HttpGet("subscribers")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.ADMIN)]
     public async Task<IActionResult> GetSubscribers()
     {
         var list = await _context.NewsletterSubscribers

@@ -26,11 +26,11 @@ namespace diploma.api.Controllers
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-                // Шлях до нової папки для ручних дизайнів
+   
                 var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/user-designs");
                 if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 
-                // Функція для збереження сторін
+                
                 async Task<string> SaveSideImage(string base64, string side)
                 {
                     if (string.IsNullOrEmpty(base64)) return string.Empty;
@@ -45,11 +45,11 @@ namespace diploma.api.Controllers
                     return $"/images/user-designs/{fileName}";
                 }
 
-                // Зберігаємо обидві сторони
+           
                 var frontPath = await SaveSideImage(request.FrontBase64, "front");
                 var backPath = await SaveSideImage(request.BackBase64, "back");
 
-                // Створюємо запис у базі
+        
                 var userDesign = new UserDesign
                 {
                     UserId = userId,
@@ -93,7 +93,7 @@ namespace diploma.api.Controllers
             if (design == null) return NotFound();
             if (design.UserId != userId) return Forbid();
 
-            // Видаляємо файли з сервера
+      
             void DeleteFile(string? path)
             {
                 if (string.IsNullOrEmpty(path)) return;
@@ -111,7 +111,6 @@ namespace diploma.api.Controllers
         }
     }
 
-    // DTO для запиту
     public class SaveManualRequest
     {
         public string FrontBase64 { get; set; } = null!;

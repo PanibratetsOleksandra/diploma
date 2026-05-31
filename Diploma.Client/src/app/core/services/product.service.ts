@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { ApiService } from './api.service';
-import { Product } from '../../data/product.model';
+import { Product } from '../models/product.model';
 import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -25,11 +25,10 @@ uploadImages(formData: FormData): Observable<string[]> {
     );
   }
 
-  // --- НОВИЙ МЕТОД ДЛЯ РЕДАГУВАННЯ ---
   updateProduct(id: number, product: Partial<Product>): Observable<Product> {
     return this.api.put<Product>(`products/${id}`, product).pipe(
       tap(updatedProduct => {
-        // Оновлюємо товар у списку Signal локально
+   
         this.products.update(prev => 
           prev.map(p => p.id === id ? { ...p, ...updatedProduct } : p)
         );
@@ -44,4 +43,5 @@ uploadImages(formData: FormData): Observable<string[]> {
       })
     );
   }
+  
 }

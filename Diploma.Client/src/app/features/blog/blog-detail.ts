@@ -1,31 +1,30 @@
 // blog-detail.component.ts
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { BlogService, Article } from '../../core/services/blog.service';
+import { ActivatedRoute} from '@angular/router';
+import { BlogService } from '../../core/services/blog.service';
+import { Article } from '../../core/models/article.model';
 import { ImageService } from '../../core/services/image.service';
 
 @Component({
   selector: 'app-blog-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './blog-detail.html' // переконайся, що назва шаблону збігається
+  imports: [CommonModule],
+  templateUrl: './blog-detail.html'
 })
 export class BlogDetailComponent implements OnInit {
-   public imageService = inject(ImageService);
+  public imageService = inject(ImageService);
   private route = inject(ActivatedRoute);
   private location = inject(Location);
   private blogService = inject(BlogService);
 
-  // Сигнал для збереження завантаженої статті
   article = signal<Article | null>(null);
 
-  // Допоміжні сигнали для розпарсених списків
   parsedParagraphs = signal<string[]>([]);
   parsedBullets = signal<string[]>([]);
 
   ngOnInit() {
-    // Зчитуємо ID статті з URL-маршруту
+
     const articleId = Number(this.route.snapshot.paramMap.get('id'));
 
     if (articleId) {
@@ -35,16 +34,16 @@ export class BlogDetailComponent implements OnInit {
           this.parseContent(data);
         },
         error: (err) => {
-          console.error('Помилка завантаження детальних даних статті: - blog-detail.ts:38', err);
+          console.error('Помилка завантаження детальних даних статті: - blog-detail.ts:36', err);
         }
       });
     }
   }
 
-  // Метод перетворення рядка з роздільником "|" у масив для відображення в HTML
+
   private parseContent(item: Article) {
     if (item.paragraphsText) {
-      // Розбиваємо текст на масив абзаців за символом '|'
+
       const paragraphs = item.paragraphsText
         .split('|')
         .map(p => p.trim())
@@ -55,7 +54,7 @@ export class BlogDetailComponent implements OnInit {
     }
 
     if (item.bulletsText) {
-      // Розбиваємо список порад за символом '|'
+
       const bullets = item.bulletsText
         .split('|')
         .map(b => b.trim())
@@ -64,6 +63,15 @@ export class BlogDetailComponent implements OnInit {
     } else {
       this.parsedBullets.set([]);
     }
+  }
+
+  getCategoryLabel(category: string): string {
+    const map: Record<string, string> = {
+      'Care Tips': 'Поради з догляду',
+      'Inspiration': 'Натхнення',
+      'Behind the Scenes': 'Залаштунки процесу',
+    };
+    return map[category] ?? category;
   }
 
   goBack() {

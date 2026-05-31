@@ -10,9 +10,7 @@ import { FooterComponent } from './shared/footer/footer.component';
     HeaderComponent, 
     FooterComponent
   ],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  templateUrl: './app.html'
 })
 export class App {
-  protected readonly title = signal('Diploma.Client');
 }

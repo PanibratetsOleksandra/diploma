@@ -8,19 +8,19 @@ namespace diploma.core.Entities
     {
         public int Id { get; set; }
         public string? UserId { get; set; }
-        public string AddressName { get; set; } = "Main Address"; // Назва (Дім, Робота)
+        public string AddressName { get; set; } = "Main Address"; 
 
-        public string DeliveryService { get; set; } = "NovaPoshta"; // NovaPoshta, UkrPoshta
-        public string DeliveryType { get; set; } = "Warehouse"; // Warehouse, Postomaten, Courier
+        public string DeliveryService { get; set; } = "NovaPoshta"; 
+        public string DeliveryType { get; set; } = "Warehouse"; 
 
-        // Загальні поля
+ 
         public string Region { get; set; } = null!;
         public string City { get; set; } = null!;
 
-        // Поля для відділень/поштоматів
+     
         public string? WarehouseNumber { get; set; }
 
-        // Поля для кур'єра
+   
         public string? Street { get; set; }
         public string? Building { get; set; }
         public string? Floor { get; set; }
