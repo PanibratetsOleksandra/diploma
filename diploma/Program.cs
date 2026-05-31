@@ -1,6 +1,4 @@
-﻿using diploma.business.Extensions;
-using diploma.business.Services;
-using diploma.dal;
+﻿using diploma.dal;
 using diploma;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,7 +24,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.RegisterBusinessDependecies(builder.Configuration);
 builder.Services.RegisterDataDependecies(builder.Configuration);
 
 builder.Services.AddAuthentication(options =>
@@ -64,7 +61,6 @@ builder.Services.AddControllers()
             .Add(new JsonStringEnumConverter());
     });
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<ProductService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

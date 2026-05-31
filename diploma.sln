@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "diploma.dal", "diploma.dal\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "diploma.core", "diploma.core\diploma.core.csproj", "{63B4AC79-445D-4262-B8AB-87810A5DDC3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "diploma.business", "diploma.business\diploma.business.csproj", "{761B3BCB-E578-43A7-AB05-84C3E0FC407C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{63B4AC79-445D-4262-B8AB-87810A5DDC3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63B4AC79-445D-4262-B8AB-87810A5DDC3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63B4AC79-445D-4262-B8AB-87810A5DDC3A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{761B3BCB-E578-43A7-AB05-84C3E0FC407C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{761B3BCB-E578-43A7-AB05-84C3E0FC407C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{761B3BCB-E578-43A7-AB05-84C3E0FC407C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{761B3BCB-E578-43A7-AB05-84C3E0FC407C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

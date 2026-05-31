@@ -158,18 +158,8 @@ namespace diploma.api.Controllers
 
                 article.ImageUrl = $"/images/blog/{uniqueFileName}";
             }
-            
-
             await _context.SaveChangesAsync();
             return Ok(article);
         }
-
-
-
     }
-
-
-
-
-
 }

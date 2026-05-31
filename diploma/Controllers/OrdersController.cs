@@ -19,42 +19,42 @@ namespace diploma.api.Controllers
             _context = context;
         }
 
-  
+
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] Order order)
         {
 
             order.UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-    
+
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-        
+
             if (order.Items != null && order.Items.Any())
             {
                 foreach (var item in order.Items)
                 {
-           
+
                     if (item.Type == "product")
                     {
-            
+
                         var shopProduct = await _context.Products
                             .FirstOrDefaultAsync(p => p.Name == item.Name);
 
                         if (shopProduct != null)
                         {
-                  
+
                             _context.Products.Remove(shopProduct);
                         }
                     }
                 }
 
-          
+
                 await _context.SaveChangesAsync();
             }
 
-         
+
             return Ok(new { id = order.Id });
         }
 
@@ -75,12 +75,12 @@ namespace diploma.api.Controllers
         }
 
         [HttpGet]
-        [Authorize] 
+        [Authorize]
         public async Task<IActionResult> GetAllOrders()
         {
             var orders = await _context.Orders
-                .Include(o => o.Items) 
-                .OrderByDescending(o => o.CreatedAt) 
+                .Include(o => o.Items)
+                .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 
             return Ok(orders);
@@ -89,8 +89,8 @@ namespace diploma.api.Controllers
         [HttpPut("{id}/status")]
         [Authorize]
         public async Task<IActionResult> UpdateOrderStatus(
-     int id,
-     [FromBody] UpdateOrderStatusRequest request)
+            int id,
+            [FromBody] UpdateOrderStatusRequest request)
         {
             var order = await _context.Orders.FindAsync(id);
 

@@ -1,6 +1,4 @@
-﻿
-using diploma.business.Services;
-using diploma.core;
+﻿using diploma.core;
 using diploma.core.DTOs;
 using diploma.core.Entities;
 using Microsoft.AspNetCore.Identity;

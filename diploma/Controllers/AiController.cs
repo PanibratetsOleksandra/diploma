@@ -7,8 +7,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
-
-
 namespace diploma.api.Controllers
 {
     [ApiController]
@@ -224,15 +222,10 @@ namespace diploma.api.Controllers
         }
 
         public class TranslateRequest { public string Text { get; set; } = null!; }
-
     }
-
     public class AiRequest
     {
         public string Vision { get; set; } = string.Empty;
     }
-
-
-
     }
 

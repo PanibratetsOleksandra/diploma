@@ -64,15 +64,10 @@ namespace diploma.api.Controllers
         public async Task<IActionResult> UpdateProduct(int id, Product product)
         {
             if (id != product.Id) return BadRequest();
-
-   
             var dbProduct = await _context.Products
                 .Include(p => p.Photos)
                 .FirstOrDefaultAsync(p => p.Id == id);
-
             if (dbProduct == null) return NotFound();
-
-        
             _context.Entry(dbProduct).CurrentValues.SetValues(product);
             dbProduct.AvailableSizes = product.AvailableSizes; 
 
