@@ -37,24 +37,28 @@ Backend
  Інструкція
 
 1. Клонування репозиторію
+gh repo clone PanibratetsOleksandra/diploma
+Або якщо використовуєте звичайний Git:
+git clone https://github.com/PanibratetsOleksandra/diploma.git
 
-2. Запуск бекенду (.NET)
+3. Запуск бекенду (.NET)
    cd diploma
    dotnet restore
    dotnet run
    Сервер запуститься за адресою: https://localhost:7001 та http://localhost:5000
 
-3. Запуск фронтенду (Angular)
+4. Запуск фронтенду (Angular)
    cd diploma.client
    npm install
    ng serve
    Додаток буде доступний за адресою: http://localhost:4200
 
-4. Реєстрація першого адміністратора
+5. Реєстрація першого адміністратора
    - Після запуску системи зареєструйте нового користувача
    - У базі даних вручну призначте йому роль Admin (або через Seed)
 
  Структура проекту
+<img width="471" height="169" alt="image" src="https://github.com/user-attachments/assets/a07bfe67-95e7-415c-a22e-257bd284b825" />
 
 
 diploma/                     # Backend (.NET 9)
