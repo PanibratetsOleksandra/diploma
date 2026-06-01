@@ -61,15 +61,6 @@ git clone https://github.com/PanibratetsOleksandra/diploma.git
 <img width="471" height="169" alt="image" src="https://github.com/user-attachments/assets/a07bfe67-95e7-415c-a22e-257bd284b825" />
 
 
-diploma/                     # Backend (.NET 9)
-├── diploma.core/            # Сутності, DTO, Enums, Constants
-├── diploma.dal/             # Доступ до даних (AppDbContext, міграції)
-└── diploma/                 # Web API (контролери, Program.cs)
-
-diploma.client/              # Frontend (Angular 19)
-├── core/                    # Сервіси, моделі
-└── features/                # Сторінки (admin, designer, profile, shop)
-
 Ліцензія
 
 Проєкт виконано в рамках кваліфікаційної роботи бакалавра. Всі права захищено.
