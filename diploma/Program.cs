@@ -1,6 +1,5 @@
 ﻿using diploma.dal;
 using diploma;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
