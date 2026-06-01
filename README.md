@@ -58,6 +58,7 @@ git clone https://github.com/PanibratetsOleksandra/diploma.git
    - У базі даних вручну призначте йому роль Admin (або через Seed)
 
  Структура проекту
+ 
 <img width="471" height="169" alt="image" src="https://github.com/user-attachments/assets/a07bfe67-95e7-415c-a22e-257bd284b825" />
 
 
